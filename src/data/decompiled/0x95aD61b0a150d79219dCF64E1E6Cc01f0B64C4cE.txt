@@ -1,0 +1,143 @@
+# Palkeoramix decompiler. 
+
+def storage:
+  balanceOf is mapping of uint256 at storage 0
+  allowance is mapping of uint256 at storage 1
+  totalSupply is uint256 at storage 2
+  name is array of uint256 at storage 3
+  symbol is array of uint256 at storage 4
+  decimals is uint8 at storage 5
+
+def name(): # not payable
+  return name[0 len name.length]
+
+def totalSupply(): # not payable
+  return totalSupply
+
+def decimals(): # not payable
+  return decimals
+
+def balanceOf(address account): # not payable
+  require calldata.size - 4 >= 32
+  return balanceOf[address(account)]
+
+def symbol(): # not payable
+  return symbol[0 len symbol.length]
+
+def allowance(address owner, address spender): # not payable
+  require calldata.size - 4 >= 64
+  return allowance[address(owner)][address(spender)]
+
+#
+#  Regular functions
+#
+
+def _fallback(?) payable: # default function
+  revert
+
+def approve(address spender, uint256 amount): # not payable
+  require calldata.size - 4 >= 64
+  if not caller:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: approve from the zero address'
+  if not spender:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: approve to the zero address'
+  allowance[caller][address(spender)] = amount
+  log Approval(
+        address owner=amount,
+        address spender=caller,
+        uint256 value=spender)
+  return 1
+
+def burn(uint256 _value): # not payable
+  require calldata.size - 4 >= 32
+  if not caller:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: burn from the zero address'
+  if _value > totalSupply:
+      revert with 0, 'SafeMath: subtraction overflow'
+  totalSupply -= _value
+  if _value > balanceOf[caller]:
+      revert with 0, 'SafeMath: subtraction overflow'
+  balanceOf[caller] -= _value
+  log Transfer(
+        address from=_value,
+        address to=caller,
+        uint256 value=0)
+
+def decreaseAllowance(address spender, uint256 subtractedValue): # not payable
+  require calldata.size - 4 >= 64
+  if subtractedValue > allowance[caller][address(spender)]:
+      revert with 0, 'SafeMath: subtraction overflow'
+  if not caller:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: approve from the zero address'
+  if not spender:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: approve to the zero address'
+  allowance[caller][address(spender)] -= subtractedValue
+  log Approval(
+        address owner=(allowance[caller][address(spender)] - subtractedValue),
+        address spender=caller,
+        uint256 value=spender)
+  return 1
+
+def increaseAllowance(address spender, uint256 addedValue): # not payable
+  require calldata.size - 4 >= 64
+  if allowance[caller][address(spender)] + addedValue < allowance[caller][address(spender)]:
+      revert with 0, 'SafeMath: addition overflow'
+  if not caller:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: approve from the zero address'
+  if not spender:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: approve to the zero address'
+  allowance[caller][address(spender)] += addedValue
+  log Approval(
+        address owner=(allowance[caller][address(spender)] + addedValue),
+        address spender=caller,
+        uint256 value=spender)
+  return 1
+
+def transfer(address recipient, uint256 amount): # not payable
+  require calldata.size - 4 >= 64
+  if not caller:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: transfer from the zero address'
+  if not recipient:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: transfer to the zero address'
+  if amount > balanceOf[caller]:
+      revert with 0, 'SafeMath: subtraction overflow'
+  balanceOf[caller] -= amount
+  if balanceOf[address(recipient)] + amount < balanceOf[address(recipient)]:
+      revert with 0, 'SafeMath: addition overflow'
+  balanceOf[address(recipient)] += amount
+  log Transfer(
+        address from=amount,
+        address to=caller,
+        uint256 value=recipient)
+  return 1
+
+def transferFrom(address sender, address recipient, uint256 amount): # not payable
+  require calldata.size - 4 >= 96
+  if not sender:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: transfer from the zero address'
+  if not recipient:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: transfer to the zero address'
+  if amount > balanceOf[address(sender)]:
+      revert with 0, 'SafeMath: subtraction overflow'
+  balanceOf[address(sender)] -= amount
+  if balanceOf[address(recipient)] + amount < balanceOf[address(recipient)]:
+      revert with 0, 'SafeMath: addition overflow'
+  balanceOf[address(recipient)] += amount
+  log Transfer(
+        address from=amount,
+        address to=sender,
+        uint256 value=recipient)
+  if amount > allowance[address(sender)][caller]:
+      revert with 0, 'SafeMath: subtraction overflow'
+  if not sender:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: approve from the zero address'
+  if not caller:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: approve to the zero address'
+  allowance[address(sender)][caller] -= amount
+  log Approval(
+        address owner=(allowance[address(sender)][caller] - amount),
+        address spender=sender,
+        uint256 value=caller)
+  return 1
+
+

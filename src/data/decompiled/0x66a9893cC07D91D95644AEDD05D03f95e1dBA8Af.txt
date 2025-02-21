@@ -1,0 +1,9 @@
+# Palkeoramix decompiler. 
+
+def _fallback(?) payable: # default function
+  require calldata.size < 4
+  require not calldata.size
+  if 0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2 != caller:
+      require caller == 0x4444c5dc75cb358380d2e3de08a90
+
+

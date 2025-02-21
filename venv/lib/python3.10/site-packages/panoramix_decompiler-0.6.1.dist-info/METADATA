@@ -1,0 +1,16 @@
+Metadata-Version: 2.1
+Name: panoramix-decompiler
+Version: 0.6.1
+Summary: A python decompiler for the EVM.
+Author: palkeo
+Author-email: panoramix@palkeo.com
+Requires-Python: >=3.9,<4
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Requires-Dist: appdirs (>=1.4,<2.0)
+Requires-Dist: coloredlogs (>=15,<16)
+Requires-Dist: requests (>=2,<3)
+Requires-Dist: timeout_decorator (>=0.5,<0.6)
+Requires-Dist: web3 (==6.0.0-beta.8)

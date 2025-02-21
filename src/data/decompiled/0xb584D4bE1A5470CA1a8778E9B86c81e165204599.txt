@@ -1,0 +1,368 @@
+# Palkeoramix decompiler. 
+
+def storage:
+  paused is uint8 at storage 0 offset 160
+  stor0 is uint128 at storage 0 offset 160
+  owner is address at storage 0
+  chainData is mapping of struct at storage 1
+  stor2 is mapping of uint8 at storage 2
+  stor3 is mapping of uint8 at storage 3
+
+def processedHashes(bytes32 _param1): # not payable
+  require calldata.size - 4 >=′ 32
+  require _param1 == _param1
+  return bool(stor2[_param1])
+
+def chainConfig(uint256 _param1): # not payable
+  require calldata.size - 4 >=′ 32
+  require _param1 == _param1
+  return chainData[_param1].field_0, bool(chainData[_param1].field_256)
+
+def paused(): # not payable
+  return bool(paused)
+
+def owner(): # not payable
+  return owner
+
+def senders(address _param1): # not payable
+  require calldata.size - 4 >=′ 32
+  require _param1 == _param1
+  return bool(stor3[_param1])
+
+def getChainData(uint256 chainId): # not payable
+  require calldata.size - 4 >=′ 32
+  require chainId == chainId
+  return chainData[chainId].field_0, bool(chainData[chainId].field_256)
+
+#
+#  Regular functions
+#
+
+def _fallback(?) payable: # default function
+  revert
+
+def renounceOwnership(): # not payable
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  owner = 0
+  log OwnershipTransferred(
+        address previousOwner=owner,
+        address newOwner=0)
+
+def setPause(): # not payable
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  if paused:
+      revert with 0, 'Pausable: paused'
+  stor0 = 1
+  log Paused(address account=caller)
+  return bool(paused)
+
+def setUnPause(): # not payable
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  if not paused:
+      revert with 0, 'Pausable: not paused'
+  stor0 = 0
+  log Unpaused(address account=caller)
+  return bool(paused)
+
+def grantSenderRole(address sender): # not payable
+  require calldata.size - 4 >=′ 32
+  require sender == sender
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  stor3[address(sender)] = 1
+  log GrantSender(address sender=sender)
+
+def revokeSenderRole(address sender): # not payable
+  require calldata.size - 4 >=′ 32
+  require sender == sender
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  stor3[address(sender)] = 0
+  log RevokeSender(address sender=sender)
+
+def setIsEnabled(uint256 chainId, bool _isEnabled): # not payable
+  require calldata.size - 4 >=′ 64
+  require chainId == chainId
+  require _isEnabled == _isEnabled
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  chainData[chainId].field_256 = uint8(_isEnabled)
+  return bool(chainData[chainId].field_256)
+
+def withdrawFullBalance(address _to): # not payable
+  require calldata.size - 4 >=′ 32
+  require _to == _to
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  call _to with:
+     value eth.balance(this.address) wei
+       gas gas_remaining wei
+  if not ext_call.success:
+      revert with 0, 'Failed to send Ether'
+  log Withdrawal(
+        address src=eth.balance(this.address),
+        uint256 wad=_to)
+
+def transferOwnership(address newOwner): # not payable
+  require calldata.size - 4 >=′ 32
+  require newOwner == newOwner
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  if not newOwner:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'Ownable: new owner is the zero address'
+  owner = newOwner
+  log OwnershipTransferred(
+        address previousOwner=owner,
+        address newOwner=newOwner)
+
+def withdrawBalance(address token, uint256 amount): # not payable
+  require calldata.size - 4 >=′ 64
+  require token == token
+  require amount == amount
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  call token with:
+     value amount wei
+       gas gas_remaining wei
+  if not ext_call.success:
+      revert with 0, 'Failed to send Ether'
+  log Withdrawal(
+        address src=amount,
+        uint256 wad=token)
+
+def depositNativeToken(uint256 destinationChainId, address _to) payable: 
+  require calldata.size - 4 >=′ 64
+  require destinationChainId == destinationChainId
+  require _to == _to
+  if paused:
+      revert with 0, 'Pausable: paused'
+  if not chainData[destinationChainId].field_256:
+      revert with 0, 'Chain is currently disabled'
+  log Deposit(
+        address user=call.value,
+        uint256 pid=_to,
+        uint256 amount=destinationChainId)
+
+def addRoutes(tuple[] _routes): # not payable
+  require calldata.size - 4 >=′ 32
+  require _routes <= LOCK8605463013()
+  require _routes + 35 <′ calldata.size
+  require _routes.length <= LOCK8605463013()
+  require _routes + (64 * _routes.length) + 36 <= calldata.size
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  idx = 0
+  while idx < _routes.length:
+      mem[0] = cd[((64 * idx) + _routes + 36)]
+      mem[32] = 1
+      require cd[((64 * idx) + _routes + 36)] == cd[((64 * idx) + _routes + 36)]
+      chainData[cd[((64 * idx) + _routes + 36)]].field_0 = cd[((64 * idx) + _routes + 36)]
+      require cd[((64 * idx) + _routes + 68)] == bool(cd[((64 * idx) + _routes + 68)])
+      chainData[cd[((64 * idx) + _routes + 36)]].field_256 = uint8(bool(cd[((64 * idx) + _routes + 68)]))
+      if idx == -1:
+          revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+      idx = idx + 1
+      continue 
+
+def sendNativeToken(address receiver, uint256 amount, bytes32 srcChainTxHash, uint256 perUserGasAmount, uint256 maxLimit): # not payable
+  require calldata.size - 4 >=′ 160
+  require receiver == receiver
+  require amount == amount
+  require srcChainTxHash == srcChainTxHash
+  require perUserGasAmount == perUserGasAmount
+  require maxLimit == maxLimit
+  if not stor3[caller]:
+      revert with 0, 'Sender role required'
+  if block.gasprice and perUserGasAmount > -1 / block.gasprice:
+      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+  if amount <= maxLimit:
+      if not stor2[srcChainTxHash]:
+          stor2[srcChainTxHash] = 1
+          if amount < block.gasprice * perUserGasAmount:
+              revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+          log Send(
+                address receiver=address(receiver),
+                uint256 amount=amount - (block.gasprice * perUserGasAmount),
+                bytes32 srcChainTxHash=srcChainTxHash)
+          call receiver with:
+             value amount - (block.gasprice * perUserGasAmount) wei
+               gas 5000 wei
+          if not ext_call.success:
+              revert with 0, 'Failed to send Ether'
+  else:
+      if amount < maxLimit:
+          revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+      if amount - maxLimit > (-1 * block.gasprice * perUserGasAmount) - 1:
+          revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+      if not stor2[srcChainTxHash]:
+          stor2[srcChainTxHash] = 1
+          if amount < amount - maxLimit + (block.gasprice * perUserGasAmount):
+              revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+          log Send(
+                address receiver=address(receiver),
+                uint256 amount=maxLimit - (block.gasprice * perUserGasAmount),
+                bytes32 srcChainTxHash=srcChainTxHash)
+          call receiver with:
+             value maxLimit - (block.gasprice * perUserGasAmount) wei
+               gas 5000 wei
+          if not ext_call.success:
+              revert with 0, 'Failed to send Ether'
+
+def batchSendNativeToken(address[] receivers, uint256[] amounts, bytes32[] srcChainTxHashes, uint256 perUserGasAmount, uint256 maxLimit): # not payable
+  require calldata.size - 4 >=′ 160
+  require receivers <= LOCK8605463013()
+  require receivers + 35 <′ calldata.size
+  if receivers.length > LOCK8605463013():
+      revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+  if floor32(receivers.length) + 97 > LOCK8605463013() or floor32(receivers.length) + 97 < 96:
+      revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+  mem[96] = receivers.length
+  require receivers + (32 * receivers.length) + 36 <= calldata.size
+  idx = 0
+  s = receivers + 36
+  t = 128
+  while idx < receivers.length:
+      require cd[s] == address(cd[s])
+      mem[t] = cd[s]
+      idx = idx + 1
+      s = s + 32
+      t = t + 32
+      continue 
+  require amounts <= LOCK8605463013()
+  require amounts + 35 <′ calldata.size
+  if amounts.length > LOCK8605463013():
+      revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+  if floor32(receivers.length) + floor32(amounts.length) + 98 > LOCK8605463013() or floor32(amounts.length) + 98 < 97:
+      revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+  mem[floor32(receivers.length) + 97] = amounts.length
+  require amounts + (32 * amounts.length) + 36 <= calldata.size
+  idx = 0
+  s = amounts + 36
+  t = floor32(receivers.length) + 129
+  while idx < amounts.length:
+      require cd[s] == cd[s]
+      mem[t] = cd[s]
+      idx = idx + 1
+      s = s + 32
+      t = t + 32
+      continue 
+  require srcChainTxHashes <= LOCK8605463013()
+  require srcChainTxHashes + 35 <′ calldata.size
+  if srcChainTxHashes.length > LOCK8605463013():
+      revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+  if floor32(receivers.length) + floor32(amounts.length) + floor32(srcChainTxHashes.length) + 99 > LOCK8605463013() or floor32(srcChainTxHashes.length) + 99 < 98:
+      revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+  mem[64] = floor32(receivers.length) + floor32(amounts.length) + floor32(srcChainTxHashes.length) + 99
+  mem[floor32(receivers.length) + floor32(amounts.length) + 98] = srcChainTxHashes.length
+  require srcChainTxHashes + (32 * srcChainTxHashes.length) + 36 <= calldata.size
+  idx = 0
+  s = srcChainTxHashes + 36
+  t = floor32(receivers.length) + floor32(amounts.length) + 130
+  while idx < srcChainTxHashes.length:
+      require cd[s] == cd[s]
+      mem[t] = cd[s]
+      idx = idx + 1
+      s = s + 32
+      t = t + 32
+      continue 
+  require perUserGasAmount == perUserGasAmount
+  require maxLimit == maxLimit
+  mem[0] = caller
+  if not stor3[caller]:
+      revert with 0, 'Sender role required'
+  if receivers.length != amounts.length:
+      revert with 0, 'Input length mismatch'
+  if receivers.length != srcChainTxHashes.length:
+      revert with 0, 'Input length mismatch'
+  idx = 0
+  while idx < receivers.length:
+      if idx >= mem[floor32(receivers.length) + 97]:
+          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+      if block.gasprice and perUserGasAmount > -1 / block.gasprice:
+          revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+      if mem[(32 * idx) + floor32(receivers.length) + 129] <= maxLimit:
+          if idx >= mem[96]:
+              revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+          _213 = mem[(32 * idx) + 128]
+          if idx >= mem[floor32(receivers.length) + 97]:
+              revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+          _215 = mem[(32 * idx) + floor32(receivers.length) + 129]
+          if idx >= mem[floor32(receivers.length) + floor32(amounts.length) + 98]:
+              revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+          _217 = mem[(32 * idx) + floor32(receivers.length) + floor32(amounts.length) + 130]
+          mem[0] = mem[(32 * idx) + floor32(receivers.length) + floor32(amounts.length) + 130]
+          mem[32] = 2
+          if not stor2[mem[(32 * idx) + floor32(receivers.length) + floor32(amounts.length) + 130]]:
+              mem[0] = mem[(32 * idx) + floor32(receivers.length) + floor32(amounts.length) + 130]
+              mem[32] = 2
+              stor2[mem[(32 * idx) + floor32(receivers.length) + floor32(amounts.length) + 130]] = 1
+              if mem[(32 * idx) + floor32(receivers.length) + 129] < block.gasprice * perUserGasAmount:
+                  revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+              mem[mem[64]] = mem[(32 * idx) + 140 len 20]
+              mem[mem[64] + 32] = _215 - (block.gasprice * perUserGasAmount)
+              mem[mem[64] + 64] = _217
+              log Send(
+                    address receiver=mem[mem[64]],
+                    uint256 amount=_215 - (block.gasprice * perUserGasAmount),
+                    bytes32 srcChainTxHash=_217)
+              call address(_213) with:
+                 value _215 - (block.gasprice * perUserGasAmount) wei
+                   gas 5000 wei
+              if return_data.size:
+                  _233 = mem[64]
+                  mem[64] = mem[64] + ceil32(return_data.size) + 1
+                  mem[_233] = return_data.size
+                  mem[_233 + 32 len return_data.size] = ext_call.return_data[0 len return_data.size]
+              if not ext_call.success:
+                  revert with 0, 'Failed to send Ether'
+      else:
+          if idx >= mem[floor32(receivers.length) + 97]:
+              revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+          _211 = mem[(32 * idx) + floor32(receivers.length) + 129]
+          if mem[(32 * idx) + floor32(receivers.length) + 129] < maxLimit:
+              revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+          if mem[(32 * idx) + floor32(receivers.length) + 129] - maxLimit > (-1 * block.gasprice * perUserGasAmount) - 1:
+              revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+          if idx >= mem[96]:
+              revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+          _222 = mem[(32 * idx) + 128]
+          if idx >= mem[floor32(receivers.length) + 97]:
+              revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+          _224 = mem[(32 * idx) + floor32(receivers.length) + 129]
+          if idx >= mem[floor32(receivers.length) + floor32(amounts.length) + 98]:
+              revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+          _226 = mem[(32 * idx) + floor32(receivers.length) + floor32(amounts.length) + 130]
+          mem[0] = mem[(32 * idx) + floor32(receivers.length) + floor32(amounts.length) + 130]
+          mem[32] = 2
+          if not stor2[mem[(32 * idx) + floor32(receivers.length) + floor32(amounts.length) + 130]]:
+              mem[0] = mem[(32 * idx) + floor32(receivers.length) + floor32(amounts.length) + 130]
+              mem[32] = 2
+              stor2[mem[(32 * idx) + floor32(receivers.length) + floor32(amounts.length) + 130]] = 1
+              if mem[(32 * idx) + floor32(receivers.length) + 129] < mem[(32 * idx) + floor32(receivers.length) + 129] - maxLimit + (block.gasprice * perUserGasAmount):
+                  revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+              mem[mem[64]] = mem[(32 * idx) + 140 len 20]
+              mem[mem[64] + 32] = _224 - _211 + maxLimit - (block.gasprice * perUserGasAmount)
+              mem[mem[64] + 64] = _226
+              log Send(
+                    address receiver=mem[mem[64]],
+                    uint256 amount=_224 - _211 + maxLimit - (block.gasprice * perUserGasAmount),
+                    bytes32 srcChainTxHash=_226)
+              call address(_222) with:
+                 value _224 - _211 + maxLimit - (block.gasprice * perUserGasAmount) wei
+                   gas 5000 wei
+              if return_data.size:
+                  _241 = mem[64]
+                  mem[64] = mem[64] + ceil32(return_data.size) + 1
+                  mem[_241] = return_data.size
+                  mem[_241 + 32 len return_data.size] = ext_call.return_data[0 len return_data.size]
+              if not ext_call.success:
+                  revert with 0, 'Failed to send Ether'
+      if idx == -1:
+          revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+      idx = idx + 1
+      continue 
+
+

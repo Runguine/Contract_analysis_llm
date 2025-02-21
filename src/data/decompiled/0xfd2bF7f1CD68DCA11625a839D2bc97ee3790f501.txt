@@ -1,0 +1,141 @@
+# Palkeoramix decompiler. 
+
+def _fallback(?) payable: # default function
+  revert
+
+def unknown3745bc8f() payable: 
+  require calldata.size - 4 >=′ 32
+  require cd[4] <= LOCK8605463013()
+  require cd[4] + 35 <′ calldata.size
+  require ('cd', 4).length <= LOCK8605463013()
+  require cd[4] + (32 * ('cd', 4).length) + 36 <= calldata.size
+  if ('cd', 4).length > LOCK8605463013():
+      revert with 0, 65
+  mem[96] = ('cd', 4).length
+  mem[64] = (32 * ('cd', 4).length) + 128
+  if not ('cd', 4).length:
+      idx = 0
+      s = calldata.size
+      while idx < ('cd', 4).length:
+          require cd[(cd[4] + (32 * idx) + 36)] <′ calldata.size + -cd[4] - 99
+          require cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 36)] == address(cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 36)])
+          require cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 68)] <′ calldata.size + -cd[(cd[4] + (32 * idx) + 36)] + -cd[4] - 67
+          require cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 68)] + 36)] <= LOCK8605463013()
+          require cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 68)] + 68 <=′ calldata.size - cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 68)] + 36)]
+          _44 = mem[64]
+          mem[mem[64] len cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 68)] + 36)]] = call.data[cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 68)] + 68 len cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 68)] + 36)]]
+          mem[cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 68)] + 36)] + mem[64]] = 0
+          call address(cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 36)]).mem[mem[64] len 4] with:
+               gas gas_remaining wei
+              args mem[mem[64] + 4 len cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 68)] + 36)] + _44 + -mem[64] - 4]
+          if not return_data.size:
+              if idx >= mem[96]:
+                  revert with 0, 50
+              mem[(32 * idx) + 128] = 96
+          else:
+              _46 = mem[64]
+              mem[64] = mem[64] + ceil32(return_data.size) + 1
+              mem[_46] = return_data.size
+              mem[_46 + 32 len return_data.size] = ext_call.return_data[0 len return_data.size]
+              if idx >= mem[96]:
+                  revert with 0, 50
+              mem[(32 * idx) + 128] = _46
+          if not ext_call.success:
+              revert with 0, 'MultiRewardCall: call failed'
+          idx = idx + 1
+          s = cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 36
+          continue 
+      _32 = mem[64]
+      mem[mem[64]] = block.number
+      mem[mem[64] + 32] = 64
+      _33 = mem[96]
+      mem[mem[64] + 64] = mem[96]
+      idx = 0
+      s = 128
+      t = mem[64] + 96
+      u = mem[64] + (32 * mem[96]) + 96
+      while idx < _33:
+          mem[t] = u + -_32 - 96
+          _62 = mem[s]
+          _63 = mem[mem[s]]
+          mem[u] = mem[mem[s]]
+          v = 0
+          while v < _63:
+              mem[v + u + 32] = mem[v + _62 + 32]
+              v = v + 32
+              continue 
+          mem[_63 + u + 32] = 0
+          idx = idx + 1
+          s = s + 32
+          t = t + 32
+          u = u + ceil32(_63) + 32
+          continue 
+  else:
+      mem[128] = 96
+      s = 128
+      idx = ('cd', 4).length
+      while idx - 1:
+          mem[s + 32] = 96
+          s = s + 32
+          idx = idx - 1
+          continue 
+      idx = 0
+      s = calldata.size
+      while idx < ('cd', 4).length:
+          require cd[(cd[4] + (32 * idx) + 36)] <′ calldata.size + -cd[4] - 99
+          require cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 36)] == address(cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 36)])
+          require cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 68)] <′ calldata.size + -cd[(cd[4] + (32 * idx) + 36)] + -cd[4] - 67
+          require cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 68)] + 36)] <= LOCK8605463013()
+          require cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 68)] + 68 <=′ calldata.size - cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 68)] + 36)]
+          mem[mem[64] len cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 68)] + 36)]] = call.data[cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 68)] + 68 len cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 68)] + 36)]]
+          mem[cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 68)] + 36)] + mem[64]] = 0
+          call address(cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 36)]) with:
+               gas gas_remaining wei
+              args call.data[cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 68)] + 68 len cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 68)] + 36)]]
+          if not return_data.size:
+              if idx >= mem[96]:
+                  revert with 0, 50
+              mem[(32 * idx) + 128] = 96
+          else:
+              _74 = mem[64]
+              mem[64] = mem[64] + ceil32(return_data.size) + 1
+              mem[_74] = return_data.size
+              mem[_74 + 32 len return_data.size] = ext_call.return_data[0 len return_data.size]
+              if idx >= mem[96]:
+                  revert with 0, 50
+              mem[(32 * idx) + 128] = _74
+          if not ext_call.success:
+              revert with 0, 'MultiRewardCall: call failed'
+          idx = idx + 1
+          s = cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 36
+          continue 
+      _65 = mem[64]
+      mem[mem[64]] = block.number
+      mem[mem[64] + 32] = 64
+      _67 = mem[96]
+      mem[mem[64] + 64] = mem[96]
+      idx = 0
+      s = 128
+      t = mem[64] + 96
+      u = mem[64] + (32 * mem[96]) + 96
+      while idx < _67:
+          mem[t] = u + -_65 - 96
+          _82 = mem[s]
+          _83 = mem[mem[s]]
+          mem[u] = mem[mem[s]]
+          v = 0
+          while v < _83:
+              mem[v + u + 32] = mem[v + _82 + 32]
+              v = v + 32
+              continue 
+          mem[_83 + u + 32] = 0
+          idx = idx + 1
+          s = s + 32
+          t = t + 32
+          u = u + ceil32(_83) + 32
+          continue 
+  return memory
+    from mem[64]
+     len u - mem[64]
+
+

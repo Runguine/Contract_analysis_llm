@@ -1,0 +1,66 @@
+# Palkeoramix decompiler. 
+
+def storage:
+  upgradeabilityOwner is address at storage 6
+  version is uint256 at storage 7
+  implementationAddress is address at storage 8
+
+def version(): # not payable
+  return version
+
+def implementation(): # not payable
+  return implementationAddress
+
+def upgradeabilityOwner(): # not payable
+  return upgradeabilityOwner
+
+#
+#  Regular functions
+#
+
+def transferProxyOwnership(address newOwner): # not payable
+  require caller == upgradeabilityOwner
+  require newOwner
+  log ProxyOwnershipTransferred(
+        address previousOwner=upgradeabilityOwner,
+        address newOwner=newOwner)
+  upgradeabilityOwner = newOwner
+
+def _fallback(?) payable: # default function
+  require implementationAddress
+  delegate implementationAddress with:
+     funct call.data[0 len 4]
+       gas gas_remaining wei
+      args call.data[4 len calldata.size - 4]
+  if not delegate.return_code:
+      revert with ext_call.return_data[0 len return_data.size]
+  return ext_call.return_data[0 len return_data.size]
+
+def upgradeTo(uint256 version, address implementation): # not payable
+  require caller == upgradeabilityOwner
+  require implementationAddress != implementation
+  require ext_code.size(implementation) > 0
+  require version > version
+  version = version
+  implementationAddress = implementation
+  log Upgraded(
+        uint256 version=version,
+        address implementation=implementation)
+
+def upgradeToAndCall(uint256 version, address implementation, bytes data) payable: 
+  require caller == upgradeabilityOwner
+  require implementationAddress != implementation
+  require ext_code.size(implementation) > 0
+  require version > version
+  version = version
+  implementationAddress = implementation
+  log Upgraded(
+        uint256 version=version,
+        address implementation=implementation)
+  call this.address with:
+     value call.value wei
+       gas gas_remaining wei
+      args data[all]
+  require ext_call.success
+
+

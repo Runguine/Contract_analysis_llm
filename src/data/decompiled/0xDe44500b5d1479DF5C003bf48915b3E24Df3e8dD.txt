@@ -1,0 +1,522 @@
+# Palkeoramix decompiler. 
+
+def storage:
+  paused is uint8 at storage 0 offset 160
+  stor0 is uint128 at storage 0 offset 160
+  owner is address at storage 0
+  stor2 is mapping of uint8 at storage 2
+  stor3 is mapping of uint8 at storage 3
+  stor4 is mapping of uint8 at storage 4
+  stor5 is mapping of uint8 at storage 5
+  feeToAddress is address at storage 6
+  unknownbf66c9b8Address is address at storage 7
+  operatorAddress is address at storage 8
+  stor9 is uint32 at storage 9
+  unknownf40a82f0Address is address at storage 9
+  stor9 is uint256 at storage 9
+  feeRate is uint256 at storage 10
+  time is uint256 at storage 11
+
+def feeTo(): # not payable
+  return feeToAddress
+
+def time(): # not payable
+  return time
+
+def unknown2eed8a59(uint256 _param1): # not payable
+  require calldata.size - 4 >=′ 32
+  require _param1 == address(_param1)
+  return bool(stor3[_param1])
+
+def unknown46ea87af(address _param1): # not payable
+  require calldata.size - 4 >=′ 32
+  require _param1 == _param1
+  return bool(stor5[_param1])
+
+def operator(): # not payable
+  return operatorAddress
+
+def paused(): # not payable
+  return bool(paused)
+
+def isWhiteListed(address _param1): # not payable
+  require calldata.size - 4 >=′ 32
+  require _param1 == _param1
+  return bool(stor2[_param1])
+
+def owner(): # not payable
+  return owner
+
+def feeRate(): # not payable
+  return feeRate
+
+def unknownbf66c9b8(): # not payable
+  return unknownbf66c9b8Address
+
+def isRouter(address router): # not payable
+  require calldata.size - 4 >=′ 32
+  require router == router
+  return bool(stor4[router])
+
+def unknownf40a82f0(): # not payable
+  return address(unknownf40a82f0Address)
+
+#
+#  Regular functions
+#
+
+def _fallback(?) payable: # default function
+  revert
+
+def pause(): # not payable
+  if operatorAddress != caller:
+      revert with CallerIsNotOperator()
+  if paused:
+      revert with 0, 'Pausable: paused'
+  stor0 = 1
+  log Paused(address account=caller)
+
+def unpause(): # not payable
+  if operatorAddress != caller:
+      revert with CallerIsNotOperator()
+  if not paused:
+      revert with 0, 'Pausable: not paused'
+  stor0 = 0
+  log Unpaused(address account=caller)
+
+def renounceOwnership(): # not payable
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  owner = 0
+  log OwnershipTransferred(
+        address previousOwner=owner,
+        address newOwner=0)
+
+def setTime(uint256 _time): # not payable
+  require calldata.size - 4 >=′ 32
+  require _time == _time
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  time = _time
+  log 0x52a98f39: time
+
+def setFeeRate(uint256 rate): # not payable
+  require calldata.size - 4 >=′ 32
+  require rate == rate
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  if rate < 10:
+      revert with 1456902552
+  if rate > 50:
+      revert with 1456902552
+  feeRate = rate
+  log SetFeeRate(uint256 feeRate=feeRate)
+
+def setOperator(address _operator): # not payable
+  require calldata.size - 4 >=′ 32
+  require _operator == _operator
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  if not _operator:
+      revert with 1684915904
+  if not _operator - operatorAddress:
+      revert with WrongParams()
+  operatorAddress = _operator
+  log ChangeOperator(address newOperator=operatorAddress)
+
+def rescueETH(): # not payable
+  if operatorAddress != caller:
+      revert with CallerIsNotOperator()
+  call address(unknownf40a82f0Address) with:
+     value eth.balance(this.address) wei
+       gas gas_remaining wei
+  if not ext_call.success:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, '_transferEth: Eth transfer failed'
+  log 0x77f67778: eth.balance(this.address), address(unknownf40a82f0Address)
+
+def unknownc838aa37(uint256 _param1, uint256 _param2): # not payable
+  require calldata.size - 4 >=′ 64
+  require _param1 == address(_param1)
+  require _param2 == bool(_param2)
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  stor2[address(_param1)] = uint8(bool(_param2))
+  log 0xc5a7995f: address(_param1), bool(_param2)
+
+def transferOwnership(address newOwner): # not payable
+  require calldata.size - 4 >=′ 32
+  require newOwner == newOwner
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  if not newOwner:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'Ownable: new owner is the zero address'
+  owner = newOwner
+  log OwnershipTransferred(
+        address previousOwner=owner,
+        address newOwner=newOwner)
+
+def allowance(address owner, address spender): # not payable
+  require calldata.size - 4 >=′ 64
+  require owner == owner
+  require spender == spender
+  static call owner.allowance(address owner, address spender) with:
+          gas gas_remaining wei
+         args address(spender), this.address
+  if not ext_call.success:
+      revert with ext_call.return_data[0 len return_data.size]
+  require return_data.size >=′ 32
+  require ext_call.return_data[0] == ext_call.return_data[0]
+  return ext_call.return_data[0]
+
+def setFeeTo(address mastercontract, address feeTo): # not payable
+  require calldata.size - 4 >=′ 64
+  require mastercontract == mastercontract
+  require feeTo == feeTo
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  if not mastercontract:
+      revert with 1684915904
+  if not feeTo:
+      revert with 1684915904
+  feeToAddress = mastercontract
+  unknownbf66c9b8Address = feeTo
+  log SetFeeTo(
+        address previousFeeTo=feeToAddress,
+        address newFeeTo=unknownbf66c9b8Address)
+
+def unknownd56ff246(uint256 _param1): # not payable
+  require calldata.size - 4 >=′ 32
+  require _param1 == address(_param1)
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  if not address(_param1):
+      revert with 1684915904
+  if not address(_param1) - address(unknownf40a82f0Address):
+      revert with WrongParams()
+  address(unknownf40a82f0Address) = address(_param1)
+  log 0x2026a564: address(unknownf40a82f0Address)
+
+def unknowncba9bc66() payable: 
+  require calldata.size - 4 >=′ 224
+  require cd[4] == address(cd[4])
+  require cd[36] == address(cd[36])
+  require cd[68] <= LOCK8605463013()
+  require cd[68] + 35 <′ calldata.size
+  if ('cd', 68).length > LOCK8605463013():
+      revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+  if floor32(('cd', 68).length) + 97 > LOCK8605463013() or floor32(('cd', 68).length) + 97 < 96:
+      revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+  require cd[68] + (32 * ('cd', 68).length) + 36 <= calldata.size
+  idx = cd[68] + 36
+  s = 128
+  while idx < cd[68] + (32 * ('cd', 68).length) + 36:
+      require cd[idx] == address(cd[idx])
+      mem[s] = cd[idx]
+      idx = idx + 32
+      s = s + 32
+      continue 
+  require cd[100] <= LOCK8605463013()
+  require cd[100] + 35 <′ calldata.size
+  if ('cd', 100).length > LOCK8605463013():
+      revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+  if floor32(('cd', 68).length) + floor32(('cd', 100).length) + 98 > LOCK8605463013() or floor32(('cd', 100).length) + 98 < 97:
+      revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+  require cd[100] + (32 * ('cd', 100).length) + 36 <= calldata.size
+  ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+
+def unknown67b20b89(): # not payable
+  require calldata.size - 4 >=′ 128
+  require cd[4] == address(cd[4])
+  require cd[36] == address(cd[36])
+  require cd[68] <= LOCK8605463013()
+  require cd[68] + 35 <′ calldata.size
+  if ('cd', 68).length > LOCK8605463013():
+      revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+  if floor32(('cd', 68).length) + 97 > LOCK8605463013() or floor32(('cd', 68).length) + 97 < 96:
+      revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+  mem[96] = ('cd', 68).length
+  require cd[68] + (32 * ('cd', 68).length) + 36 <= calldata.size
+  idx = cd[68] + 36
+  s = 128
+  while idx < cd[68] + (32 * ('cd', 68).length) + 36:
+      require cd[idx] == address(cd[idx])
+      mem[s] = cd[idx]
+      idx = idx + 32
+      s = s + 32
+      continue 
+  require cd[100] == cd[100]
+  mem[floor32(('cd', 68).length) + 97] = 0x33456d7800000000000000000000000000000000000000000000000000000000
+  mem[floor32(('cd', 68).length) + 101] = address(cd[36])
+  mem[floor32(('cd', 68).length) + 133] = 96
+  mem[floor32(('cd', 68).length) + 197] = ('cd', 68).length
+  idx = 0
+  s = 128
+  t = floor32(('cd', 68).length) + 229
+  while idx < ('cd', 68).length:
+      mem[t] = mem[s + 12 len 20]
+      idx = idx + 1
+      s = s + 32
+      t = t + 32
+      continue 
+  static call address(cd[4]).unknown33456d78() with:
+          gas gas_remaining wei
+         args address(cd[36]), Array(len=('cd', 68).length, data=mem[floor32(('cd', 68).length) + 229 len 32 * ('cd', 68).length]), cd[100]
+  if not ext_call.success:
+      revert with ext_call.return_data[0 len return_data.size]
+  require return_data.size >=′ 32
+  require ext_call.return_data[0] == ext_call.return_data[0]
+  return ext_call.return_data[0]
+
+def unknown850d5e6e(): # not payable
+  require calldata.size - 4 >=′ 128
+  require cd[4] == address(cd[4])
+  require cd[36] == address(cd[36])
+  require cd[68] <= LOCK8605463013()
+  require cd[68] + 35 <′ calldata.size
+  if ('cd', 68).length > LOCK8605463013():
+      revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+  if floor32(('cd', 68).length) + 97 > LOCK8605463013() or floor32(('cd', 68).length) + 97 < 96:
+      revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+  mem[96] = ('cd', 68).length
+  require cd[68] + (32 * ('cd', 68).length) + 36 <= calldata.size
+  idx = cd[68] + 36
+  s = 128
+  while idx < cd[68] + (32 * ('cd', 68).length) + 36:
+      require cd[idx] == address(cd[idx])
+      mem[s] = cd[idx]
+      idx = idx + 32
+      s = s + 32
+      continue 
+  require cd[100] == cd[100]
+  mem[floor32(('cd', 68).length) + 97] = 0x6b0d350800000000000000000000000000000000000000000000000000000000
+  mem[floor32(('cd', 68).length) + 101] = address(cd[36])
+  mem[floor32(('cd', 68).length) + 133] = 96
+  mem[floor32(('cd', 68).length) + 197] = ('cd', 68).length
+  idx = 0
+  s = 128
+  t = floor32(('cd', 68).length) + 229
+  while idx < ('cd', 68).length:
+      mem[t] = mem[s + 12 len 20]
+      idx = idx + 1
+      s = s + 32
+      t = t + 32
+      continue 
+  static call address(cd[4]).unknown6b0d3508() with:
+          gas gas_remaining wei
+         args address(cd[36]), Array(len=('cd', 68).length, data=mem[floor32(('cd', 68).length) + 229 len 32 * ('cd', 68).length]), cd[100]
+  if not ext_call.success:
+      revert with ext_call.return_data[0 len return_data.size]
+  require return_data.size >=′ 32
+  require ext_call.return_data[0] == ext_call.return_data[0]
+  return ext_call.return_data[0]
+
+def unknowna2dcc4ff(): # not payable
+  require calldata.size - 4 >=′ 64
+  require cd[4] <= LOCK8605463013()
+  require cd[4] + 35 <′ calldata.size
+  if ('cd', 4).length > LOCK8605463013():
+      revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+  if floor32(('cd', 4).length) + 97 > LOCK8605463013() or floor32(('cd', 4).length) + 97 < 96:
+      revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+  mem[64] = floor32(('cd', 4).length) + 97
+  mem[96] = ('cd', 4).length
+  require cd[4] + (32 * ('cd', 4).length) + 36 <= calldata.size
+  idx = cd[4] + 36
+  s = 128
+  while idx < cd[4] + (32 * ('cd', 4).length) + 36:
+      require cd[idx] == address(cd[idx])
+      mem[s] = cd[idx]
+      idx = idx + 32
+      s = s + 32
+      continue 
+  require cd[36] == bool(cd[36])
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  idx = 0
+  while idx < ('cd', 4).length:
+      if idx >= ('cd', 4).length:
+          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+      if not mem[(32 * idx) + 140 len 20]:
+          revert with 1684915904
+      if idx >= ('cd', 4).length:
+          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+      mem[0] = mem[(32 * idx) + 140 len 20]
+      mem[32] = 5
+      stor5[mem[(32 * idx) + 140 len 20]] = uint8(bool(cd[36]))
+      if not idx - 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff:
+          revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+      idx = idx + 1
+      continue 
+  mem[floor32(('cd', 4).length) + 97] = 64
+  mem[floor32(('cd', 4).length) + 161] = ('cd', 4).length
+  idx = 0
+  s = 128
+  t = mem[64] + 96
+  while idx < ('cd', 4).length:
+      mem[t] = mem[s + 12 len 20]
+      idx = idx + 1
+      s = s + 32
+      t = t + 32
+      continue 
+  mem[floor32(('cd', 4).length) + 129] = bool(cd[36])
+  log 0x48936b52: mem[mem[64] len floor32(('cd', 4).length) + (32 * ('cd', 4).length) + -mem[64] + 193]
+
+def unknownab9f6f62(): # not payable
+  require calldata.size - 4 >=′ 64
+  require cd[4] <= LOCK8605463013()
+  require cd[4] + 35 <′ calldata.size
+  if ('cd', 4).length > LOCK8605463013():
+      revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+  if floor32(('cd', 4).length) + 97 > LOCK8605463013() or floor32(('cd', 4).length) + 97 < 96:
+      revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+  mem[64] = floor32(('cd', 4).length) + 97
+  mem[96] = ('cd', 4).length
+  require cd[4] + (32 * ('cd', 4).length) + 36 <= calldata.size
+  idx = cd[4] + 36
+  s = 128
+  while idx < cd[4] + (32 * ('cd', 4).length) + 36:
+      require cd[idx] == address(cd[idx])
+      mem[s] = cd[idx]
+      idx = idx + 32
+      s = s + 32
+      continue 
+  require cd[36] == bool(cd[36])
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  idx = 0
+  while idx < ('cd', 4).length:
+      if idx >= ('cd', 4).length:
+          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+      if not mem[(32 * idx) + 140 len 20]:
+          revert with 1684915904
+      if idx >= ('cd', 4).length:
+          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+      mem[0] = mem[(32 * idx) + 140 len 20]
+      mem[32] = 4
+      stor4[mem[(32 * idx) + 140 len 20]] = uint8(bool(cd[36]))
+      if not idx - 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff:
+          revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+      idx = idx + 1
+      continue 
+  mem[floor32(('cd', 4).length) + 97] = 64
+  mem[floor32(('cd', 4).length) + 161] = ('cd', 4).length
+  idx = 0
+  s = 128
+  t = mem[64] + 96
+  while idx < ('cd', 4).length:
+      mem[t] = mem[s + 12 len 20]
+      idx = idx + 1
+      s = s + 32
+      t = t + 32
+      continue 
+  mem[floor32(('cd', 4).length) + 129] = bool(cd[36])
+  log 0xb518fc1f: mem[mem[64] len floor32(('cd', 4).length) + (32 * ('cd', 4).length) + -mem[64] + 193]
+
+def unknownbcf2af6d(): # not payable
+  require calldata.size - 4 >=′ 64
+  require cd[4] <= LOCK8605463013()
+  require cd[4] + 35 <′ calldata.size
+  if ('cd', 4).length > LOCK8605463013():
+      revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+  if floor32(('cd', 4).length) + 97 > LOCK8605463013() or floor32(('cd', 4).length) + 97 < 96:
+      revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+  mem[64] = floor32(('cd', 4).length) + 97
+  mem[96] = ('cd', 4).length
+  require cd[4] + (32 * ('cd', 4).length) + 36 <= calldata.size
+  idx = cd[4] + 36
+  s = 128
+  while idx < cd[4] + (32 * ('cd', 4).length) + 36:
+      require cd[idx] == address(cd[idx])
+      mem[s] = cd[idx]
+      idx = idx + 32
+      s = s + 32
+      continue 
+  require cd[36] == bool(cd[36])
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  idx = 0
+  while idx < ('cd', 4).length:
+      if idx >= ('cd', 4).length:
+          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+      if not mem[(32 * idx) + 140 len 20]:
+          revert with 1684915904
+      if idx >= ('cd', 4).length:
+          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+      mem[0] = mem[(32 * idx) + 140 len 20]
+      mem[32] = 3
+      stor3[mem[(32 * idx) + 140 len 20]] = uint8(bool(cd[36]))
+      if not idx - 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff:
+          revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+      idx = idx + 1
+      continue 
+  mem[floor32(('cd', 4).length) + 97] = 64
+  mem[floor32(('cd', 4).length) + 161] = ('cd', 4).length
+  idx = 0
+  s = 128
+  t = mem[64] + 96
+  while idx < ('cd', 4).length:
+      mem[t] = mem[s + 12 len 20]
+      idx = idx + 1
+      s = s + 32
+      t = t + 32
+      continue 
+  mem[floor32(('cd', 4).length) + 129] = bool(cd[36])
+  log 0xc0c7f079: mem[mem[64] len floor32(('cd', 4).length) + (32 * ('cd', 4).length) + -mem[64] + 193]
+
+def rescueERC20(address _token): # not payable
+  require calldata.size - 4 >=′ 32
+  require _token == _token
+  if operatorAddress != caller:
+      revert with CallerIsNotOperator()
+  mem[100] = this.address
+  static call _token.balanceOf(address account) with:
+          gas gas_remaining wei
+         args this.address
+  mem[96] = ext_call.return_data[0]
+  if not ext_call.success:
+      revert with ext_call.return_data[0 len return_data.size]
+  require return_data.size >=′ 32
+  require ext_call.return_data[0] == ext_call.return_data[0]
+  mem[ceil32(return_data.size) + 132] = address(unknownf40a82f0Address)
+  mem[ceil32(return_data.size) + 164] = ext_call.return_data[0]
+  mem[ceil32(return_data.size) + 96] = 68
+  mem[ceil32(return_data.size) + 132 len 28] = Mask(224, 0, stor9)
+  mem[ceil32(return_data.size) + 128 len 4] = transfer(address recipient, uint256 amount)
+  mem[ceil32(return_data.size) + 196] = 32
+  mem[ceil32(return_data.size) + 228] = 'SafeERC20: low-level call failed'
+  if eth.balance(this.address) < 0:
+      revert with 0, 'Address: insufficient balance for call'
+  if ext_code.size(_token) <= 0:
+      revert with 0, 'Address: call to non-contract'
+  mem[ceil32(return_data.size) + 260 len 96] = transfer(address recipient, uint256 amount), Mask(224, 0, stor9), uint32(stor9), ext_call.return_data[0], 0
+  mem[ceil32(return_data.size) + 328] = 0
+  call _token with:
+     funct Mask(32, 224, transfer(address recipient, uint256 amount), Mask(224, 0, stor9), uint32(stor9), ext_call.return_data[0], 0) >> 224
+       gas gas_remaining wei
+      args (Mask(512, -288, transfer(address recipient, uint256 amount), Mask(224, 0, stor9), uint32(stor9), ext_call.return_data[0], 0) << 288)
+  if not return_data.size:
+      if not ext_call.success:
+          if ext_call.return_data[0] > 0:
+              revert with memory
+                from 128
+                 len ext_call.return_data[0]
+          revert with 0, 'SafeERC20: low-level call failed'
+      if ext_call.return_data[0] > 0:
+          require ext_call.return_data[0] >=′ 32
+          require 0, mem[132 len 28] == bool(0, mem[132 len 28])
+          if not 0, mem[132 len 28]:
+              revert with 0, 'SafeERC20: ERC20 operation did not succeed'
+  else:
+      mem[ceil32(return_data.size) + 292 len return_data.size] = ext_call.return_data[0 len return_data.size]
+      if not ext_call.success:
+          if return_data.size > 0:
+              revert with ext_call.return_data[0 len return_data.size]
+          revert with 0, 'SafeERC20: low-level call failed'
+      if return_data.size > 0:
+          require return_data.size >=′ 32
+          require mem[ceil32(return_data.size) + 292] == bool(mem[ceil32(return_data.size) + 292])
+          if not mem[ceil32(return_data.size) + 292]:
+              revert with 0, 'SafeERC20: ERC20 operation did not succeed'
+  log 0x8c4e91db: address(unknownf40a82f0Address), _token
+
+

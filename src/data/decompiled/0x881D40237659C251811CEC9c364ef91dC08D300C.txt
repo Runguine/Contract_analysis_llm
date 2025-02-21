@@ -1,0 +1,454 @@
+# Palkeoramix decompiler. 
+#
+#  I failed with these: 
+#  - unknown6b68764c(?)
+#  All the rest is below.
+#
+
+const chi = 0x4946c0e9f43f4dee607b0ef1fa1c
+const spender = 0x74de5d4fcbf63e00296fd95d33236b9794016631
+
+def storage:
+  paused is uint8 at storage 0 offset 160
+  owner is address at storage 0
+  stor1 is uint256 at storage 1
+  stor2 is mapping of struct at storage 2
+  stor3 is mapping of uint8 at storage 3
+
+def paused(): # not payable
+  return bool(paused)
+
+def owner(): # not payable
+  return owner
+
+#
+#  Regular functions
+#
+
+def _fallback(?) payable: # default function
+  revert
+
+def pauseSwaps(): # not payable
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  if paused:
+      revert with 0, 'Pausable: paused'
+  paused = 1
+  log Paused(address account=caller)
+
+def unknown9804a380(): # not payable
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  if not paused:
+      revert with 0, 'Pausable: not paused'
+  paused = 0
+  log Unpaused(address account=caller)
+
+def renounceOwnership(): # not payable
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  log OwnershipTransferred(
+        address previousOwner=owner,
+        address newOwner=0)
+  owner = 0
+
+def transferOwnership(address newOwner): # not payable
+  require calldata.size - 4 >= 32
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  if not newOwner:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  38,
+                  0xfe4f776e61626c653a206e6577206f776e657220697320746865207a65726f20616464726573,
+                  mem[202 len 26]
+  log OwnershipTransferred(
+        address previousOwner=owner,
+        address newOwner=newOwner)
+  owner = newOwner
+
+def unknownb5268389(array _param1): # not payable
+  require calldata.size - 4 >= 32
+  require _param1 <= unknown10000000()
+  require _param1 + 36 <= calldata.size
+  require _param1.length <= unknown10000000() and _param1 + _param1.length + 36 <= calldata.size
+  mem[ceil32(_param1.length) + 128] = bool(stor3[_param1[all]])
+  return Mask(8 * -ceil32(_param1.length) + _param1.length + 32, 0, 0), 
+         mem[_param1.length + 160 len -_param1.length + ceil32(_param1.length)]
+
+def unknown3ef11fd7(array _param1): # not payable
+  require calldata.size - 4 >= 32
+  require _param1 <= unknown10000000()
+  require _param1 + 36 <= calldata.size
+  require _param1.length <= unknown10000000() and _param1 + _param1.length + 36 <= calldata.size
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  if not address(stor2[_param1[all]].field_0):
+      revert with 0, 'ADAPTER_DOES_NOT_EXIST'
+  Mask(192, 0, stor2[_param1[all]].field_0) = 0
+  uint256(stor2[_param1[all]].field_256) = 0
+  if 31 < stor2[_param1[all]][1].length:
+      idx = 0
+      while stor2[_param1[all]][1].length + 31 / 32 > idx:
+          uint256(stor2[_param1[all]][idx + 1].field_0) = 0
+          idx = idx + 1
+          continue 
+  stor3[_param1[all]] = 1
+  log AdapterRemoved(string _param1=sha3(_param1[all]))
+
+def unknown459a39fb(): # not payable
+  require calldata.size - 4 >= 128
+  require cd[4] <= unknown10000000()
+  require cd[4] + 36 <= calldata.size
+  require ('cd', 4).length <= unknown10000000() and cd[4] + ('cd', 4).length + 36 <= calldata.size
+  require cd[100] <= unknown10000000()
+  require cd[100] + 36 <= calldata.size
+  require ('cd', 100).length <= unknown10000000() and cd[100] + ('cd', 100).length + 36 <= calldata.size
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  if not ext_code.size(address(cd[36])):
+      revert with 0, 'ADAPTER_IS_NOT_A_CONTRACT'
+  if stor3[call.data[cd[4] + 36 len ('cd', 4).length]]:
+      revert with 0, 'ADAPTER_REMOVED'
+  if address(stor2[call.data[cd[4] + 36 len ('cd', 4).length]].field_0):
+      revert with 0, 'ADAPTER_EXISTS'
+  address(stor2[call.data[cd[4] + 36 len ('cd', 4).length]].field_0) = address(cd[36])
+  uint32(stor2[call.data[cd[4] + 36 len ('cd', 4).length]].field_160) = 0
+  uint256(stor2[call.data[cd[4] + 36 len ('cd', 4).length]].field_256) = (2 * ('cd', 100).length) + 1
+  s = 0
+  idx = cd[100] + 36
+  while cd[100] + ('cd', 100).length + 36 > idx:
+      uint256(stor2[call.data[cd[4] + 36 len ('cd', 4).length]][s + 1].field_0) = cd[idx]
+      s = s + 1
+      idx = idx + 32
+      continue 
+  idx = Mask(251, 0, ('cd', 100).length + 31) >> 5
+  while stor2[call.data[cd[4] + 36 len ('cd', 4).length]][1].length + 31 / 32 > idx:
+      uint256(stor2[call.data[cd[4] + 36 len ('cd', 4).length]][idx + 1].field_0) = 0
+      idx = idx + 1
+      continue 
+  log 0x779d768d: Mask(32, 224, cd[68]), Array(len=('cd', 100).length, data=call.data[cd[100] + 36 len ('cd', 100).length]), sha3(call.data[cd[4] + 36 len ('cd', 4).length]), address(cd[36])
+
+def adapters(string _param1): # not payable
+  require calldata.size - 4 >= 32
+  require _param1 <= unknown10000000()
+  require _param1 + 36 <= calldata.size
+  require _param1.length <= unknown10000000() and _param1 + _param1.length + 36 <= calldata.size
+  mem[96] = _param1.length
+  mem[128 len _param1.length] = _param1[all]
+  mem[_param1.length + 128] = 0
+  mem[ceil32(_param1.length) + 128] = stor2[_param1[all]][1].length
+  mem[ceil32(_param1.length) + 160] = uint256(stor2[_param1[all]][1].field_0)
+  idx = ceil32(_param1.length) + 160
+  s = 0
+  while ceil32(_param1.length) + stor2[_param1[all]][1].length + 128 > idx:
+      mem[idx + 32] = uint256(stor2[_param1[all]][s + 1].field_256)
+      idx = idx + 32
+      s = s + 1
+      continue 
+  mem[ceil32(_param1.length) + ceil32(stor2[_param1[all]][1].length) + 160] = address(stor2[_param1[all]].field_0)
+  mem[ceil32(_param1.length) + ceil32(stor2[_param1[all]][1].length) + 192] = Mask(96, 0, stor2[_param1[all]].field_160) << 224
+  mem[ceil32(_param1.length) + ceil32(stor2[_param1[all]][1].length) + 224] = 96
+  mem[ceil32(_param1.length) + ceil32(stor2[_param1[all]][1].length) + 256] = Mask(8 * -ceil32(_param1.length) + _param1.length + 32, 0, 0), mem[_param1.length + 160 len -_param1.length + ceil32(_param1.length)]
+  mem[ceil32(_param1.length) + ceil32(stor2[_param1[all]][1].length) + 288 len ceil32(Mask(8 * -ceil32(_param1.length) + _param1.length + 32, 0, 0), mem[_param1.length + 160 len -_param1.length + ceil32(_param1.length)])] = mem[ceil32(_param1.length) + 160 len ceil32(Mask(8 * -ceil32(_param1.length) + _param1.length + 32, 0, 0), mem[_param1.length + 160 len -_param1.length + ceil32(_param1.length)])]
+  if not Mask(8 * -ceil32(_param1.length) + _param1.length + 32, 0, 0), mem[_param1.length + 160 len -_param1.length + ceil32(_param1.length)] % 32:
+      return memory
+        from ceil32(_param1.length) + ceil32(stor2[_param1[all]][1].length) + 160
+         len Mask(8 * -ceil32(_param1.length) + _param1.length + 32, 0, 0), mem[_param1.length + 160 len -_param1.length + ceil32(_param1.length)] + 128
+  mem[floor32(Mask(8 * -ceil32(_param1.length) + _param1.length + 32, 0, 0), mem[_param1.length + 160 len -_param1.length + ceil32(_param1.length)]) + ceil32(_param1.length) + ceil32(stor2[_param1[all]][1].length) + 288] = mem[floor32(Mask(8 * -ceil32(_param1.length) + _param1.length + 32, 0, 0), mem[_param1.length + 160 len -_param1.length + ceil32(_param1.length)]) + ceil32(_param1.length) + ceil32(stor2[_param1[all]][1].length) + -(Mask(8 * -ceil32(_param1.length) + _param1.length + 32, 0, 0), mem[_param1.length + 160 len -_param1.length + ceil32(_param1.length)] % 32) + 320 len Mask(8 * -ceil32(_param1.length) + _param1.length + 32, 0, 0), mem[_param1.length + 160 len -_param1.length + ceil32(_param1.length)] % 32]
+  return memory
+    from ceil32(_param1.length) + ceil32(stor2[_param1[all]][1].length) + 160
+     len floor32(Mask(8 * -ceil32(_param1.length) + _param1.length + 32, 0, 0), mem[_param1.length + 160 len -_param1.length + ceil32(_param1.length)]) + 160
+
+def swap(string aggregatorId, address tokenFrom, uint256 amount, bytes data) payable: 
+  require calldata.size - 4 >= 128
+  require aggregatorId <= unknown10000000()
+  require aggregatorId + 36 <= calldata.size
+  require aggregatorId.length <= unknown10000000() and aggregatorId + aggregatorId.length + 36 <= calldata.size
+  require data <= unknown10000000()
+  require data + 36 <= calldata.size
+  require data.length <= unknown10000000() and data + data.length + 36 <= calldata.size
+  if paused:
+      revert with 0, 'Pausable: paused'
+  if stor1 == 2:
+      revert with 0, 'ReentrancyGuard: reentrant call'
+  stor1 = 2
+  mem[96 len aggregatorId.length] = aggregatorId[all]
+  mem[aggregatorId.length + 96] = 2
+  _7 = sha3(aggregatorId[all], 2)
+  if not tokenFrom:
+      mem[128] = caller
+      mem[96] = 32
+      mem[192] = Mask(96, 0, stor[_7].field_160) << 224
+      _10 = 32
+      mem[196] = caller
+      var16001 = 160
+      var16002 = 228
+      var16003 = 0
+      mem[0] = _7 + 1
+      mem[228] = uint256(stor[sha3(_7 + 1)].field_0)
+      idx = 228
+      s = 0
+      while _10 + stor[_7 + 1].length + 196 > idx + 32:
+          mem[idx + 32] = uint256(stor[s + sha3(_7 + 1) + 1].field_0)
+          idx = idx + 32
+          s = s + 1
+          continue 
+      mem[_10 + stor[_7 + 1].length + 196 len data.length] = data[all]
+      _585 = 160
+      mem[64] = _10 + stor[_7 + 1].length + data.length + 196
+      _586 = _10 + stor[_7 + 1].length + data.length + 196
+      mem[_10 + stor[_7 + 1].length + data.length + 196] = 0xe354733500000000000000000000000000000000000000000000000000000000
+      mem[_10 + stor[_7 + 1].length + data.length + 200] = address(stor[_7].field_0)
+      mem[_10 + stor[_7 + 1].length + data.length + 232] = 64
+      mem[_10 + stor[_7 + 1].length + data.length + 264] = mem[_585]
+      _588 = mem[_585]
+      mem[0 + _10 + stor[_7 + 1].length + data.length + 296 len ceil32(_588)] = mem[0 + _585 + 32 len ceil32(_588)]
+      var25001 = ceil32(_588)
+      if not _588 % 32:
+          require ext_code.size(0x74de5d4fcbf63e00296fd95d33236b9794016631)
+          call 0x74de5d4fcbf63e00296fd95d33236b9794016631.unknowne3547335(address _param1, array _param2) with:
+             value call.value wei
+               gas gas_remaining wei
+              args address(stor[_7].field_0), 64, mem[_10 + stor[_7 + 1].length + data.length + 264 len _588 + 32]
+          if not ext_call.success:
+              revert with ext_call.return_data[0 len return_data.size]
+          _711 = _10 + stor[_7 + 1].length + data.length + 196
+      else:
+          mem[floor32(_588) + _10 + stor[_7 + 1].length + data.length + 296] = mem[floor32(_588) + _10 + stor[_7 + 1].length + data.length + -(_588 % 32) + 328 len _588 % 32]
+          require ext_code.size(0x74de5d4fcbf63e00296fd95d33236b9794016631)
+          call 0x74de5d4fcbf63e00296fd95d33236b9794016631.unknowne3547335(address _param1, array _param2) with:
+             value call.value wei
+               gas gas_remaining wei
+              args address(stor[_7].field_0), 64, mem[_10 + stor[_7 + 1].length + data.length + 264 len floor32(_588) + 64]
+          if not ext_call.success:
+              revert with ext_call.return_data[0 len return_data.size]
+          _718 = _10 + stor[_7 + 1].length + data.length + 196
+  else:
+      mem[132] = caller
+      mem[164] = 0x74de5d4fcbf63e00296fd95d33236b9794016631
+      mem[196] = amount
+      mem[96] = 100
+      mem[132 len 28] = Mask(224, 32, caller) >> 32
+      mem[128 len 4] = transferFrom(address sender, address recipient, uint256 amount)
+      mem[64] = 292
+      mem[228] = 32
+      mem[260] = 'SafeERC20: low-level call failed'
+      if not ext_code.size(tokenFrom):
+          revert with 0, 'Address: call to non-contract'
+      _33 = 100
+      mem[292 len 96] = transferFrom(address sender, address recipient, uint256 amount), caller, 0x74de5d4fcbf63e00296fd95d33236b9794016631, Mask(224, 32, amount) >> 32
+      var23001 = 224
+      var23002 = 388
+      var23003 = 4
+      mem[388] = 0 or Mask(224, 32, mem[388])
+      call tokenFrom.0x94016631 with:
+           gas gas_remaining wei
+          args mem[296 len _33 - 4]
+      if not return_data.size:
+          if not ext_call.success:
+              revert with transferFrom(address sender, address recipient, uint256 amount), 
+                          caller,
+                          0x74de5d4fcbf63e00296fd95d33236b9794016631,
+                          amount
+          if not transferFrom(address sender, address recipient, uint256 amount), Mask(224, 32, caller) >> 32:
+              _288 = 292
+              mem[292] = 0x8c379a000000000000000000000000000000000000000000000000000000000
+              mem[296] = 32
+              mem[_288 + 36] = 42
+              mem[_288 + 68 len 42] = 0x735361666545524332303a204552433230206f7065726174696f6e20646964206e6f7420737563636565
+              revert with memory
+                from 292
+                 len _288 - 160
+          _298 = 292
+          mem[324] = caller
+          _299 = 292
+          mem[292] = 32
+          mem[64] = 356
+          mem[_298 + 96] = Mask(96, 0, stor[_7].field_160) << 224
+          _300 = mem[_299]
+          mem[_298 + 100 len floor32(mem[_299])] = mem[_299 + 32 len floor32(mem[_299])]
+          var37001 = _299 + floor32(mem[_299]) + 32
+          var37002 = _298 + floor32(mem[_299]) + 100
+          var37003 = mem[_299] - (32 * Mask(251, 0, mem[_299]) >> 5)
+          mem[_298 + floor32(mem[_299]) + 100] = mem[_299 + floor32(mem[_299]) + -(mem[_299] % 32) + 64 len mem[_299] % 32] or Mask(8 * -(mem[_299] % 32) + 32, -(8 * -(mem[_299] % 32) + 32) + 256, mem[_298 + floor32(mem[_299]) + 100])
+          mem[0] = _7 + 1
+          mem[_300 + _298 + 100] = uint256(stor[sha3(_7 + 1)].field_0)
+          idx = _300 + _298 + 100
+          s = 0
+          while _300 + _298 + stor[_7 + 1].length + 100 > idx + 32:
+              mem[idx + 32] = uint256(stor[s + sha3(_7 + 1) + 1].field_0)
+              idx = idx + 32
+              s = s + 1
+              continue 
+          mem[_300 + _298 + stor[_7 + 1].length + 100 len data.length] = data[all]
+          _683 = 356
+          mem[64] = _300 + _298 + stor[_7 + 1].length + data.length + 100
+          _684 = _300 + _298 + stor[_7 + 1].length + data.length + 100
+          mem[_300 + _298 + stor[_7 + 1].length + data.length + 100] = 0xe354733500000000000000000000000000000000000000000000000000000000
+          mem[_300 + _298 + stor[_7 + 1].length + data.length + 104] = address(stor[_7].field_0)
+          mem[_300 + _298 + stor[_7 + 1].length + data.length + 136] = 64
+          mem[_300 + _298 + stor[_7 + 1].length + data.length + 168] = mem[_683]
+          _686 = mem[_683]
+          mem[0 + _300 + _298 + stor[_7 + 1].length + data.length + 200 len ceil32(_686)] = mem[0 + _683 + 32 len ceil32(_686)]
+          var46001 = ceil32(_686)
+          if not _686 % 32:
+              require ext_code.size(0x74de5d4fcbf63e00296fd95d33236b9794016631)
+              call 0x74de5d4fcbf63e00296fd95d33236b9794016631.unknowne3547335(address _param1, array _param2) with:
+                 value call.value wei
+                   gas gas_remaining wei
+                  args address(stor[_7].field_0), 64, mem[_300 + _298 + stor[_7 + 1].length + data.length + 168 len _686 + 32]
+              if not ext_call.success:
+                  revert with ext_call.return_data[0 len return_data.size]
+              _764 = _300 + _298 + stor[_7 + 1].length + data.length + 100
+          else:
+              mem[floor32(_686) + _300 + _298 + stor[_7 + 1].length + data.length + 200] = mem[floor32(_686) + _300 + _298 + stor[_7 + 1].length + data.length + -(_686 % 32) + 232 len _686 % 32]
+              require ext_code.size(0x74de5d4fcbf63e00296fd95d33236b9794016631)
+              call 0x74de5d4fcbf63e00296fd95d33236b9794016631.unknowne3547335(address _param1, array _param2) with:
+                 value call.value wei
+                   gas gas_remaining wei
+                  args address(stor[_7].field_0), 64, mem[_300 + _298 + stor[_7 + 1].length + data.length + 168 len floor32(_686) + 64]
+              if not ext_call.success:
+                  revert with ext_call.return_data[0 len return_data.size]
+              _776 = _300 + _298 + stor[_7 + 1].length + data.length + 100
+      else:
+          _235 = 292
+          mem[64] = ceil32(return_data.size) + 293
+          mem[_235] = return_data.size
+          mem[_235 + 32 len return_data.size] = ext_call.return_data[0 len return_data.size]
+          if not ext_call.success:
+              if return_data.size:
+                  revert with ext_call.return_data[0 len return_data.size]
+              _250 = ceil32(return_data.size) + 293
+              mem[ceil32(return_data.size) + 293] = 0x8c379a000000000000000000000000000000000000000000000000000000000
+              mem[ceil32(return_data.size) + 297] = 32
+              mem[_250 + 36] = 32
+              _252 = 32
+              mem[0 + _250 + 68 len ceil32(_252)] = mem[0 + 260 len ceil32(_252)]
+              var30001 = ceil32(_252)
+              if not _252 % 32:
+                  revert with memory
+                    from ceil32(return_data.size) + 293
+                     len _252 + _250 + -ceil32(return_data.size) - 225
+              mem[floor32(_252) + _250 + 68] = mem[floor32(_252) + _250 + -(_252 % 32) + 100 len _252 % 32]
+              revert with memory
+                from ceil32(return_data.size) + 293
+                 len floor32(_252) + _250 + -ceil32(return_data.size) - 193
+          if not return_data.size:
+              _290 = ceil32(return_data.size) + 293
+              mem[ceil32(return_data.size) + 325] = caller
+              _291 = ceil32(return_data.size) + 293
+              mem[ceil32(return_data.size) + 293] = 32
+              mem[64] = ceil32(return_data.size) + 357
+              mem[_290 + 96] = Mask(96, 0, stor[_7].field_160) << 224
+              _292 = mem[_291]
+              mem[_290 + 100 len floor32(mem[_291])] = mem[_291 + 32 len floor32(mem[_291])]
+              var35001 = _291 + floor32(mem[_291]) + 32
+              var35002 = _290 + floor32(mem[_291]) + 100
+              var35003 = mem[_291] - (32 * Mask(251, 0, mem[_291]) >> 5)
+              mem[_290 + floor32(mem[_291]) + 100] = mem[_291 + floor32(mem[_291]) + -(mem[_291] % 32) + 64 len mem[_291] % 32] or Mask(8 * -(mem[_291] % 32) + 32, -(8 * -(mem[_291] % 32) + 32) + 256, mem[_290 + floor32(mem[_291]) + 100])
+              mem[0] = _7 + 1
+              mem[_292 + _290 + 100] = uint256(stor[sha3(_7 + 1)].field_0)
+              idx = _292 + _290 + 100
+              s = 0
+              while _292 + _290 + stor[_7 + 1].length + 100 > idx + 32:
+                  mem[idx + 32] = uint256(stor[s + sha3(_7 + 1) + 1].field_0)
+                  idx = idx + 32
+                  s = s + 1
+                  continue 
+              mem[_292 + _290 + stor[_7 + 1].length + 100 len data.length] = data[all]
+              _687 = ceil32(return_data.size) + 357
+              mem[64] = _292 + _290 + stor[_7 + 1].length + data.length + 100
+              _688 = _292 + _290 + stor[_7 + 1].length + data.length + 100
+              mem[_292 + _290 + stor[_7 + 1].length + data.length + 100] = 0xe354733500000000000000000000000000000000000000000000000000000000
+              mem[_292 + _290 + stor[_7 + 1].length + data.length + 104] = address(stor[_7].field_0)
+              mem[_292 + _290 + stor[_7 + 1].length + data.length + 136] = 64
+              mem[_292 + _290 + stor[_7 + 1].length + data.length + 168] = mem[_687]
+              _690 = mem[_687]
+              mem[0 + _292 + _290 + stor[_7 + 1].length + data.length + 200 len ceil32(_690)] = mem[0 + _687 + 32 len ceil32(_690)]
+              var44001 = ceil32(_690)
+              if not _690 % 32:
+                  require ext_code.size(0x74de5d4fcbf63e00296fd95d33236b9794016631)
+                  call 0x74de5d4fcbf63e00296fd95d33236b9794016631.unknowne3547335(address _param1, array _param2) with:
+                     value call.value wei
+                       gas gas_remaining wei
+                      args address(stor[_7].field_0), 64, mem[_292 + _290 + stor[_7 + 1].length + data.length + 168 len _690 + 32]
+                  if not ext_call.success:
+                      revert with ext_call.return_data[0 len return_data.size]
+                  _767 = _292 + _290 + stor[_7 + 1].length + data.length + 100
+              else:
+                  mem[floor32(_690) + _292 + _290 + stor[_7 + 1].length + data.length + 200] = mem[floor32(_690) + _292 + _290 + stor[_7 + 1].length + data.length + -(_690 % 32) + 232 len _690 % 32]
+                  require ext_code.size(0x74de5d4fcbf63e00296fd95d33236b9794016631)
+                  call 0x74de5d4fcbf63e00296fd95d33236b9794016631.unknowne3547335(address _param1, array _param2) with:
+                     value call.value wei
+                       gas gas_remaining wei
+                      args address(stor[_7].field_0), 64, mem[_292 + _290 + stor[_7 + 1].length + data.length + 168 len floor32(_690) + 64]
+                  if not ext_call.success:
+                      revert with ext_call.return_data[0 len return_data.size]
+                  _779 = _292 + _290 + stor[_7 + 1].length + data.length + 100
+          else:
+              require return_data.size >= 32
+              if not mem[_235 + 32]:
+                  _293 = ceil32(return_data.size) + 293
+                  mem[ceil32(return_data.size) + 293] = 0x8c379a000000000000000000000000000000000000000000000000000000000
+                  mem[ceil32(return_data.size) + 297] = 32
+                  mem[_293 + 36] = 42
+                  mem[_293 + 68 len 42] = 0x735361666545524332303a204552433230206f7065726174696f6e20646964206e6f7420737563636565
+                  revert with memory
+                    from ceil32(return_data.size) + 293
+                     len _293 + -ceil32(return_data.size) - 161
+              _304 = ceil32(return_data.size) + 293
+              mem[ceil32(return_data.size) + 325] = caller
+              _305 = ceil32(return_data.size) + 293
+              mem[ceil32(return_data.size) + 293] = 32
+              mem[64] = ceil32(return_data.size) + 357
+              mem[_304 + 96] = Mask(96, 0, stor[_7].field_160) << 224
+              _306 = mem[_305]
+              mem[_304 + 100 len floor32(mem[_305])] = mem[_305 + 32 len floor32(mem[_305])]
+              var37001 = _305 + floor32(mem[_305]) + 32
+              var37002 = _304 + floor32(mem[_305]) + 100
+              var37003 = mem[_305] - (32 * Mask(251, 0, mem[_305]) >> 5)
+              mem[_304 + floor32(mem[_305]) + 100] = mem[_305 + floor32(mem[_305]) + -(mem[_305] % 32) + 64 len mem[_305] % 32] or Mask(8 * -(mem[_305] % 32) + 32, -(8 * -(mem[_305] % 32) + 32) + 256, mem[_304 + floor32(mem[_305]) + 100])
+              mem[0] = _7 + 1
+              mem[_306 + _304 + 100] = uint256(stor[sha3(_7 + 1)].field_0)
+              idx = _306 + _304 + 100
+              s = 0
+              while _306 + _304 + stor[_7 + 1].length + 100 > idx + 32:
+                  mem[idx + 32] = uint256(stor[s + sha3(_7 + 1) + 1].field_0)
+                  idx = idx + 32
+                  s = s + 1
+                  continue 
+              mem[_306 + _304 + stor[_7 + 1].length + 100 len data.length] = data[all]
+              _691 = ceil32(return_data.size) + 357
+              mem[64] = _306 + _304 + stor[_7 + 1].length + data.length + 100
+              _692 = _306 + _304 + stor[_7 + 1].length + data.length + 100
+              mem[_306 + _304 + stor[_7 + 1].length + data.length + 100] = 0xe354733500000000000000000000000000000000000000000000000000000000
+              mem[_306 + _304 + stor[_7 + 1].length + data.length + 104] = address(stor[_7].field_0)
+              mem[_306 + _304 + stor[_7 + 1].length + data.length + 136] = 64
+              mem[_306 + _304 + stor[_7 + 1].length + data.length + 168] = mem[_691]
+              _694 = mem[_691]
+              mem[0 + _306 + _304 + stor[_7 + 1].length + data.length + 200 len ceil32(_694)] = mem[0 + _691 + 32 len ceil32(_694)]
+              var46001 = ceil32(_694)
+              if not _694 % 32:
+                  require ext_code.size(0x74de5d4fcbf63e00296fd95d33236b9794016631)
+                  call 0x74de5d4fcbf63e00296fd95d33236b9794016631.unknowne3547335(address _param1, array _param2) with:
+                     value call.value wei
+                       gas gas_remaining wei
+                      args address(stor[_7].field_0), 64, mem[_306 + _304 + stor[_7 + 1].length + data.length + 168 len _694 + 32]
+                  if not ext_call.success:
+                      revert with ext_call.return_data[0 len return_data.size]
+                  _770 = _306 + _304 + stor[_7 + 1].length + data.length + 100
+              else:
+                  mem[floor32(_694) + _306 + _304 + stor[_7 + 1].length + data.length + 200] = mem[floor32(_694) + _306 + _304 + stor[_7 + 1].length + data.length + -(_694 % 32) + 232 len _694 % 32]
+                  require ext_code.size(0x74de5d4fcbf63e00296fd95d33236b9794016631)
+                  call 0x74de5d4fcbf63e00296fd95d33236b9794016631.unknowne3547335(address _param1, array _param2) with:
+                     value call.value wei
+                       gas gas_remaining wei
+                      args address(stor[_7].field_0), 64, mem[_306 + _304 + stor[_7 + 1].length + data.length + 168 len floor32(_694) + 64]
+                  if not ext_call.success:
+                      revert with ext_call.return_data[0 len return_data.size]
+                  _782 = _306 + _304 + stor[_7 + 1].length + data.length + 100
+  log 0xbeee1e6e: sha3(aggregatorId[all]), caller
+  stor1 = 1
+
+

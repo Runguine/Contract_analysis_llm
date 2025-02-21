@@ -1,0 +1,2810 @@
+# Palkeoramix decompiler. 
+
+const name = '', 0
+const totalSupply = 10^17
+const decimals = 9
+const symbol = '', 0
+
+def storage:
+  owner is address at storage 0
+  stor2 is mapping of uint256 at storage 2
+  allowance is mapping of uint256 at storage 4
+  stor5 is mapping of uint8 at storage 5
+  stor6 is uint256 at storage 6
+  stor8 is uint256 at storage 8
+  stor9 is uint256 at storage 9
+  stor10 is uint256 at storage 10
+  stor11 is uint256 at storage 11
+  stor12 is uint256 at storage 12
+  stor13 is uint256 at storage 13
+  stor14 is uint256 at storage 14
+  stor15 is uint256 at storage 15
+  _buyMap is mapping of uint256 at storage 16
+  stor17 is address at storage 17
+  stor18 is address at storage 18
+  uniswapV2RouterAddress is address at storage 19
+  stor20 is uint8 at storage 20 offset 160
+  stor20 is uint8 at storage 20 offset 168
+  stor20 is uint128 at storage 20 offset 176
+  stor20 is uint128 at storage 20 offset 160
+  uniswapV2PairAddress is address at storage 20
+  _maxTxAmount is uint256 at storage 21
+  _maxWalletSize is uint256 at storage 22
+  _swapTokensAtAmount is uint256 at storage 23
+
+def uniswapV2Router(): # not payable
+  return uniswapV2RouterAddress
+
+def _swapTokensAtAmount(): # not payable
+  return _swapTokensAtAmount
+
+def uniswapV2Pair(): # not payable
+  return uniswapV2PairAddress
+
+def _maxTxAmount(): # not payable
+  return _maxTxAmount
+
+def _buyMap(address _param1): # not payable
+  require calldata.size - 4 >=′ 32
+  require _param1 == _param1
+  return _buyMap[_param1]
+
+def owner(): # not payable
+  return owner
+
+def _maxWalletSize(): # not payable
+  return _maxWalletSize
+
+def allowance(address owner, address spender): # not payable
+  require calldata.size - 4 >=′ 64
+  require owner == owner
+  require spender == spender
+  return allowance[address(owner)][address(spender)]
+
+#
+#  Regular functions
+#
+
+def setMaxTxnAmount(uint256 maxTxAmount): # not payable
+  require calldata.size - 4 >=′ 32
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  _maxTxAmount = maxTxAmount
+
+def setMaxWalletSize(uint256 maxWalletSize): # not payable
+  require calldata.size - 4 >=′ 32
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  _maxWalletSize = maxWalletSize
+
+def setMinSwapTokensThreshold(uint256 swapTokensAtAmount): # not payable
+  require calldata.size - 4 >=′ 32
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  _swapTokensAtAmount = swapTokensAtAmount
+
+def renounceOwnership(): # not payable
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  log OwnershipTransferred(
+        address previousOwner=owner,
+        address newOwner=0)
+  owner = 0
+
+def manualsend(): # not payable
+  if stor17 != caller:
+      require caller == stor18
+  call stor18 with:
+     value eth.balance(this.address) wei
+       gas 2300 * is_zero(value) wei
+  if not ext_call.success:
+      revert with ext_call.return_data[0 len return_data.size]
+
+def toggleSwap(bool _swapEnabled): # not payable
+  require calldata.size - 4 >=′ 32
+  require _swapEnabled == _swapEnabled
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  Mask(80, 0, stor20.field_176) = Mask(80, 0, _swapEnabled)
+
+def setTrading(bool _tradingOpen): # not payable
+  require calldata.size - 4 >=′ 32
+  require _tradingOpen == _tradingOpen
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  Mask(96, 0, stor20.field_160) = Mask(96, 0, _tradingOpen)
+
+def setFee(uint256 redisFeeOnBuy, uint256 redisFeeOnSell, uint256 taxFeeOnBuy, uint256 taxFeeOnSell): # not payable
+  require calldata.size - 4 >=′ 128
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  stor8 = redisFeeOnBuy
+  stor10 = redisFeeOnSell
+  stor9 = taxFeeOnBuy
+  stor11 = taxFeeOnSell
+
+def transferOwnership(address newOwner): # not payable
+  require calldata.size - 4 >=′ 32
+  require newOwner == newOwner
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  if not newOwner:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'Ownable: new owner is the zero address'
+  log OwnershipTransferred(
+        address previousOwner=owner,
+        address newOwner=newOwner)
+  owner = newOwner
+
+def balanceOf(address account): # not payable
+  require calldata.size - 4 >=′ 32
+  require account == account
+  if stor2[address(account)] > stor6:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'Amount must be less than total reflections'
+  if not stor6 / 10^17:
+      revert with 0, 'SafeMath: division by zero', 0
+  return (stor2[address(account)] / stor6 / 10^17)
+
+def approve(address spender, uint256 amount): # not payable
+  require calldata.size - 4 >=′ 64
+  require spender == spender
+  if not caller:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: approve from the zero address'
+  if not spender:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: approve to the zero address'
+  allowance[caller][address(spender)] = amount
+  log Approval(
+        address owner=amount,
+        address spender=caller,
+        uint256 value=spender)
+  return 1
+
+def excludeMultipleAccountsFromFees(address[] accounts, bool excluded): # not payable
+  require calldata.size - 4 >=′ 64
+  require accounts <= LOCK8605463013()
+  require accounts + 35 <′ calldata.size
+  require accounts.length <= LOCK8605463013()
+  require accounts + (32 * accounts.length) + 36 <= calldata.size
+  require excluded == excluded
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  idx = 0
+  while idx < accounts.length:
+      require cd[((32 * idx) + accounts + 36)] == address(cd[((32 * idx) + accounts + 36)])
+      mem[0] = address(cd[((32 * idx) + accounts + 36)])
+      mem[32] = 5
+      stor5[address(cd[((32 * idx) + accounts + 36)])] = uint8(excluded)
+      if not idx + 1:
+          revert with 0, 17
+      idx = idx + 1
+      continue 
+
+def manualswap(): # not payable
+  if stor17 != caller:
+      require caller == stor18
+  if stor2[address(this.address)] > stor6:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'Amount must be less than total reflections'
+  if not stor6 / 10^17:
+      revert with 0, 'SafeMath: division by zero', 0
+  uint8(stor20.field_168) = 1
+  mem[320] = this.address
+  static call uniswapV2RouterAddress.WETH() with:
+          gas gas_remaining wei
+  mem[384] = ext_call.return_data[0]
+  if not ext_call.success:
+      revert with ext_call.return_data[0 len return_data.size]
+  require return_data.size >=′ 32
+  require ext_call.return_data[0] == ext_call.return_data[12 len 20]
+  mem[352] = ext_call.return_data[12 len 20]
+  if not this.address:
+      revert with 0, 'ERC20: approve from the zero address'
+  if not uniswapV2RouterAddress:
+      revert with 0, 'ERC20: approve to the zero address'
+  allowance[address(this.address)][stor19] = stor2[address(this.address)] / stor6 / 10^17
+  log Approval(
+        address owner=(stor2[address(this.address)] / stor6 / 10^17),
+        address spender=this.address,
+        uint256 value=uniswapV2RouterAddress)
+  mem[ceil32(return_data.size) + 384] = 0x791ac94700000000000000000000000000000000000000000000000000000000
+  mem[ceil32(return_data.size) + 388] = stor2[address(this.address)] / stor6 / 10^17
+  idx = 0
+  s = ceil32(return_data.size) + 580
+  t = 320
+  while idx < 2:
+      mem[s] = mem[t + 12 len 20]
+      idx = idx + 1
+      s = s + 32
+      t = t + 32
+      continue 
+  require ext_code.size(uniswapV2RouterAddress)
+  call uniswapV2RouterAddress.swapExactTokensForETHSupportingFeeOnTransferTokens(uint256 amountIn, uint256 amountOutMin, address[] path, address to, uint256 deadline) with:
+       gas gas_remaining wei
+      args stor2[address(this.address)] / stor6 / 10^17, 0, 160, address(this.address), block.timestamp, 2, mem[ceil32(return_data.size) + 580 len 64]
+  if not ext_call.success:
+      revert with ext_call.return_data[0 len return_data.size]
+  uint8(stor20.field_168) = 0
+
+def transfer(address recipient, uint256 amount): # not payable
+  require calldata.size - 4 >=′ 64
+  require recipient == recipient
+  if not caller:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: transfer from the zero address'
+  if not recipient:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: transfer to the zero address'
+  if amount <= 0:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'Transfer amount must be greater than zero'
+  if owner == caller:
+      if stor5[caller]:
+          if stor12:
+              stor14 = stor12
+              stor15 = stor13
+              stor12 = 0
+              stor13 = 0
+              if not -amount:
+                  if not -amount:
+                      if 0 <= amount:
+                  else:
+                      if amount and stor13 > -1 / amount:
+                          revert with 0, 17
+                      if not amount:
+                          revert with 0, 18
+                      if amount * stor13 / amount != stor13:
+                          revert with 0, 'SafeMath: multiplication overflow'
+              else:
+                  if amount and stor12 > -1 / amount:
+                      revert with 0, 17
+                  if not amount:
+                      revert with 0, 18
+                  if amount * stor12 / amount != stor12:
+                      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                  if -amount:
+                      if amount and stor13 > -1 / amount:
+                          revert with 0, 17
+                      if not amount:
+                          revert with 0, 18
+                      if amount * stor13 / amount != stor13:
+                          revert with 0, 'SafeMath: multiplication overflow'
+          else:
+              if stor13:
+                  stor14 = stor12
+                  stor15 = stor13
+                  stor12 = 0
+                  stor13 = 0
+              if not -amount:
+                  if -amount:
+                      if amount and stor13 > -1 / amount:
+                          revert with 0, 17
+                      if not amount:
+                          revert with 0, 18
+                      if amount * stor13 / amount != stor13:
+                          revert with 0, 'SafeMath: multiplication overflow'
+              else:
+                  if amount and stor12 > -1 / amount:
+                      revert with 0, 17
+                  if not amount:
+                      revert with 0, 18
+                  if amount * stor12 / amount != stor12:
+                      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                  if -amount:
+                      if amount and stor13 > -1 / amount:
+                          revert with 0, 17
+                      if not amount:
+                          revert with 0, 18
+      else:
+          if stor5[address(recipient)]:
+              if stor12:
+                  stor14 = stor12
+                  stor15 = stor13
+                  stor12 = 0
+                  stor13 = 0
+              else:
+                  if stor13:
+                      stor14 = stor12
+                      stor15 = stor13
+                      stor12 = 0
+                      stor13 = 0
+              if not -amount:
+                  if -amount:
+                      if amount and stor13 > -1 / amount:
+                          revert with 0, 17
+                      if not amount:
+                          revert with 0, 18
+                      if amount * stor13 / amount != stor13:
+                          revert with 0, 'SafeMath: multiplication overflow'
+              else:
+                  if amount and stor12 > -1 / amount:
+                      revert with 0, 17
+                  if not amount:
+                      revert with 0, 18
+                  if amount * stor12 / amount != stor12:
+                      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                  if -amount:
+                      if amount and stor13 > -1 / amount:
+                          revert with 0, 17
+                      if not amount:
+                          revert with 0, 18
+          else:
+              if uniswapV2PairAddress == caller:
+                  if uniswapV2RouterAddress == recipient:
+                      if uniswapV2PairAddress != recipient:
+                          if not -amount:
+                              if -amount:
+                                  if amount and stor13 > -1 / amount:
+                                      revert with 0, 17
+                                  if not amount:
+                                      revert with 0, 18
+                                  if amount * stor13 / amount != stor13:
+                                      revert with 0, 'SafeMath: multiplication overflow'
+                          else:
+                              if amount and stor12 > -1 / amount:
+                                  revert with 0, 17
+                              if not amount:
+                                  revert with 0, 18
+                              if amount * stor12 / amount != stor12:
+                                  revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                              if -amount:
+                                  if amount and stor13 > -1 / amount:
+                                      revert with 0, 17
+                                  if not amount:
+                                      revert with 0, 18
+                      else:
+                          if uniswapV2RouterAddress == caller:
+                              if not -amount:
+                                  if -amount:
+                                      if amount and stor13 > -1 / amount:
+                                          revert with 0, 17
+                                      if not amount:
+                                          revert with 0, 18
+                                      if amount * stor13 / amount != stor13:
+                                          revert with 0, 'SafeMath: multiplication overflow'
+                              else:
+                                  if amount and stor12 > -1 / amount:
+                                      revert with 0, 17
+                                  if not amount:
+                                      revert with 0, 18
+                                  if amount * stor12 / amount != stor12:
+                                      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                                  if -amount:
+                                      if amount and stor13 > -1 / amount:
+                                          revert with 0, 17
+                                      if not amount:
+                                          revert with 0, 18
+                          else:
+                              stor12 = stor10
+                              stor13 = stor11
+                              if not -amount:
+                                  if -amount:
+                                      if amount and stor13 > -1 / amount:
+                                          revert with 0, 17
+                                      if not amount:
+                                          revert with 0, 18
+                                      if amount * stor13 / amount != stor13:
+                                          revert with 0, 'SafeMath: multiplication overflow'
+                              else:
+                                  if amount and stor12 > -1 / amount:
+                                      revert with 0, 17
+                                  if not amount:
+                                      revert with 0, 18
+                                  if amount * stor12 / amount != stor12:
+                                      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                                  if -amount:
+                                      if amount and stor13 > -1 / amount:
+                                          revert with 0, 17
+                  else:
+                      stor12 = stor8
+                      stor13 = stor9
+                      if uniswapV2PairAddress != recipient:
+                          if not -amount:
+                              if -amount:
+                                  if amount and stor13 > -1 / amount:
+                                      revert with 0, 17
+                                  if not amount:
+                                      revert with 0, 18
+                                  if amount * stor13 / amount != stor13:
+                                      revert with 0, 'SafeMath: multiplication overflow'
+                          else:
+                              if amount and stor12 > -1 / amount:
+                                  revert with 0, 17
+                              if not amount:
+                                  revert with 0, 18
+                              if amount * stor12 / amount != stor12:
+                                  revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                              if -amount:
+                                  if amount and stor13 > -1 / amount:
+                                      revert with 0, 17
+                                  if not amount:
+                                      revert with 0, 18
+                      else:
+                          if uniswapV2RouterAddress != caller:
+                              stor12 = stor10
+                              stor13 = stor11
+                          if not -amount:
+                              if -amount:
+                                  if amount and stor13 > -1 / amount:
+                                      revert with 0, 17
+                                  if not amount:
+                                      revert with 0, 18
+                                  if amount * stor13 / amount != stor13:
+                                      revert with 0, 'SafeMath: multiplication overflow'
+                          else:
+                              if amount and stor12 > -1 / amount:
+                                  revert with 0, 17
+                              if not amount:
+                                  revert with 0, 18
+                              if amount * stor12 / amount != stor12:
+                                  revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                              if -amount:
+                                  if amount and stor13 > -1 / amount:
+                                      revert with 0, 17
+              else:
+                  if uniswapV2PairAddress != recipient:
+                      if stor12:
+                          stor14 = stor12
+                          stor15 = stor13
+                          stor12 = 0
+                          stor13 = 0
+                          if not -amount:
+                              if -amount:
+                                  if amount and stor13 > -1 / amount:
+                                      revert with 0, 17
+                                  if not amount:
+                                      revert with 0, 18
+                                  if amount * stor13 / amount != stor13:
+                                      revert with 0, 'SafeMath: multiplication overflow'
+                          else:
+                              if amount and stor12 > -1 / amount:
+                                  revert with 0, 17
+                              if not amount:
+                                  revert with 0, 18
+                              if amount * stor12 / amount != stor12:
+                                  revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                              if -amount:
+                                  if amount and stor13 > -1 / amount:
+                                      revert with 0, 17
+                                  if not amount:
+                                      revert with 0, 18
+                      else:
+                          if stor13:
+                              stor14 = stor12
+                              stor15 = stor13
+                              stor12 = 0
+                              stor13 = 0
+                          if not -amount:
+                              if -amount:
+                                  if amount and stor13 > -1 / amount:
+                                      revert with 0, 17
+                                  if not amount:
+                                      revert with 0, 18
+                                  if amount * stor13 / amount != stor13:
+                                      revert with 0, 'SafeMath: multiplication overflow'
+                          else:
+                              if amount and stor12 > -1 / amount:
+                                  revert with 0, 17
+                              if not amount:
+                                  revert with 0, 18
+                              if amount * stor12 / amount != stor12:
+                                  revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                              if -amount:
+                                  if amount and stor13 > -1 / amount:
+                                      revert with 0, 17
+                  else:
+                      if uniswapV2PairAddress != caller:
+                          if uniswapV2PairAddress != recipient:
+                              if not -amount:
+                                  if -amount:
+                                      if amount and stor13 > -1 / amount:
+                                          revert with 0, 17
+                                      if not amount:
+                                          revert with 0, 18
+                                      if amount * stor13 / amount != stor13:
+                                          revert with 0, 'SafeMath: multiplication overflow'
+                              else:
+                                  if amount and stor12 > -1 / amount:
+                                      revert with 0, 17
+                                  if not amount:
+                                      revert with 0, 18
+                                  if amount * stor12 / amount != stor12:
+                                      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                                  if -amount:
+                                      if amount and stor13 > -1 / amount:
+                                          revert with 0, 17
+                                      if not amount:
+                                          revert with 0, 18
+                          else:
+                              if uniswapV2RouterAddress == caller:
+                                  if not -amount:
+                                      if -amount:
+                                          if amount and stor13 > -1 / amount:
+                                              revert with 0, 17
+                                          if not amount:
+                                              revert with 0, 18
+                                          if amount * stor13 / amount != stor13:
+                                              revert with 0, 'SafeMath: multiplication overflow'
+                                  else:
+                                      if amount and stor12 > -1 / amount:
+                                          revert with 0, 17
+                                      if not amount:
+                                          revert with 0, 18
+                                      if amount * stor12 / amount != stor12:
+                                          revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                                      if -amount:
+                                          if amount and stor13 > -1 / amount:
+                                              revert with 0, 17
+                                          if not amount:
+                                              revert with 0, 18
+                              else:
+                                  stor12 = stor10
+                                  stor13 = stor11
+                                  if not -amount:
+                                      if -amount:
+                                          if amount and stor13 > -1 / amount:
+                                              revert with 0, 17
+                                          if not amount:
+                                              revert with 0, 18
+                                          if amount * stor13 / amount != stor13:
+                                              revert with 0, 'SafeMath: multiplication overflow'
+                                  else:
+                                      if amount and stor12 > -1 / amount:
+                                          revert with 0, 17
+                                      if not amount:
+                                          revert with 0, 18
+                                      if amount * stor12 / amount != stor12:
+                                          revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                                      if -amount:
+                                          if amount and stor13 > -1 / amount:
+                                              revert with 0, 17
+                      else:
+                          if uniswapV2RouterAddress == recipient:
+                              if uniswapV2PairAddress != recipient:
+                                  if not -amount:
+                                      if -amount:
+                                          if amount and stor13 > -1 / amount:
+                                              revert with 0, 17
+                                          if not amount:
+                                              revert with 0, 18
+                                          if amount * stor13 / amount != stor13:
+                                              revert with 0, 'SafeMath: multiplication overflow'
+                                  else:
+                                      if amount and stor12 > -1 / amount:
+                                          revert with 0, 17
+                                      if not amount:
+                                          revert with 0, 18
+                                      if amount * stor12 / amount != stor12:
+                                          revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                                      if -amount:
+                                          if amount and stor13 > -1 / amount:
+                                              revert with 0, 17
+                                          if not amount:
+                                              revert with 0, 18
+                              else:
+                                  if uniswapV2RouterAddress != caller:
+                                      stor12 = stor10
+                                      stor13 = stor11
+                                  if not -amount:
+                                      if -amount:
+                                          if amount and stor13 > -1 / amount:
+                                              revert with 0, 17
+                                          if not amount:
+                                              revert with 0, 18
+                                          if amount * stor13 / amount != stor13:
+                                              revert with 0, 'SafeMath: multiplication overflow'
+                                  else:
+                                      if amount and stor12 > -1 / amount:
+                                          revert with 0, 17
+                                      if not amount:
+                                          revert with 0, 18
+                                      if amount * stor12 / amount != stor12:
+                                          revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                                      if -amount:
+                                          if amount and stor13 > -1 / amount:
+                                              revert with 0, 17
+                          else:
+                              stor12 = stor8
+                              stor13 = stor9
+                              if uniswapV2PairAddress != recipient:
+                                  if not -amount:
+                                      if -amount:
+                                          if amount and stor13 > -1 / amount:
+                                              revert with 0, 17
+                                          if not amount:
+                                              revert with 0, 18
+                                          if amount * stor13 / amount != stor13:
+                                              revert with 0, 'SafeMath: multiplication overflow'
+                                  else:
+                                      if amount and stor12 > -1 / amount:
+                                          revert with 0, 17
+                                      if not amount:
+                                          revert with 0, 18
+                                      if amount * stor12 / amount != stor12:
+                                          revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                                      if -amount:
+                                          if amount and stor13 > -1 / amount:
+                                              revert with 0, 17
+                              else:
+                                  if uniswapV2RouterAddress == caller:
+                                      if not -amount:
+                                          if -amount:
+                                              if amount and stor13 > -1 / amount:
+                                                  revert with 0, 17
+                                              if not amount:
+                                                  revert with 0, 18
+                                              if amount * stor13 / amount != stor13:
+                                                  revert with 0, 'SafeMath: multiplication overflow'
+                                      else:
+                                          if amount and stor12 > -1 / amount:
+                                              revert with 0, 17
+                                          if not amount:
+                                              revert with 0, 18
+                                          if amount * stor12 / amount != stor12:
+                                              revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                                          if -amount:
+                                              if amount and stor13 > -1 / amount:
+                                                  revert with 0, 17
+                                  else:
+                                      stor12 = stor10
+                                      stor13 = stor11
+                                      if not -amount:
+                                          if -amount:
+                                              if amount and stor13 > -1 / amount:
+                                                  revert with 0, 17
+                                              if not amount:
+                                                  revert with 0, 18
+                                              if amount * stor13 / amount != stor13:
+                                                  revert with 0, 'SafeMath: multiplication overflow'
+                                      else:
+                                          if amount and stor12 > -1 / amount:
+                                              revert with 0, 17
+                                          if not amount:
+                                              revert with 0, 18
+                                          if amount * stor12 / amount != stor12:
+                                              revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                                          if -amount:
+  else:
+      if owner != recipient:
+          if uint8(stor20.field_160):
+              if amount > _maxTxAmount:
+                  revert with 0, 'TOKEN: Max Transaction Limit'
+              if uniswapV2PairAddress != recipient:
+                  if stor2[address(recipient)] > stor6:
+                      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'Amount must be less than total reflections'
+                  if stor6 / 10^17:
+                      if stor2[address(recipient)] / stor6 / 10^17 > !amount:
+                          revert with 0, 17
+              else:
+                  if stor2[address(this.address)] > stor6:
+                      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'Amount must be less than total reflections'
+                  if stor6 / 10^17:
+                      if stor2[address(this.address)] / stor6 / 10^17 < _maxTxAmount:
+                          if stor2[address(this.address)] / stor6 / 10^17 >= _swapTokensAtAmount:
+          else:
+              if owner != caller:
+                  revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                              'TOKEN: This account cannot send tokens until trading is enabled'
+              if amount > _maxTxAmount:
+                  revert with 0, 'TOKEN: Max Transaction Limit'
+              if uniswapV2PairAddress != recipient:
+                  if stor2[address(recipient)] > stor6:
+                      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'Amount must be less than total reflections'
+              else:
+                  if stor2[address(this.address)] > stor6:
+                      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'Amount must be less than total reflections'
+              if stor6 / 10^17:
+      else:
+          if stor5[caller]:
+              if stor12:
+                  stor14 = stor12
+                  stor15 = stor13
+                  stor12 = 0
+                  stor13 = 0
+              else:
+                  if stor13:
+                      stor14 = stor12
+                      stor15 = stor13
+                      stor12 = 0
+                      stor13 = 0
+              if not -amount:
+                  if -amount:
+                      if amount and stor13 > -1 / amount:
+                          revert with 0, 17
+                      if not amount:
+                          revert with 0, 18
+                      if amount * stor13 / amount != stor13:
+                          revert with 0, 'SafeMath: multiplication overflow'
+              else:
+                  if amount and stor12 > -1 / amount:
+                      revert with 0, 17
+                  if not amount:
+                      revert with 0, 18
+                  if amount * stor12 / amount != stor12:
+                      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                  if -amount:
+                      if amount and stor13 > -1 / amount:
+                          revert with 0, 17
+                      if not amount:
+                          revert with 0, 18
+          else:
+              if stor5[address(recipient)]:
+                  if stor12:
+                      stor14 = stor12
+                      stor15 = stor13
+                      stor12 = 0
+                      stor13 = 0
+                  else:
+                      if stor13:
+                          stor14 = stor12
+                          stor15 = stor13
+                          stor12 = 0
+                          stor13 = 0
+                  if not -amount:
+                      if -amount:
+                          if amount and stor13 > -1 / amount:
+                              revert with 0, 17
+                          if not amount:
+                              revert with 0, 18
+                          if amount * stor13 / amount != stor13:
+                              revert with 0, 'SafeMath: multiplication overflow'
+                  else:
+                      if amount and stor12 > -1 / amount:
+                          revert with 0, 17
+                      if not amount:
+                          revert with 0, 18
+                      if amount * stor12 / amount != stor12:
+                          revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                      if -amount:
+                          if amount and stor13 > -1 / amount:
+                              revert with 0, 17
+                          if not amount:
+                              revert with 0, 18
+              else:
+                  if uniswapV2PairAddress == caller:
+                      if uniswapV2RouterAddress == recipient:
+                          if uniswapV2PairAddress != recipient:
+                              if not -amount:
+                                  if -amount:
+                                      if amount and stor13 > -1 / amount:
+                                          revert with 0, 17
+                                      if not amount:
+                                          revert with 0, 18
+                                      if amount * stor13 / amount != stor13:
+                                          revert with 0, 'SafeMath: multiplication overflow'
+                              else:
+                                  if amount and stor12 > -1 / amount:
+                                      revert with 0, 17
+                                  if not amount:
+                                      revert with 0, 18
+                                  if amount * stor12 / amount != stor12:
+                                      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                                  if -amount:
+                                      if amount and stor13 > -1 / amount:
+                                          revert with 0, 17
+                                      if not amount:
+                                          revert with 0, 18
+                          else:
+                              if uniswapV2RouterAddress != caller:
+                                  stor12 = stor10
+                                  stor13 = stor11
+                              if not -amount:
+                                  if -amount:
+                                      if amount and stor13 > -1 / amount:
+                                          revert with 0, 17
+                                      if not amount:
+                                          revert with 0, 18
+                                      if amount * stor13 / amount != stor13:
+                                          revert with 0, 'SafeMath: multiplication overflow'
+                              else:
+                                  if amount and stor12 > -1 / amount:
+                                      revert with 0, 17
+                                  if not amount:
+                                      revert with 0, 18
+                                  if amount * stor12 / amount != stor12:
+                                      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                                  if -amount:
+                                      if amount and stor13 > -1 / amount:
+                                          revert with 0, 17
+                      else:
+                          stor12 = stor8
+                          stor13 = stor9
+                          if uniswapV2PairAddress != recipient:
+                              if not -amount:
+                                  if -amount:
+                                      if amount and stor13 > -1 / amount:
+                                          revert with 0, 17
+                                      if not amount:
+                                          revert with 0, 18
+                                      if amount * stor13 / amount != stor13:
+                                          revert with 0, 'SafeMath: multiplication overflow'
+                              else:
+                                  if amount and stor12 > -1 / amount:
+                                      revert with 0, 17
+                                  if not amount:
+                                      revert with 0, 18
+                                  if amount * stor12 / amount != stor12:
+                                      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                                  if -amount:
+                                      if amount and stor13 > -1 / amount:
+                                          revert with 0, 17
+                          else:
+                              if uniswapV2RouterAddress == caller:
+                                  if not -amount:
+                                      if -amount:
+                                          if amount and stor13 > -1 / amount:
+                                              revert with 0, 17
+                                          if not amount:
+                                              revert with 0, 18
+                                          if amount * stor13 / amount != stor13:
+                                              revert with 0, 'SafeMath: multiplication overflow'
+                                  else:
+                                      if amount and stor12 > -1 / amount:
+                                          revert with 0, 17
+                                      if not amount:
+                                          revert with 0, 18
+                                      if amount * stor12 / amount != stor12:
+                                          revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                                      if -amount:
+                                          if amount and stor13 > -1 / amount:
+                                              revert with 0, 17
+                              else:
+                                  stor12 = stor10
+                                  stor13 = stor11
+                                  if not -amount:
+                                      if -amount:
+                                          if amount and stor13 > -1 / amount:
+                                              revert with 0, 17
+                                          if not amount:
+                                              revert with 0, 18
+                                          if amount * stor13 / amount != stor13:
+                                              revert with 0, 'SafeMath: multiplication overflow'
+                                  else:
+                                      if amount and stor12 > -1 / amount:
+                                          revert with 0, 17
+                                      if not amount:
+                                          revert with 0, 18
+                                      if amount * stor12 / amount != stor12:
+                                          revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                                      if -amount:
+                  else:
+                      if uniswapV2PairAddress != recipient:
+                          if stor12:
+                              stor14 = stor12
+                              stor15 = stor13
+                              stor12 = 0
+                              stor13 = 0
+                          else:
+                              if stor13:
+                                  stor14 = stor12
+                                  stor15 = stor13
+                                  stor12 = 0
+                                  stor13 = 0
+                          if not -amount:
+                              if -amount:
+                                  if amount and stor13 > -1 / amount:
+                                      revert with 0, 17
+                                  if not amount:
+                                      revert with 0, 18
+                                  if amount * stor13 / amount != stor13:
+                                      revert with 0, 'SafeMath: multiplication overflow'
+                          else:
+                              if amount and stor12 > -1 / amount:
+                                  revert with 0, 17
+                              if not amount:
+                                  revert with 0, 18
+                              if amount * stor12 / amount != stor12:
+                                  revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                              if -amount:
+                                  if amount and stor13 > -1 / amount:
+                                      revert with 0, 17
+                      else:
+                          if uniswapV2PairAddress != caller:
+                              if uniswapV2PairAddress != recipient:
+                                  if not -amount:
+                                      if -amount:
+                                          if amount and stor13 > -1 / amount:
+                                              revert with 0, 17
+                                          if not amount:
+                                              revert with 0, 18
+                                          if amount * stor13 / amount != stor13:
+                                              revert with 0, 'SafeMath: multiplication overflow'
+                                  else:
+                                      if amount and stor12 > -1 / amount:
+                                          revert with 0, 17
+                                      if not amount:
+                                          revert with 0, 18
+                                      if amount * stor12 / amount != stor12:
+                                          revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                                      if -amount:
+                                          if amount and stor13 > -1 / amount:
+                                              revert with 0, 17
+                                          if not amount:
+                                              revert with 0, 18
+                              else:
+                                  if uniswapV2RouterAddress != caller:
+                                      stor12 = stor10
+                                      stor13 = stor11
+                                  if not -amount:
+                                      if -amount:
+                                          if amount and stor13 > -1 / amount:
+                                              revert with 0, 17
+                                          if not amount:
+                                              revert with 0, 18
+                                          if amount * stor13 / amount != stor13:
+                                              revert with 0, 'SafeMath: multiplication overflow'
+                                  else:
+                                      if amount and stor12 > -1 / amount:
+                                          revert with 0, 17
+                                      if not amount:
+                                          revert with 0, 18
+                                      if amount * stor12 / amount != stor12:
+                                          revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                                      if -amount:
+                                          if amount and stor13 > -1 / amount:
+                                              revert with 0, 17
+                          else:
+                              if uniswapV2RouterAddress == recipient:
+                                  if uniswapV2PairAddress != recipient:
+                                      if not -amount:
+                                          if -amount:
+                                              if amount and stor13 > -1 / amount:
+                                                  revert with 0, 17
+                                              if not amount:
+                                                  revert with 0, 18
+                                              if amount * stor13 / amount != stor13:
+                                                  revert with 0, 'SafeMath: multiplication overflow'
+                                      else:
+                                          if amount and stor12 > -1 / amount:
+                                              revert with 0, 17
+                                          if not amount:
+                                              revert with 0, 18
+                                          if amount * stor12 / amount != stor12:
+                                              revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                                          if -amount:
+                                              if amount and stor13 > -1 / amount:
+                                                  revert with 0, 17
+                                  else:
+                                      if uniswapV2RouterAddress == caller:
+                                          if not -amount:
+                                              if -amount:
+                                                  if amount and stor13 > -1 / amount:
+                                                      revert with 0, 17
+                                                  if not amount:
+                                                      revert with 0, 18
+                                                  if amount * stor13 / amount != stor13:
+                                                      revert with 0, 'SafeMath: multiplication overflow'
+                                          else:
+                                              if amount and stor12 > -1 / amount:
+                                                  revert with 0, 17
+                                              if not amount:
+                                                  revert with 0, 18
+                                              if amount * stor12 / amount != stor12:
+                                                  revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                                              if -amount:
+                                                  if amount and stor13 > -1 / amount:
+                                                      revert with 0, 17
+                                      else:
+                                          stor12 = stor10
+                                          stor13 = stor11
+                                          if not -amount:
+                                              if -amount:
+                                                  if amount and stor13 > -1 / amount:
+                                                      revert with 0, 17
+                                                  if not amount:
+                                                      revert with 0, 18
+                                                  if amount * stor13 / amount != stor13:
+                                                      revert with 0, 'SafeMath: multiplication overflow'
+                                          else:
+                                              if amount and stor12 > -1 / amount:
+                                                  revert with 0, 17
+                                              if not amount:
+                                                  revert with 0, 18
+                                              if amount * stor12 / amount != stor12:
+                                                  revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                                              if -amount:
+                              else:
+                                  stor12 = stor8
+                                  stor13 = stor9
+                                  if uniswapV2PairAddress != recipient:
+                                      if not -amount:
+                                          if -amount:
+                                              if amount and stor13 > -1 / amount:
+                                                  revert with 0, 17
+                                              if not amount:
+                                                  revert with 0, 18
+                                              if amount * stor13 / amount != stor13:
+                                                  revert with 0, 'SafeMath: multiplication overflow'
+                                      else:
+                                          if amount and stor12 > -1 / amount:
+                                              revert with 0, 17
+                                          if not amount:
+                                              revert with 0, 18
+                                          if amount * stor12 / amount != stor12:
+                                              revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                                          if -amount:
+                                              if amount and stor13 > -1 / amount:
+                                                  revert with 0, 17
+                                  else:
+                                      if uniswapV2RouterAddress == caller:
+                                          if not -amount:
+                                              if -amount:
+                                                  if amount and stor13 > -1 / amount:
+                                                      revert with 0, 17
+                                                  if not amount:
+                                                      revert with 0, 18
+                                                  if amount * stor13 / amount != stor13:
+                                                      revert with 0, 'SafeMath: multiplication overflow'
+                                          else:
+                                              if amount and stor12 > -1 / amount:
+                                                  revert with 0, 17
+                                              if not amount:
+                                                  revert with 0, 18
+                                              if amount * stor12 / amount != stor12:
+                                                  revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                                              if -amount:
+                                      else:
+                                          stor12 = stor10
+                                          stor13 = stor11
+                                          if not -amount:
+                                              if -amount:
+                                                  if amount and stor13 > -1 / amount:
+                                                      revert with 0, 17
+                                                  if not amount:
+                                                      revert with 0, 18
+                                          else:
+                                              if amount and stor12 > -1 / amount:
+                                                  revert with 0, 17
+                                              if not amount:
+                                                  revert with 0, 18
+                                              if amount * stor12 / amount != stor12:
+                                                  revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                                              if -amount:
+  ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+
+def transferFrom(address sender, address recipient, uint256 amount): # not payable
+  require calldata.size - 4 >=′ 96
+  require sender == sender
+  require recipient == recipient
+  if not sender:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: transfer from the zero address'
+  if not recipient:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: transfer to the zero address'
+  if amount <= 0:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'Transfer amount must be greater than zero'
+  if owner == sender:
+      if stor5[address(sender)]:
+          if stor12:
+              stor14 = stor12
+              stor15 = stor13
+              stor12 = 0
+              stor13 = 0
+              if not -amount:
+                  if not -amount:
+                      if 0 <= amount:
+                  else:
+                      if amount and stor13 > -1 / amount:
+                          revert with 0, 17
+                      if not amount:
+                          revert with 0, 18
+                      if amount * stor13 / amount != stor13:
+                          revert with 0, 'SafeMath: multiplication overflow'
+              else:
+                  if amount and stor12 > -1 / amount:
+                      revert with 0, 17
+                  if not amount:
+                      revert with 0, 18
+                  if amount * stor12 / amount != stor12:
+                      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                  if -amount:
+                      if amount and stor13 > -1 / amount:
+                          revert with 0, 17
+                      if not amount:
+                          revert with 0, 18
+                      if amount * stor13 / amount != stor13:
+                          revert with 0, 'SafeMath: multiplication overflow'
+          else:
+              if stor13:
+                  stor14 = stor12
+                  stor15 = stor13
+                  stor12 = 0
+                  stor13 = 0
+              if not -amount:
+                  if -amount:
+                      if amount and stor13 > -1 / amount:
+                          revert with 0, 17
+                      if not amount:
+                          revert with 0, 18
+                      if amount * stor13 / amount != stor13:
+                          revert with 0, 'SafeMath: multiplication overflow'
+              else:
+                  if amount and stor12 > -1 / amount:
+                      revert with 0, 17
+                  if not amount:
+                      revert with 0, 18
+                  if amount * stor12 / amount != stor12:
+                      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                  if -amount:
+                      if amount and stor13 > -1 / amount:
+                          revert with 0, 17
+                      if not amount:
+                          revert with 0, 18
+      else:
+          if stor5[address(recipient)]:
+              if stor12:
+                  stor14 = stor12
+                  stor15 = stor13
+                  stor12 = 0
+                  stor13 = 0
+              else:
+                  if stor13:
+                      stor14 = stor12
+                      stor15 = stor13
+                      stor12 = 0
+                      stor13 = 0
+              if not -amount:
+                  if -amount:
+                      if amount and stor13 > -1 / amount:
+                          revert with 0, 17
+                      if not amount:
+                          revert with 0, 18
+                      if amount * stor13 / amount != stor13:
+                          revert with 0, 'SafeMath: multiplication overflow'
+              else:
+                  if amount and stor12 > -1 / amount:
+                      revert with 0, 17
+                  if not amount:
+                      revert with 0, 18
+                  if amount * stor12 / amount != stor12:
+                      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                  if -amount:
+                      if amount and stor13 > -1 / amount:
+                          revert with 0, 17
+                      if not amount:
+                          revert with 0, 18
+          else:
+              if uniswapV2PairAddress == sender:
+                  if uniswapV2RouterAddress == recipient:
+                      if uniswapV2PairAddress != recipient:
+                          if not -amount:
+                              if -amount:
+                                  if amount and stor13 > -1 / amount:
+                                      revert with 0, 17
+                                  if not amount:
+                                      revert with 0, 18
+                                  if amount * stor13 / amount != stor13:
+                                      revert with 0, 'SafeMath: multiplication overflow'
+                          else:
+                              if amount and stor12 > -1 / amount:
+                                  revert with 0, 17
+                              if not amount:
+                                  revert with 0, 18
+                              if amount * stor12 / amount != stor12:
+                                  revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                              if -amount:
+                                  if amount and stor13 > -1 / amount:
+                                      revert with 0, 17
+                                  if not amount:
+                                      revert with 0, 18
+                      else:
+                          if uniswapV2RouterAddress == sender:
+                              if not -amount:
+                                  if -amount:
+                                      if amount and stor13 > -1 / amount:
+                                          revert with 0, 17
+                                      if not amount:
+                                          revert with 0, 18
+                                      if amount * stor13 / amount != stor13:
+                                          revert with 0, 'SafeMath: multiplication overflow'
+                              else:
+                                  if amount and stor12 > -1 / amount:
+                                      revert with 0, 17
+                                  if not amount:
+                                      revert with 0, 18
+                                  if amount * stor12 / amount != stor12:
+                                      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                                  if -amount:
+                                      if amount and stor13 > -1 / amount:
+                                          revert with 0, 17
+                                      if not amount:
+                                          revert with 0, 18
+                          else:
+                              stor12 = stor10
+                              stor13 = stor11
+                              if not -amount:
+                                  if -amount:
+                                      if amount and stor13 > -1 / amount:
+                                          revert with 0, 17
+                                      if not amount:
+                                          revert with 0, 18
+                                      if amount * stor13 / amount != stor13:
+                                          revert with 0, 'SafeMath: multiplication overflow'
+                              else:
+                                  if amount and stor12 > -1 / amount:
+                                      revert with 0, 17
+                                  if not amount:
+                                      revert with 0, 18
+                                  if amount * stor12 / amount != stor12:
+                                      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                                  if -amount:
+                                      if amount and stor13 > -1 / amount:
+                                          revert with 0, 17
+                  else:
+                      stor12 = stor8
+                      stor13 = stor9
+                      if uniswapV2PairAddress != recipient:
+                          if not -amount:
+                              if -amount:
+                                  if amount and stor13 > -1 / amount:
+                                      revert with 0, 17
+                                  if not amount:
+                                      revert with 0, 18
+                                  if amount * stor13 / amount != stor13:
+                                      revert with 0, 'SafeMath: multiplication overflow'
+                          else:
+                              if amount and stor12 > -1 / amount:
+                                  revert with 0, 17
+                              if not amount:
+                                  revert with 0, 18
+                              if amount * stor12 / amount != stor12:
+                                  revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                              if -amount:
+                                  if amount and stor13 > -1 / amount:
+                                      revert with 0, 17
+                                  if not amount:
+                                      revert with 0, 18
+                      else:
+                          if uniswapV2RouterAddress != sender:
+                              stor12 = stor10
+                              stor13 = stor11
+                          if not -amount:
+                              if -amount:
+                                  if amount and stor13 > -1 / amount:
+                                      revert with 0, 17
+                                  if not amount:
+                                      revert with 0, 18
+                                  if amount * stor13 / amount != stor13:
+                                      revert with 0, 'SafeMath: multiplication overflow'
+                          else:
+                              if amount and stor12 > -1 / amount:
+                                  revert with 0, 17
+                              if not amount:
+                                  revert with 0, 18
+                              if amount * stor12 / amount != stor12:
+                                  revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                              if -amount:
+                                  if amount and stor13 > -1 / amount:
+                                      revert with 0, 17
+              else:
+                  if uniswapV2PairAddress != recipient:
+                      if stor12:
+                          stor14 = stor12
+                          stor15 = stor13
+                          stor12 = 0
+                          stor13 = 0
+                          if not -amount:
+                              if -amount:
+                                  if amount and stor13 > -1 / amount:
+                                      revert with 0, 17
+                                  if not amount:
+                                      revert with 0, 18
+                                  if amount * stor13 / amount != stor13:
+                                      revert with 0, 'SafeMath: multiplication overflow'
+                          else:
+                              if amount and stor12 > -1 / amount:
+                                  revert with 0, 17
+                              if not amount:
+                                  revert with 0, 18
+                              if amount * stor12 / amount != stor12:
+                                  revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                              if -amount:
+                                  if amount and stor13 > -1 / amount:
+                                      revert with 0, 17
+                                  if not amount:
+                                      revert with 0, 18
+                      else:
+                          if stor13:
+                              stor14 = stor12
+                              stor15 = stor13
+                              stor12 = 0
+                              stor13 = 0
+                          if not -amount:
+                              if -amount:
+                                  if amount and stor13 > -1 / amount:
+                                      revert with 0, 17
+                                  if not amount:
+                                      revert with 0, 18
+                                  if amount * stor13 / amount != stor13:
+                                      revert with 0, 'SafeMath: multiplication overflow'
+                          else:
+                              if amount and stor12 > -1 / amount:
+                                  revert with 0, 17
+                              if not amount:
+                                  revert with 0, 18
+                              if amount * stor12 / amount != stor12:
+                                  revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                              if -amount:
+                                  if amount and stor13 > -1 / amount:
+                                      revert with 0, 17
+                  else:
+                      if uniswapV2PairAddress != sender:
+                          if uniswapV2PairAddress != recipient:
+                              if not -amount:
+                                  if -amount:
+                                      if amount and stor13 > -1 / amount:
+                                          revert with 0, 17
+                                      if not amount:
+                                          revert with 0, 18
+                                      if amount * stor13 / amount != stor13:
+                                          revert with 0, 'SafeMath: multiplication overflow'
+                              else:
+                                  if amount and stor12 > -1 / amount:
+                                      revert with 0, 17
+                                  if not amount:
+                                      revert with 0, 18
+                                  if amount * stor12 / amount != stor12:
+                                      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                                  if -amount:
+                                      if amount and stor13 > -1 / amount:
+                                          revert with 0, 17
+                                      if not amount:
+                                          revert with 0, 18
+                          else:
+                              if uniswapV2RouterAddress == sender:
+                                  if not -amount:
+                                      if -amount:
+                                          if amount and stor13 > -1 / amount:
+                                              revert with 0, 17
+                                          if not amount:
+                                              revert with 0, 18
+                                          if amount * stor13 / amount != stor13:
+                                              revert with 0, 'SafeMath: multiplication overflow'
+                                  else:
+                                      if amount and stor12 > -1 / amount:
+                                          revert with 0, 17
+                                      if not amount:
+                                          revert with 0, 18
+                                      if amount * stor12 / amount != stor12:
+                                          revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                                      if -amount:
+                                          if amount and stor13 > -1 / amount:
+                                              revert with 0, 17
+                                          if not amount:
+                                              revert with 0, 18
+                              else:
+                                  stor12 = stor10
+                                  stor13 = stor11
+                                  if not -amount:
+                                      if -amount:
+                                          if amount and stor13 > -1 / amount:
+                                              revert with 0, 17
+                                          if not amount:
+                                              revert with 0, 18
+                                          if amount * stor13 / amount != stor13:
+                                              revert with 0, 'SafeMath: multiplication overflow'
+                                  else:
+                                      if amount and stor12 > -1 / amount:
+                                          revert with 0, 17
+                                      if not amount:
+                                          revert with 0, 18
+                                      if amount * stor12 / amount != stor12:
+                                          revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                                      if -amount:
+                                          if amount and stor13 > -1 / amount:
+                                              revert with 0, 17
+                      else:
+                          if uniswapV2RouterAddress == recipient:
+                              if uniswapV2PairAddress != recipient:
+                                  if not -amount:
+                                      if -amount:
+                                          if amount and stor13 > -1 / amount:
+                                              revert with 0, 17
+                                          if not amount:
+                                              revert with 0, 18
+                                          if amount * stor13 / amount != stor13:
+                                              revert with 0, 'SafeMath: multiplication overflow'
+                                  else:
+                                      if amount and stor12 > -1 / amount:
+                                          revert with 0, 17
+                                      if not amount:
+                                          revert with 0, 18
+                                      if amount * stor12 / amount != stor12:
+                                          revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                                      if -amount:
+                                          if amount and stor13 > -1 / amount:
+                                              revert with 0, 17
+                                          if not amount:
+                                              revert with 0, 18
+                              else:
+                                  if uniswapV2RouterAddress != sender:
+                                      stor12 = stor10
+                                      stor13 = stor11
+                                  if not -amount:
+                                      if -amount:
+                                          if amount and stor13 > -1 / amount:
+                                              revert with 0, 17
+                                          if not amount:
+                                              revert with 0, 18
+                                          if amount * stor13 / amount != stor13:
+                                              revert with 0, 'SafeMath: multiplication overflow'
+                                  else:
+                                      if amount and stor12 > -1 / amount:
+                                          revert with 0, 17
+                                      if not amount:
+                                          revert with 0, 18
+                                      if amount * stor12 / amount != stor12:
+                                          revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                                      if -amount:
+                                          if amount and stor13 > -1 / amount:
+                                              revert with 0, 17
+                          else:
+                              stor12 = stor8
+                              stor13 = stor9
+                              if uniswapV2PairAddress != recipient:
+                                  if not -amount:
+                                      if -amount:
+                                          if amount and stor13 > -1 / amount:
+                                              revert with 0, 17
+                                          if not amount:
+                                              revert with 0, 18
+                                          if amount * stor13 / amount != stor13:
+                                              revert with 0, 'SafeMath: multiplication overflow'
+                                  else:
+                                      if amount and stor12 > -1 / amount:
+                                          revert with 0, 17
+                                      if not amount:
+                                          revert with 0, 18
+                                      if amount * stor12 / amount != stor12:
+                                          revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                                      if -amount:
+                                          if amount and stor13 > -1 / amount:
+                                              revert with 0, 17
+                              else:
+                                  if uniswapV2RouterAddress == sender:
+                                      if not -amount:
+                                          if -amount:
+                                              if amount and stor13 > -1 / amount:
+                                                  revert with 0, 17
+                                              if not amount:
+                                                  revert with 0, 18
+                                              if amount * stor13 / amount != stor13:
+                                                  revert with 0, 'SafeMath: multiplication overflow'
+                                      else:
+                                          if amount and stor12 > -1 / amount:
+                                              revert with 0, 17
+                                          if not amount:
+                                              revert with 0, 18
+                                          if amount * stor12 / amount != stor12:
+                                              revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                                          if -amount:
+                                              if amount and stor13 > -1 / amount:
+                                                  revert with 0, 17
+                                  else:
+                                      stor12 = stor10
+                                      stor13 = stor11
+                                      if not -amount:
+                                          if -amount:
+                                              if amount and stor13 > -1 / amount:
+                                                  revert with 0, 17
+                                              if not amount:
+                                                  revert with 0, 18
+                                              if amount * stor13 / amount != stor13:
+                                                  revert with 0, 'SafeMath: multiplication overflow'
+                                      else:
+                                          if amount and stor12 > -1 / amount:
+                                              revert with 0, 17
+                                          if not amount:
+                                              revert with 0, 18
+                                          if amount * stor12 / amount != stor12:
+                                              revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                                          if -amount:
+  else:
+      if owner != recipient:
+          if uint8(stor20.field_160):
+              if amount > _maxTxAmount:
+                  revert with 0, 'TOKEN: Max Transaction Limit'
+              if uniswapV2PairAddress != recipient:
+                  if stor2[address(recipient)] > stor6:
+                      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'Amount must be less than total reflections'
+                  if stor6 / 10^17:
+                      if stor2[address(recipient)] / stor6 / 10^17 > !amount:
+                          revert with 0, 17
+              else:
+                  if stor2[address(this.address)] > stor6:
+                      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'Amount must be less than total reflections'
+                  if stor6 / 10^17:
+                      if stor2[address(this.address)] / stor6 / 10^17 < _maxTxAmount:
+                          if stor2[address(this.address)] / stor6 / 10^17 >= _swapTokensAtAmount:
+          else:
+              if owner != sender:
+                  revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                              'TOKEN: This account cannot send tokens until trading is enabled'
+              if amount > _maxTxAmount:
+                  revert with 0, 'TOKEN: Max Transaction Limit'
+              if uniswapV2PairAddress != recipient:
+                  if stor2[address(recipient)] > stor6:
+                      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'Amount must be less than total reflections'
+              else:
+                  if stor2[address(this.address)] > stor6:
+                      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'Amount must be less than total reflections'
+              if stor6 / 10^17:
+      else:
+          if stor5[address(sender)]:
+              if stor12:
+                  stor14 = stor12
+                  stor15 = stor13
+                  stor12 = 0
+                  stor13 = 0
+              else:
+                  if stor13:
+                      stor14 = stor12
+                      stor15 = stor13
+                      stor12 = 0
+                      stor13 = 0
+              if not -amount:
+                  if -amount:
+                      if amount and stor13 > -1 / amount:
+                          revert with 0, 17
+                      if not amount:
+                          revert with 0, 18
+                      if amount * stor13 / amount != stor13:
+                          revert with 0, 'SafeMath: multiplication overflow'
+              else:
+                  if amount and stor12 > -1 / amount:
+                      revert with 0, 17
+                  if not amount:
+                      revert with 0, 18
+                  if amount * stor12 / amount != stor12:
+                      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                  if -amount:
+                      if amount and stor13 > -1 / amount:
+                          revert with 0, 17
+                      if not amount:
+                          revert with 0, 18
+          else:
+              if stor5[address(recipient)]:
+                  if stor12:
+                      stor14 = stor12
+                      stor15 = stor13
+                      stor12 = 0
+                      stor13 = 0
+                  else:
+                      if stor13:
+                          stor14 = stor12
+                          stor15 = stor13
+                          stor12 = 0
+                          stor13 = 0
+                  if not -amount:
+                      if -amount:
+                          if amount and stor13 > -1 / amount:
+                              revert with 0, 17
+                          if not amount:
+                              revert with 0, 18
+                          if amount * stor13 / amount != stor13:
+                              revert with 0, 'SafeMath: multiplication overflow'
+                  else:
+                      if amount and stor12 > -1 / amount:
+                          revert with 0, 17
+                      if not amount:
+                          revert with 0, 18
+                      if amount * stor12 / amount != stor12:
+                          revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                      if -amount:
+                          if amount and stor13 > -1 / amount:
+                              revert with 0, 17
+                          if not amount:
+                              revert with 0, 18
+              else:
+                  if uniswapV2PairAddress == sender:
+                      if uniswapV2RouterAddress == recipient:
+                          if uniswapV2PairAddress != recipient:
+                              if not -amount:
+                                  if -amount:
+                                      if amount and stor13 > -1 / amount:
+                                          revert with 0, 17
+                                      if not amount:
+                                          revert with 0, 18
+                                      if amount * stor13 / amount != stor13:
+                                          revert with 0, 'SafeMath: multiplication overflow'
+                              else:
+                                  if amount and stor12 > -1 / amount:
+                                      revert with 0, 17
+                                  if not amount:
+                                      revert with 0, 18
+                                  if amount * stor12 / amount != stor12:
+                                      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                                  if -amount:
+                                      if amount and stor13 > -1 / amount:
+                                          revert with 0, 17
+                                      if not amount:
+                                          revert with 0, 18
+                          else:
+                              if uniswapV2RouterAddress != sender:
+                                  stor12 = stor10
+                                  stor13 = stor11
+                              if not -amount:
+                                  if -amount:
+                                      if amount and stor13 > -1 / amount:
+                                          revert with 0, 17
+                                      if not amount:
+                                          revert with 0, 18
+                                      if amount * stor13 / amount != stor13:
+                                          revert with 0, 'SafeMath: multiplication overflow'
+                              else:
+                                  if amount and stor12 > -1 / amount:
+                                      revert with 0, 17
+                                  if not amount:
+                                      revert with 0, 18
+                                  if amount * stor12 / amount != stor12:
+                                      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                                  if -amount:
+                                      if amount and stor13 > -1 / amount:
+                                          revert with 0, 17
+                      else:
+                          stor12 = stor8
+                          stor13 = stor9
+                          if uniswapV2PairAddress != recipient:
+                              if not -amount:
+                                  if -amount:
+                                      if amount and stor13 > -1 / amount:
+                                          revert with 0, 17
+                                      if not amount:
+                                          revert with 0, 18
+                                      if amount * stor13 / amount != stor13:
+                                          revert with 0, 'SafeMath: multiplication overflow'
+                              else:
+                                  if amount and stor12 > -1 / amount:
+                                      revert with 0, 17
+                                  if not amount:
+                                      revert with 0, 18
+                                  if amount * stor12 / amount != stor12:
+                                      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                                  if -amount:
+                                      if amount and stor13 > -1 / amount:
+                                          revert with 0, 17
+                          else:
+                              if uniswapV2RouterAddress == sender:
+                                  if not -amount:
+                                      if -amount:
+                                          if amount and stor13 > -1 / amount:
+                                              revert with 0, 17
+                                          if not amount:
+                                              revert with 0, 18
+                                          if amount * stor13 / amount != stor13:
+                                              revert with 0, 'SafeMath: multiplication overflow'
+                                  else:
+                                      if amount and stor12 > -1 / amount:
+                                          revert with 0, 17
+                                      if not amount:
+                                          revert with 0, 18
+                                      if amount * stor12 / amount != stor12:
+                                          revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                                      if -amount:
+                                          if amount and stor13 > -1 / amount:
+                                              revert with 0, 17
+                              else:
+                                  stor12 = stor10
+                                  stor13 = stor11
+                                  if not -amount:
+                                      if -amount:
+                                          if amount and stor13 > -1 / amount:
+                                              revert with 0, 17
+                                          if not amount:
+                                              revert with 0, 18
+                                          if amount * stor13 / amount != stor13:
+                                              revert with 0, 'SafeMath: multiplication overflow'
+                                  else:
+                                      if amount and stor12 > -1 / amount:
+                                          revert with 0, 17
+                                      if not amount:
+                                          revert with 0, 18
+                                      if amount * stor12 / amount != stor12:
+                                          revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                                      if -amount:
+                  else:
+                      if uniswapV2PairAddress != recipient:
+                          if stor12:
+                              stor14 = stor12
+                              stor15 = stor13
+                              stor12 = 0
+                              stor13 = 0
+                          else:
+                              if stor13:
+                                  stor14 = stor12
+                                  stor15 = stor13
+                                  stor12 = 0
+                                  stor13 = 0
+                          if not -amount:
+                              if -amount:
+                                  if amount and stor13 > -1 / amount:
+                                      revert with 0, 17
+                                  if not amount:
+                                      revert with 0, 18
+                                  if amount * stor13 / amount != stor13:
+                                      revert with 0, 'SafeMath: multiplication overflow'
+                          else:
+                              if amount and stor12 > -1 / amount:
+                                  revert with 0, 17
+                              if not amount:
+                                  revert with 0, 18
+                              if amount * stor12 / amount != stor12:
+                                  revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                              if -amount:
+                                  if amount and stor13 > -1 / amount:
+                                      revert with 0, 17
+                      else:
+                          if uniswapV2PairAddress != sender:
+                              if uniswapV2PairAddress != recipient:
+                                  if not -amount:
+                                      if -amount:
+                                          if amount and stor13 > -1 / amount:
+                                              revert with 0, 17
+                                          if not amount:
+                                              revert with 0, 18
+                                          if amount * stor13 / amount != stor13:
+                                              revert with 0, 'SafeMath: multiplication overflow'
+                                  else:
+                                      if amount and stor12 > -1 / amount:
+                                          revert with 0, 17
+                                      if not amount:
+                                          revert with 0, 18
+                                      if amount * stor12 / amount != stor12:
+                                          revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                                      if -amount:
+                                          if amount and stor13 > -1 / amount:
+                                              revert with 0, 17
+                                          if not amount:
+                                              revert with 0, 18
+                              else:
+                                  if uniswapV2RouterAddress != sender:
+                                      stor12 = stor10
+                                      stor13 = stor11
+                                  if not -amount:
+                                      if -amount:
+                                          if amount and stor13 > -1 / amount:
+                                              revert with 0, 17
+                                          if not amount:
+                                              revert with 0, 18
+                                          if amount * stor13 / amount != stor13:
+                                              revert with 0, 'SafeMath: multiplication overflow'
+                                  else:
+                                      if amount and stor12 > -1 / amount:
+                                          revert with 0, 17
+                                      if not amount:
+                                          revert with 0, 18
+                                      if amount * stor12 / amount != stor12:
+                                          revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                                      if -amount:
+                                          if amount and stor13 > -1 / amount:
+                                              revert with 0, 17
+                          else:
+                              if uniswapV2RouterAddress == recipient:
+                                  if uniswapV2PairAddress != recipient:
+                                      if not -amount:
+                                          if -amount:
+                                              if amount and stor13 > -1 / amount:
+                                                  revert with 0, 17
+                                              if not amount:
+                                                  revert with 0, 18
+                                              if amount * stor13 / amount != stor13:
+                                                  revert with 0, 'SafeMath: multiplication overflow'
+                                      else:
+                                          if amount and stor12 > -1 / amount:
+                                              revert with 0, 17
+                                          if not amount:
+                                              revert with 0, 18
+                                          if amount * stor12 / amount != stor12:
+                                              revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                                          if -amount:
+                                              if amount and stor13 > -1 / amount:
+                                                  revert with 0, 17
+                                  else:
+                                      if uniswapV2RouterAddress == sender:
+                                          if not -amount:
+                                              if -amount:
+                                                  if amount and stor13 > -1 / amount:
+                                                      revert with 0, 17
+                                                  if not amount:
+                                                      revert with 0, 18
+                                                  if amount * stor13 / amount != stor13:
+                                                      revert with 0, 'SafeMath: multiplication overflow'
+                                          else:
+                                              if amount and stor12 > -1 / amount:
+                                                  revert with 0, 17
+                                              if not amount:
+                                                  revert with 0, 18
+                                              if amount * stor12 / amount != stor12:
+                                                  revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                                              if -amount:
+                                                  if amount and stor13 > -1 / amount:
+                                                      revert with 0, 17
+                                      else:
+                                          stor12 = stor10
+                                          stor13 = stor11
+                                          if not -amount:
+                                              if -amount:
+                                                  if amount and stor13 > -1 / amount:
+                                                      revert with 0, 17
+                                                  if not amount:
+                                                      revert with 0, 18
+                                                  if amount * stor13 / amount != stor13:
+                                                      revert with 0, 'SafeMath: multiplication overflow'
+                                          else:
+                                              if amount and stor12 > -1 / amount:
+                                                  revert with 0, 17
+                                              if not amount:
+                                                  revert with 0, 18
+                                              if amount * stor12 / amount != stor12:
+                                                  revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                                              if -amount:
+                              else:
+                                  stor12 = stor8
+                                  stor13 = stor9
+                                  if uniswapV2PairAddress != recipient:
+                                      if not -amount:
+                                          if -amount:
+                                              if amount and stor13 > -1 / amount:
+                                                  revert with 0, 17
+                                              if not amount:
+                                                  revert with 0, 18
+                                              if amount * stor13 / amount != stor13:
+                                                  revert with 0, 'SafeMath: multiplication overflow'
+                                      else:
+                                          if amount and stor12 > -1 / amount:
+                                              revert with 0, 17
+                                          if not amount:
+                                              revert with 0, 18
+                                          if amount * stor12 / amount != stor12:
+                                              revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                                          if -amount:
+                                              if amount and stor13 > -1 / amount:
+                                                  revert with 0, 17
+                                  else:
+                                      if uniswapV2RouterAddress == sender:
+                                          if not -amount:
+                                              if -amount:
+                                                  if amount and stor13 > -1 / amount:
+                                                      revert with 0, 17
+                                                  if not amount:
+                                                      revert with 0, 18
+                                                  if amount * stor13 / amount != stor13:
+                                                      revert with 0, 'SafeMath: multiplication overflow'
+                                          else:
+                                              if amount and stor12 > -1 / amount:
+                                                  revert with 0, 17
+                                              if not amount:
+                                                  revert with 0, 18
+                                              if amount * stor12 / amount != stor12:
+                                                  revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                                              if -amount:
+                                      else:
+                                          stor12 = stor10
+                                          stor13 = stor11
+                                          if not -amount:
+                                              if -amount:
+                                                  if amount and stor13 > -1 / amount:
+                                                      revert with 0, 17
+                                                  if not amount:
+                                                      revert with 0, 18
+                                          else:
+                                              if amount and stor12 > -1 / amount:
+                                                  revert with 0, 17
+                                              if not amount:
+                                                  revert with 0, 18
+                                              if amount * stor12 / amount != stor12:
+                                                  revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'SafeMath: multiplication overflow'
+                                              if -amount:
+  ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+
+def _fallback(?) payable: # default function
+  if calldata.size < 4:
+      require not calldata.size
+      stop
+  if _maxTxAmount() <= uint32(call.func_hash) >> 224:
+      if setFee(uint256 redisFeeOnBuy, uint256 redisFeeOnSell, uint256 taxFeeOnBuy, uint256 taxFeeOnSell) > uint32(call.func_hash) >> 224:
+          if setTrading(bool _tradingOpen) > uint32(call.func_hash) >> 224:
+              if _maxTxAmount() == uint32(call.func_hash) >> 224:
+                  require not call.value
+                  return _maxTxAmount
+              if uint32(call.func_hash) >> 224 != _buyMap(address _param1):
+                  require owner() == uint32(call.func_hash) >> 224
+                  require not call.value
+                  return owner
+              require not call.value
+              require calldata.size - 4 >=′ 32
+              require _param1 == address(_param1)
+              return _buyMap[_param1]
+          if setTrading(bool _tradingOpen) == uint32(call.func_hash) >> 224:
+              require not call.value
+              require calldata.size - 4 >=′ 32
+              require _param1 == bool(_param1)
+              if owner != caller:
+                  revert with 0, 'Ownable: caller is not the owner'
+              Mask(96, 0, stor20.field_160) = Mask(96, 0, bool(_param1))
+          else:
+              if _maxWalletSize() == uint32(call.func_hash) >> 224:
+                  require not call.value
+                  return _maxWalletSize
+              if symbol() == uint32(call.func_hash) >> 224:
+                  require not call.value
+                  ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+              require setMinSwapTokensThreshold(uint256 swapTokensAtAmount) == uint32(call.func_hash) >> 224
+              require not call.value
+              require calldata.size - 4 >=′ 32
+              if owner != caller:
+                  revert with 0, 'Ownable: caller is not the owner'
+              _swapTokensAtAmount = _param1
+          stop
+      if excludeMultipleAccountsFromFees(address[] accounts, bool excluded) <= uint32(call.func_hash) >> 224:
+          if excludeMultipleAccountsFromFees(address[] accounts, bool excluded) == uint32(call.func_hash) >> 224:
+              require not call.value
+              require calldata.size - 4 >=′ 64
+              require _param1 <= LOCK8605463013()
+              require _param1 + 35 <′ calldata.size
+              require _param1.length <= LOCK8605463013()
+              require _param1 + (32 * _param1.length) + 36 <= calldata.size
+              require _param2 == bool(_param2)
+              if owner != caller:
+                  revert with 0, 'Ownable: caller is not the owner'
+              ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+          if allowance(address owner, address spender) == uint32(call.func_hash) >> 224:
+              require not call.value
+              require calldata.size - 4 >=′ 64
+              require _param1 == address(_param1)
+              require _param2 == address(_param2)
+              return allowance[address(_param1)][address(_param2)]
+          if setMaxWalletSize(uint256 maxWalletSize) == uint32(call.func_hash) >> 224:
+              require not call.value
+              require calldata.size - 4 >=′ 32
+              if owner != caller:
+                  revert with 0, 'Ownable: caller is not the owner'
+              _maxWalletSize = _param1
+          else:
+              require transferOwnership(address newOwner) == uint32(call.func_hash) >> 224
+              require not call.value
+              require calldata.size - 4 >=′ 32
+              require _param1 == address(_param1)
+              if owner != caller:
+                  revert with 0, 'Ownable: caller is not the owner'
+              if not address(_param1):
+                  revert with 0, 'Ownable: new owner is the zero address'
+              log OwnershipTransferred(
+                    address previousOwner=owner,
+                    address newOwner=address(_param1))
+              owner = address(_param1)
+          stop
+      if setFee(uint256 redisFeeOnBuy, uint256 redisFeeOnSell, uint256 taxFeeOnBuy, uint256 taxFeeOnSell) == uint32(call.func_hash) >> 224:
+          require not call.value
+          require calldata.size - 4 >=′ 128
+          if owner != caller:
+              revert with 0, 'Ownable: caller is not the owner'
+          stor8 = _param1
+          stor10 = _param2
+          stor9 = _param3
+          stor11 = _param4
+          stop
+      if uint32(call.func_hash) >> 224 != transfer(address recipient, uint256 amount):
+          require manualswap() == uint32(call.func_hash) >> 224
+          require not call.value
+          if stor17 != caller:
+              require caller == stor18
+          if stor2[address(this.address)] > stor6:
+              revert with 0, 'Amount must be less than total reflections'
+          if stor6 / 10^17:
+              uint8(stor20.field_168) = 1
+              static call uniswapV2RouterAddress.WETH() with:
+                      gas gas_remaining wei
+              if not ext_call.success:
+                  revert with ext_call.return_data[0 len return_data.size]
+              require return_data.size >=′ 32
+      else:
+          require not call.value
+          require calldata.size - 4 >=′ 64
+          require _param1 == address(_param1)
+          if not caller:
+              revert with 0, 'ERC20: transfer from the zero address'
+          if not address(_param1):
+              revert with 0, 'ERC20: transfer to the zero address'
+          if _param2 <= 0:
+              revert with 0, 'Transfer amount must be greater than zero'
+          if owner == caller:
+              if stor5[caller]:
+                  if stor12:
+                      stor14 = stor12
+                      stor15 = stor13
+                      stor12 = 0
+                      stor13 = 0
+                      if -_param2:
+                          if _param2 and stor12 > -1 / _param2:
+                              revert with 0, 17
+                          if not _param2:
+                              revert with 0, 18
+                          if _param2 * stor12 / _param2 != stor12:
+                              revert with 0, 'SafeMath: multiplication overflow'
+                      else:
+                          if -_param2:
+                              if _param2 and stor13 > -1 / _param2:
+                                  revert with 0, 17
+                  else:
+                      if stor13:
+                          stor14 = stor12
+                          stor15 = stor13
+                          stor12 = 0
+                          stor13 = 0
+                      if not -_param2:
+                          if -_param2:
+                              if _param2 and stor13 > -1 / _param2:
+                                  revert with 0, 17
+                      else:
+                          if _param2 and stor12 > -1 / _param2:
+                              revert with 0, 17
+                          if not _param2:
+                              revert with 0, 18
+                          if _param2 * stor12 / _param2 != stor12:
+                              revert with 0, 'SafeMath: multiplication overflow'
+              else:
+                  if stor5[address(_param1)]:
+                      if stor12:
+                          stor14 = stor12
+                          stor15 = stor13
+                          stor12 = 0
+                          stor13 = 0
+                          if not -_param2:
+                              if -_param2:
+                                  if _param2 and stor13 > -1 / _param2:
+                                      revert with 0, 17
+                          else:
+                              if _param2 and stor12 > -1 / _param2:
+                                  revert with 0, 17
+                              if not _param2:
+                                  revert with 0, 18
+                              if _param2 * stor12 / _param2 != stor12:
+                                  revert with 0, 'SafeMath: multiplication overflow'
+                      else:
+                          if stor13:
+                              stor14 = stor12
+                              stor15 = stor13
+                              stor12 = 0
+                              stor13 = 0
+                          if not -_param2:
+                              if -_param2:
+                          else:
+                              if _param2 and stor12 > -1 / _param2:
+                                  revert with 0, 17
+                              if not _param2:
+                                  revert with 0, 18
+                              if _param2 * stor12 / _param2 != stor12:
+                                  revert with 0, 'SafeMath: multiplication overflow'
+                  else:
+                      if uniswapV2PairAddress == caller:
+                          if uniswapV2RouterAddress == address(_param1):
+                              if uniswapV2PairAddress != address(_param1):
+                                  if not -_param2:
+                                      if -_param2:
+                                  else:
+                                      if _param2 and stor12 > -1 / _param2:
+                                          revert with 0, 17
+                                      if not _param2:
+                                          revert with 0, 18
+                                      if _param2 * stor12 / _param2 != stor12:
+                                          revert with 0, 'SafeMath: multiplication overflow'
+                              else:
+                                  if uniswapV2RouterAddress == caller:
+                                      if not -_param2:
+                                          if -_param2:
+                                      else:
+                                          if _param2 and stor12 > -1 / _param2:
+                                              revert with 0, 17
+                                          if not _param2:
+                                              revert with 0, 18
+                                          if _param2 * stor12 / _param2 != stor12:
+                                              revert with 0, 'SafeMath: multiplication overflow'
+                                  else:
+                                      stor12 = stor10
+                                      stor13 = stor11
+                                      if -_param2:
+                                          if _param2 and stor12 > -1 / _param2:
+                                              revert with 0, 17
+                                          if not _param2:
+                                              revert with 0, 18
+                                          if _param2 * stor12 / _param2 != stor12:
+                                              revert with 0, 'SafeMath: multiplication overflow'
+                          else:
+                              stor12 = stor8
+                              stor13 = stor9
+                              if uniswapV2PairAddress != address(_param1):
+                                  if not -_param2:
+                                      if -_param2:
+                                  else:
+                                      if _param2 and stor12 > -1 / _param2:
+                                          revert with 0, 17
+                                      if not _param2:
+                                          revert with 0, 18
+                                      if _param2 * stor12 / _param2 != stor12:
+                                          revert with 0, 'SafeMath: multiplication overflow'
+                              else:
+                                  if uniswapV2RouterAddress != caller:
+                                      stor12 = stor10
+                                      stor13 = stor11
+                                  if -_param2:
+                                      if _param2 and stor12 > -1 / _param2:
+                                          revert with 0, 17
+                                      if not _param2:
+                                          revert with 0, 18
+                                      if _param2 * stor12 / _param2 != stor12:
+                                          revert with 0, 'SafeMath: multiplication overflow'
+                      else:
+                          if uniswapV2PairAddress != address(_param1):
+                              if stor12:
+                                  stor14 = stor12
+                                  stor15 = stor13
+                                  stor12 = 0
+                                  stor13 = 0
+                                  if not -_param2:
+                                      if -_param2:
+                                  else:
+                                      if _param2 and stor12 > -1 / _param2:
+                                          revert with 0, 17
+                                      if not _param2:
+                                          revert with 0, 18
+                                      if _param2 * stor12 / _param2 != stor12:
+                                          revert with 0, 'SafeMath: multiplication overflow'
+                              else:
+                                  if stor13:
+                                      stor14 = stor12
+                                      stor15 = stor13
+                                      stor12 = 0
+                                      stor13 = 0
+                                  if -_param2:
+                                      if _param2 and stor12 > -1 / _param2:
+                                          revert with 0, 17
+                                      if not _param2:
+                                          revert with 0, 18
+                                      if _param2 * stor12 / _param2 != stor12:
+                                          revert with 0, 'SafeMath: multiplication overflow'
+                          else:
+                              if uniswapV2PairAddress != caller:
+                                  if uniswapV2PairAddress != address(_param1):
+                                      if not -_param2:
+                                          if -_param2:
+                                      else:
+                                          if _param2 and stor12 > -1 / _param2:
+                                              revert with 0, 17
+                                          if not _param2:
+                                              revert with 0, 18
+                                          if _param2 * stor12 / _param2 != stor12:
+                                              revert with 0, 'SafeMath: multiplication overflow'
+                                  else:
+                                      if uniswapV2RouterAddress == caller:
+                                          if not -_param2:
+                                              if -_param2:
+                                          else:
+                                              if _param2 and stor12 > -1 / _param2:
+                                                  revert with 0, 17
+                                              if not _param2:
+                                                  revert with 0, 18
+                                              if _param2 * stor12 / _param2 != stor12:
+                                                  revert with 0, 'SafeMath: multiplication overflow'
+                                      else:
+                                          stor12 = stor10
+                                          stor13 = stor11
+                                          if -_param2:
+                                              if _param2 and stor12 > -1 / _param2:
+                                                  revert with 0, 17
+                                              if not _param2:
+                                                  revert with 0, 18
+                                              if _param2 * stor12 / _param2 != stor12:
+                                                  revert with 0, 'SafeMath: multiplication overflow'
+                              else:
+                                  if uniswapV2RouterAddress == address(_param1):
+                                      if uniswapV2PairAddress != address(_param1):
+                                          if not -_param2:
+                                              if -_param2:
+                                          else:
+                                              if _param2 and stor12 > -1 / _param2:
+                                                  revert with 0, 17
+                                              if not _param2:
+                                                  revert with 0, 18
+                                              if _param2 * stor12 / _param2 != stor12:
+                                                  revert with 0, 'SafeMath: multiplication overflow'
+                                      else:
+                                          if uniswapV2RouterAddress != caller:
+                                              stor12 = stor10
+                                              stor13 = stor11
+                                          if -_param2:
+                                              if _param2 and stor12 > -1 / _param2:
+                                                  revert with 0, 17
+                                              if not _param2:
+                                                  revert with 0, 18
+                                              if _param2 * stor12 / _param2 != stor12:
+                                                  revert with 0, 'SafeMath: multiplication overflow'
+                                  else:
+                                      stor12 = stor8
+                                      stor13 = stor9
+                                      if uniswapV2PairAddress == address(_param1):
+                                          if uniswapV2RouterAddress != caller:
+                                              stor12 = stor10
+                                              stor13 = stor11
+                                      if -_param2:
+                                          if _param2 and stor12 > -1 / _param2:
+                                              revert with 0, 17
+                                          if not _param2:
+                                              revert with 0, 18
+                                          if _param2 * stor12 / _param2 != stor12:
+                                              revert with 0, 'SafeMath: multiplication overflow'
+          else:
+              if owner != address(_param1):
+                  if not uint8(stor20.field_160):
+                      if owner != caller:
+                          revert with 0, 'TOKEN: This account cannot send tokens until trading is enabled'
+                  if _param2 > _maxTxAmount:
+                      revert with 0, 'TOKEN: Max Transaction Limit'
+                  if uniswapV2PairAddress == address(_param1):
+                      if stor2[address(this.address)] > stor6:
+                          revert with 0, 'Amount must be less than total reflections'
+                  else:
+                      if stor2[address(_param1)] > stor6:
+                          revert with 0, 'Amount must be less than total reflections'
+              else:
+                  if stor5[caller]:
+                      if stor12:
+                          stor14 = stor12
+                          stor15 = stor13
+                          stor12 = 0
+                          stor13 = 0
+                          if not -_param2:
+                              if -_param2:
+                                  if _param2 and stor13 > -1 / _param2:
+                                      revert with 0, 17
+                          else:
+                              if _param2 and stor12 > -1 / _param2:
+                                  revert with 0, 17
+                              if not _param2:
+                                  revert with 0, 18
+                              if _param2 * stor12 / _param2 != stor12:
+                                  revert with 0, 'SafeMath: multiplication overflow'
+                      else:
+                          if stor13:
+                              stor14 = stor12
+                              stor15 = stor13
+                              stor12 = 0
+                              stor13 = 0
+                          if not -_param2:
+                              if -_param2:
+                          else:
+                              if _param2 and stor12 > -1 / _param2:
+                                  revert with 0, 17
+                              if not _param2:
+                                  revert with 0, 18
+                              if _param2 * stor12 / _param2 != stor12:
+                                  revert with 0, 'SafeMath: multiplication overflow'
+                  else:
+                      if stor5[address(_param1)]:
+                          if stor12:
+                              stor14 = stor12
+                              stor15 = stor13
+                              stor12 = 0
+                              stor13 = 0
+                          else:
+                              if stor13:
+                                  stor14 = stor12
+                                  stor15 = stor13
+                                  stor12 = 0
+                                  stor13 = 0
+                          if not -_param2:
+                              if -_param2:
+                          else:
+                              if _param2 and stor12 > -1 / _param2:
+                                  revert with 0, 17
+                              if not _param2:
+                                  revert with 0, 18
+                              if _param2 * stor12 / _param2 != stor12:
+                                  revert with 0, 'SafeMath: multiplication overflow'
+                      else:
+                          if uniswapV2PairAddress == caller:
+                              if uniswapV2RouterAddress == address(_param1):
+                                  if uniswapV2PairAddress != address(_param1):
+                                      if not -_param2:
+                                          if -_param2:
+                                      else:
+                                          if _param2 and stor12 > -1 / _param2:
+                                              revert with 0, 17
+                                          if not _param2:
+                                              revert with 0, 18
+                                          if _param2 * stor12 / _param2 != stor12:
+                                              revert with 0, 'SafeMath: multiplication overflow'
+                                  else:
+                                      if uniswapV2RouterAddress != caller:
+                                          stor12 = stor10
+                                          stor13 = stor11
+                                      if -_param2:
+                                          if _param2 and stor12 > -1 / _param2:
+                                              revert with 0, 17
+                                          if not _param2:
+                                              revert with 0, 18
+                                          if _param2 * stor12 / _param2 != stor12:
+                                              revert with 0, 'SafeMath: multiplication overflow'
+                              else:
+                                  stor12 = stor8
+                                  stor13 = stor9
+                                  if uniswapV2PairAddress == address(_param1):
+                                      if uniswapV2RouterAddress != caller:
+                                          stor12 = stor10
+                                          stor13 = stor11
+                                  if -_param2:
+                                      if _param2 and stor12 > -1 / _param2:
+                                          revert with 0, 17
+                                      if not _param2:
+                                          revert with 0, 18
+                                      if _param2 * stor12 / _param2 != stor12:
+                                          revert with 0, 'SafeMath: multiplication overflow'
+                          else:
+                              if uniswapV2PairAddress != address(_param1):
+                                  if stor12:
+                                      stor14 = stor12
+                                      stor15 = stor13
+                                      stor12 = 0
+                                      stor13 = 0
+                                  else:
+                                      if stor13:
+                                          stor14 = stor12
+                                          stor15 = stor13
+                                          stor12 = 0
+                                          stor13 = 0
+                                  if -_param2:
+                                      if _param2 and stor12 > -1 / _param2:
+                                          revert with 0, 17
+                                      if not _param2:
+                                          revert with 0, 18
+                                      if _param2 * stor12 / _param2 != stor12:
+                                          revert with 0, 'SafeMath: multiplication overflow'
+                              else:
+                                  if uniswapV2PairAddress != caller:
+                                      if uniswapV2PairAddress != address(_param1):
+                                          if not -_param2:
+                                              if -_param2:
+                                          else:
+                                              if _param2 and stor12 > -1 / _param2:
+                                                  revert with 0, 17
+                                              if not _param2:
+                                                  revert with 0, 18
+                                              if _param2 * stor12 / _param2 != stor12:
+                                                  revert with 0, 'SafeMath: multiplication overflow'
+                                      else:
+                                          if uniswapV2RouterAddress != caller:
+                                              stor12 = stor10
+                                              stor13 = stor11
+                                          if -_param2:
+                                              if _param2 and stor12 > -1 / _param2:
+                                                  revert with 0, 17
+                                              if not _param2:
+                                                  revert with 0, 18
+                                              if _param2 * stor12 / _param2 != stor12:
+                                                  revert with 0, 'SafeMath: multiplication overflow'
+                                  else:
+                                      if uniswapV2RouterAddress != address(_param1):
+                                          stor12 = stor8
+                                          stor13 = stor9
+                                      if uniswapV2PairAddress == address(_param1):
+                                          if uniswapV2RouterAddress != caller:
+                                              stor12 = stor10
+                                              stor13 = stor11
+                                      if -_param2:
+                                          if _param2 and stor12 > -1 / _param2:
+                                              revert with 0, 17
+                                          if not _param2:
+                                              revert with 0, 18
+                                          if _param2 * stor12 / _param2 != stor12:
+                                              revert with 0, 'SafeMath: multiplication overflow'
+  else:
+      if decimals() <= uint32(call.func_hash) >> 224:
+          if manualsend() > uint32(call.func_hash) >> 224:
+              if decimals() == uint32(call.func_hash) >> 224:
+                  require not call.value
+                  return 9
+              if uniswapV2Pair() == uint32(call.func_hash) >> 224:
+                  require not call.value
+                  return uniswapV2PairAddress
+              require toggleSwap(bool _swapEnabled) == uint32(call.func_hash) >> 224
+              require not call.value
+              require calldata.size - 4 >=′ 32
+              require _param1 == bool(_param1)
+              if owner != caller:
+                  revert with 0, 'Ownable: caller is not the owner'
+              Mask(80, 0, stor20.field_176) = Mask(80, 0, bool(_param1))
+          else:
+              if manualsend() == uint32(call.func_hash) >> 224:
+                  require not call.value
+                  if stor17 != caller:
+                      require caller == stor18
+                  call stor18 with:
+                     value eth.balance(this.address) wei
+                       gas 2300 * is_zero(value) wei
+                  if not ext_call.success:
+                      revert with ext_call.return_data[0 len return_data.size]
+              else:
+                  if balanceOf(address account) == uint32(call.func_hash) >> 224:
+                      require not call.value
+                      require calldata.size - 4 >=′ 32
+                      require _param1 == address(_param1)
+                      if stor2[address(_param1)] > stor6:
+                          revert with 0, 'Amount must be less than total reflections'
+                      if stor6 / 10^17:
+                          return (stor2[address(_param1)] / stor6 / 10^17)
+                      ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+                  if renounceOwnership() == uint32(call.func_hash) >> 224:
+                      require not call.value
+                      if owner != caller:
+                          revert with 0, 'Ownable: caller is not the owner'
+                      log OwnershipTransferred(
+                            address previousOwner=owner,
+                            address newOwner=0)
+                      owner = 0
+                  else:
+                      require setMaxTxnAmount(uint256 maxTxAmount) == uint32(call.func_hash) >> 224
+                      require not call.value
+                      require calldata.size - 4 >=′ 32
+                      if owner != caller:
+                          revert with 0, 'Ownable: caller is not the owner'
+                      _maxTxAmount = _param1
+          stop
+      if name() == uint32(call.func_hash) >> 224:
+          require not call.value
+      else:
+          if approve(address spender, uint256 amount) == uint32(call.func_hash) >> 224:
+              require not call.value
+              require calldata.size - 4 >=′ 64
+              require _param1 == address(_param1)
+              if not caller:
+                  revert with 0, 'ERC20: approve from the zero address'
+              if not address(_param1):
+                  revert with 0, 'ERC20: approve to the zero address'
+              allowance[caller][address(_param1)] = _param2
+              log Approval(
+                    address owner=_param2,
+                    address spender=caller,
+                    uint256 value=address(_param1))
+              return 1
+          if uniswapV2Router() == uint32(call.func_hash) >> 224:
+              require not call.value
+              return uniswapV2RouterAddress
+          if totalSupply() == uint32(call.func_hash) >> 224:
+              require not call.value
+              return 10^17
+          if uint32(call.func_hash) >> 224 != transferFrom(address sender, address recipient, uint256 amount):
+              require _swapTokensAtAmount() == uint32(call.func_hash) >> 224
+              require not call.value
+              return _swapTokensAtAmount
+          require not call.value
+          require calldata.size - 4 >=′ 96
+          require _param1 == address(_param1)
+          require _param2 == address(_param2)
+          if not address(_param1):
+              revert with 0, 'ERC20: transfer from the zero address'
+          if not address(_param2):
+              revert with 0, 'ERC20: transfer to the zero address'
+          if _param3 <= 0:
+              revert with 0, 'Transfer amount must be greater than zero'
+          if owner == address(_param1):
+              if stor5[address(_param1)]:
+                  if stor12:
+                      stor14 = stor12
+                      stor15 = stor13
+                      stor12 = 0
+                      stor13 = 0
+                  else:
+                      if stor13:
+                          stor14 = stor12
+                          stor15 = stor13
+                          stor12 = 0
+                          stor13 = 0
+                  if -_param3:
+                      if _param3 and stor12 > -1 / _param3:
+                          revert with 0, 17
+                      if not _param3:
+                          revert with 0, 18
+                      if _param3 * stor12 / _param3 != stor12:
+                          revert with 0, 'SafeMath: multiplication overflow'
+              else:
+                  if stor5[address(_param2)]:
+                      if stor12:
+                          stor14 = stor12
+                          stor15 = stor13
+                          stor12 = 0
+                          stor13 = 0
+                      else:
+                          if stor13:
+                              stor14 = stor12
+                              stor15 = stor13
+                              stor12 = 0
+                              stor13 = 0
+                      if -_param3:
+                          if _param3 and stor12 > -1 / _param3:
+                              revert with 0, 17
+                          if not _param3:
+                              revert with 0, 18
+                          if _param3 * stor12 / _param3 != stor12:
+                              revert with 0, 'SafeMath: multiplication overflow'
+                  else:
+                      if uniswapV2PairAddress == address(_param1):
+                          if uniswapV2RouterAddress == address(_param2):
+                              if uniswapV2PairAddress != address(_param2):
+                                  if -_param3:
+                                      if _param3 and stor12 > -1 / _param3:
+                                          revert with 0, 17
+                                      if not _param3:
+                                          revert with 0, 18
+                                      if _param3 * stor12 / _param3 != stor12:
+                                          revert with 0, 'SafeMath: multiplication overflow'
+                              else:
+                                  if uniswapV2RouterAddress == address(_param1):
+                                      if -_param3:
+                                          if _param3 and stor12 > -1 / _param3:
+                                              revert with 0, 17
+                                          if not _param3:
+                                              revert with 0, 18
+                                          if _param3 * stor12 / _param3 != stor12:
+                                              revert with 0, 'SafeMath: multiplication overflow'
+                                  else:
+                                      stor12 = stor10
+                                      stor13 = stor11
+                                      if -_param3:
+                                          if _param3 and stor12 > -1 / _param3:
+                                              revert with 0, 17
+                                          if not _param3:
+                                              revert with 0, 18
+                          else:
+                              stor12 = stor8
+                              stor13 = stor9
+                              if uniswapV2PairAddress != address(_param2):
+                                  if -_param3:
+                                      if _param3 and stor12 > -1 / _param3:
+                                          revert with 0, 17
+                                      if not _param3:
+                                          revert with 0, 18
+                                      if _param3 * stor12 / _param3 != stor12:
+                                          revert with 0, 'SafeMath: multiplication overflow'
+                              else:
+                                  if uniswapV2RouterAddress != address(_param1):
+                                      stor12 = stor10
+                                      stor13 = stor11
+                                  if -_param3:
+                                      if _param3 and stor12 > -1 / _param3:
+                                          revert with 0, 17
+                                      if not _param3:
+                                          revert with 0, 18
+                      else:
+                          if uniswapV2PairAddress != address(_param2):
+                              if stor12:
+                                  stor14 = stor12
+                                  stor15 = stor13
+                                  stor12 = 0
+                                  stor13 = 0
+                                  if -_param3:
+                                      if _param3 and stor12 > -1 / _param3:
+                                          revert with 0, 17
+                                      if not _param3:
+                                          revert with 0, 18
+                                      if _param3 * stor12 / _param3 != stor12:
+                                          revert with 0, 'SafeMath: multiplication overflow'
+                              else:
+                                  if stor13:
+                                      stor14 = stor12
+                                      stor15 = stor13
+                                      stor12 = 0
+                                      stor13 = 0
+                                  if -_param3:
+                                      if _param3 and stor12 > -1 / _param3:
+                                          revert with 0, 17
+                                      if not _param3:
+                                          revert with 0, 18
+                          else:
+                              if uniswapV2PairAddress != address(_param1):
+                                  if uniswapV2PairAddress != address(_param2):
+                                      if -_param3:
+                                          if _param3 and stor12 > -1 / _param3:
+                                              revert with 0, 17
+                                          if not _param3:
+                                              revert with 0, 18
+                                          if _param3 * stor12 / _param3 != stor12:
+                                              revert with 0, 'SafeMath: multiplication overflow'
+                                  else:
+                                      if uniswapV2RouterAddress == address(_param1):
+                                          if -_param3:
+                                              if _param3 and stor12 > -1 / _param3:
+                                                  revert with 0, 17
+                                              if not _param3:
+                                                  revert with 0, 18
+                                              if _param3 * stor12 / _param3 != stor12:
+                                                  revert with 0, 'SafeMath: multiplication overflow'
+                                      else:
+                                          stor12 = stor10
+                                          stor13 = stor11
+                                          if -_param3:
+                                              if _param3 and stor12 > -1 / _param3:
+                                                  revert with 0, 17
+                                              if not _param3:
+                                                  revert with 0, 18
+                              else:
+                                  if uniswapV2RouterAddress == address(_param2):
+                                      if uniswapV2PairAddress != address(_param2):
+                                          if -_param3:
+                                              if _param3 and stor12 > -1 / _param3:
+                                                  revert with 0, 17
+                                              if not _param3:
+                                                  revert with 0, 18
+                                              if _param3 * stor12 / _param3 != stor12:
+                                                  revert with 0, 'SafeMath: multiplication overflow'
+                                      else:
+                                          if uniswapV2RouterAddress != address(_param1):
+                                              stor12 = stor10
+                                              stor13 = stor11
+                                          if -_param3:
+                                              if _param3 and stor12 > -1 / _param3:
+                                                  revert with 0, 17
+                                              if not _param3:
+                                                  revert with 0, 18
+                                  else:
+                                      stor12 = stor8
+                                      stor13 = stor9
+                                      if uniswapV2PairAddress == address(_param2):
+                                          if uniswapV2RouterAddress != address(_param1):
+                                              stor12 = stor10
+                                              stor13 = stor11
+                                      if -_param3:
+                                          if _param3 and stor12 > -1 / _param3:
+                                              revert with 0, 17
+                                          if not _param3:
+                                              revert with 0, 18
+          else:
+              if owner != address(_param2):
+                  if not uint8(stor20.field_160):
+                      if owner != address(_param1):
+                          revert with 0, 'TOKEN: This account cannot send tokens until trading is enabled'
+                  if _param3 > _maxTxAmount:
+                      revert with 0, 'TOKEN: Max Transaction Limit'
+                  if uniswapV2PairAddress == address(_param2):
+                      if stor2[address(this.address)] > stor6:
+                          revert with 0, 'Amount must be less than total reflections'
+                  else:
+                      if stor2[address(_param2)] > stor6:
+                          revert with 0, 'Amount must be less than total reflections'
+              else:
+                  if stor5[address(_param1)]:
+                      if stor12:
+                          stor14 = stor12
+                          stor15 = stor13
+                          stor12 = 0
+                          stor13 = 0
+                      else:
+                          if stor13:
+                              stor14 = stor12
+                              stor15 = stor13
+                              stor12 = 0
+                              stor13 = 0
+                      if -_param3:
+                          if _param3 and stor12 > -1 / _param3:
+                              revert with 0, 17
+                          if not _param3:
+                              revert with 0, 18
+                          if _param3 * stor12 / _param3 != stor12:
+                              revert with 0, 'SafeMath: multiplication overflow'
+                  else:
+                      if stor5[address(_param2)]:
+                          if stor12:
+                              stor14 = stor12
+                              stor15 = stor13
+                              stor12 = 0
+                              stor13 = 0
+                          else:
+                              if stor13:
+                                  stor14 = stor12
+                                  stor15 = stor13
+                                  stor12 = 0
+                                  stor13 = 0
+                          if -_param3:
+                              if _param3 and stor12 > -1 / _param3:
+                                  revert with 0, 17
+                              if not _param3:
+                                  revert with 0, 18
+                              if _param3 * stor12 / _param3 != stor12:
+                                  revert with 0, 'SafeMath: multiplication overflow'
+                      else:
+                          if uniswapV2PairAddress == address(_param1):
+                              if uniswapV2RouterAddress == address(_param2):
+                                  if uniswapV2PairAddress != address(_param2):
+                                      if -_param3:
+                                          if _param3 and stor12 > -1 / _param3:
+                                              revert with 0, 17
+                                          if not _param3:
+                                              revert with 0, 18
+                                          if _param3 * stor12 / _param3 != stor12:
+                                              revert with 0, 'SafeMath: multiplication overflow'
+                                  else:
+                                      if uniswapV2RouterAddress != address(_param1):
+                                          stor12 = stor10
+                                          stor13 = stor11
+                                      if -_param3:
+                                          if _param3 and stor12 > -1 / _param3:
+                                              revert with 0, 17
+                                          if not _param3:
+                                              revert with 0, 18
+                              else:
+                                  stor12 = stor8
+                                  stor13 = stor9
+                                  if uniswapV2PairAddress == address(_param2):
+                                      if uniswapV2RouterAddress != address(_param1):
+                                          stor12 = stor10
+                                          stor13 = stor11
+                                  if -_param3:
+                                      if _param3 and stor12 > -1 / _param3:
+                                          revert with 0, 17
+                                      if not _param3:
+                                          revert with 0, 18
+                          else:
+                              if uniswapV2PairAddress != address(_param2):
+                                  if stor12:
+                                      stor14 = stor12
+                                      stor15 = stor13
+                                      stor12 = 0
+                                      stor13 = 0
+                                  else:
+                                      if stor13:
+                                          stor14 = stor12
+                                          stor15 = stor13
+                                          stor12 = 0
+                                          stor13 = 0
+                                  if -_param3:
+                                      if _param3 and stor12 > -1 / _param3:
+                                          revert with 0, 17
+                                      if not _param3:
+                                          revert with 0, 18
+                              else:
+                                  if uniswapV2PairAddress != address(_param1):
+                                      if uniswapV2PairAddress != address(_param2):
+                                          if -_param3:
+                                              if _param3 and stor12 > -1 / _param3:
+                                                  revert with 0, 17
+                                              if not _param3:
+                                                  revert with 0, 18
+                                              if _param3 * stor12 / _param3 != stor12:
+                                                  revert with 0, 'SafeMath: multiplication overflow'
+                                      else:
+                                          if uniswapV2RouterAddress != address(_param1):
+                                              stor12 = stor10
+                                              stor13 = stor11
+                                          if -_param3:
+                                              if _param3 and stor12 > -1 / _param3:
+                                                  revert with 0, 17
+                                              if not _param3:
+                                                  revert with 0, 18
+                                  else:
+                                      if uniswapV2RouterAddress == address(_param2):
+                                          if uniswapV2PairAddress == address(_param2):
+                                              if uniswapV2RouterAddress != address(_param1):
+                                                  stor12 = stor10
+                                                  stor13 = stor11
+                                          if -_param3:
+                                              if _param3 and stor12 > -1 / _param3:
+                                                  revert with 0, 17
+                                              if not _param3:
+                                                  revert with 0, 18
+                                      else:
+                                          stor12 = stor8
+                                          stor13 = stor9
+                                          if uniswapV2PairAddress != address(_param2):
+                                              if -_param3:
+                                                  if _param3 and stor12 > -1 / _param3:
+                                                      revert with 0, 17
+                                                  if not _param3:
+                                                      revert with 0, 18
+                                          else:
+                                              if uniswapV2RouterAddress == address(_param1):
+                                                  if -_param3:
+                                                      if _param3 and stor12 > -1 / _param3:
+                                                          revert with 0, 17
+                                                      if not _param3:
+                                                          revert with 0, 18
+                                              else:
+                                                  stor12 = stor10
+                                                  stor13 = stor11
+                                                  if -_param3:
+                                                      if _param3 and stor12 > -1 / _param3:
+                                                          revert with 0, 17
+  ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+
+

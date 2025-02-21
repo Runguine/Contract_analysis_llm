@@ -1,0 +1,146 @@
+# Palkeoramix decompiler. 
+
+const proxyType = 2
+
+def storage:
+  stor99 is mapping of uint256 at storage 99
+  status is uint256 at storage 0x1400e57c855c9b8af53b65ba9c4c3680496a2facf3cb863c7d0ca088bbc89f7d
+  implementationAddress is address at storage 0x84f92e9efe723882a563880a3e2fa9ae9a1db2611adcbe80e6bd878486aff51e
+  stor84F9 is uint256 at storage 0x84f92e9efe723882a563880a3e2fa9ae9a1db2611adcbe80e6bd878486aff51e
+  proxyOwner is address at storage 0xcac960375e7e3e1927ba0980937375d7ee1873cdefd60716f508c770004bd781
+  storCAC9 is uint256 at storage 0xcac960375e7e3e1927ba0980937375d7ee1873cdefd60716f508c770004bd781
+
+def proxyOwner(): # not payable
+  return address(proxyOwner)
+
+def status(): # not payable
+  return bool(status)
+
+def isPauser(address account): # not payable
+  require calldata.size - 4 >=′ 32
+  require account == account
+  return bool(stor[account][0x1deb16af3c96961b83c983977e0f6ff4136fa28250dbabaa4808c7433a9edf78])
+
+def implementation(): # not payable
+  return address(implementationAddress)
+
+def isUpgrader(address _param1): # not payable
+  require calldata.size - 4 >=′ 32
+  require _param1 == _param1
+  return bool(stor[_param1][0x9de98e870c89d1135e77618f88cf80ad4ce8a3a50f9fe21edfb7dd02f321801a])
+
+#
+#  Regular functions
+#
+
+def _fallback(?) payable: # default function
+  if not status:
+      revert with 0, 'Proxy: proxy is not active'
+  delegate uint256(stor84F9) with:
+     funct call.data[0 len 4]
+       gas gas_remaining wei
+      args call.data[4 len calldata.size - 4]
+  if not delegate.return_code:
+      revert with ext_call.return_data[0 len return_data.size]
+  return ext_call.return_data[0 len return_data.size]
+
+def setStatus(bool _status): # not payable
+  require calldata.size - 4 >=′ 32
+  require _status == _status
+  if address(proxyOwner) != caller:
+      if not stor[caller][0x1deb16af3c96961b83c983977e0f6ff4136fa28250dbabaa4808c7433a9edf78]:
+          revert with 0, 'Proxy: is not owner or pauser'
+  status = _status
+  log StatusUpdated(bool active=_status)
+
+def changeOwner(address _newOwner): # not payable
+  require calldata.size - 4 >=′ 32
+  require _newOwner == _newOwner
+  if address(proxyOwner) != caller:
+      revert with 0, 'Proxy: is not owner'
+  if not _newOwner:
+      revert with 0, 'Proxy: account can not be zero'
+  uint256(storCAC9) = _newOwner
+  log OwnerChanged(
+        address oldOwner=address(proxyOwner),
+        address newOwner=_newOwner)
+
+def setPauser(address who, bool status): # not payable
+  require calldata.size - 4 >=′ 64
+  require who == who
+  require status == status
+  if address(proxyOwner) != caller:
+      revert with 0, 'Proxy: is not owner'
+  if not who:
+      revert with 0, 'Proxy: account can not be zero'
+  stor[who][0x1deb16af3c96961b83c983977e0f6ff4136fa28250dbabaa4808c7433a9edf78] = status
+  log 0xd34f4aa5: status, who
+
+def upgradeTo(address newImplementation): # not payable
+  require calldata.size - 4 >=′ 32
+  require newImplementation == newImplementation
+  if address(proxyOwner) != caller:
+      if not stor[caller][0x9de98e870c89d1135e77618f88cf80ad4ce8a3a50f9fe21edfb7dd02f321801a]:
+          revert with 0, 'Proxy: is not owner or upgrader'
+  if ext_code.size(newImplementation) <= 0:
+      revert with 0, 'Proxy: not a contract address'
+  uint256(stor84F9) = newImplementation
+  log Upgraded(address implementation=newImplementation)
+
+def unknown07eddd47(uint256 _param1, uint256 _param2): # not payable
+  require calldata.size - 4 >=′ 64
+  require _param1 == address(_param1)
+  require _param2 == bool(_param2)
+  if address(proxyOwner) != caller:
+      revert with 0, 'Proxy: is not owner'
+  if not address(_param1):
+      revert with 0, 'Proxy: account can not be zero'
+  stor[address(_param1)][0x9de98e870c89d1135e77618f88cf80ad4ce8a3a50f9fe21edfb7dd02f321801a] = _param2
+  log 0xafc2cdf3: bool(_param2), address(_param1)
+
+def upgradeToAndCall(address newImplementation, bytes data) payable: 
+  require calldata.size - 4 >=′ 64
+  require newImplementation == newImplementation
+  require data <= LOCK8605463013()
+  require data + 35 <′ calldata.size
+  if data.length > LOCK8605463013():
+      revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+  if ceil32(ceil32(data.length)) + 97 < 96 or ceil32(ceil32(data.length)) + 97 > LOCK8605463013():
+      revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+  mem[96] = data.length
+  require data + data.length + 36 <= calldata.size
+  mem[128 len data.length] = data[all]
+  mem[data.length + 128] = 0
+  if caller == address(proxyOwner):
+      if ext_code.size(newImplementation) <= 0:
+          revert with 0, 'Proxy: not a contract address'
+      uint256(stor84F9) = newImplementation
+      log Upgraded(address implementation=newImplementation)
+      if data.length:
+          mem[ceil32(ceil32(data.length)) + 97 len ceil32(data.length)] = data[all], mem[data.length + 128 len ceil32(data.length) - data.length]
+          if ceil32(data.length) > data.length:
+              mem[ceil32(ceil32(data.length)) + data.length + 97] = 0
+          delegate newImplementation.mem[ceil32(ceil32(data.length)) + 97 len 4] with:
+               gas gas_remaining wei
+              args mem[ceil32(ceil32(data.length)) + 101 len data.length - 4]
+          if not delegate.return_code:
+              revert with 0, 'Proxy: delegateCall failed'
+  else:
+      mem[ceil32(ceil32(data.length)) + 161] = caller
+      if not stor[caller][0x9de98e870c89d1135e77618f88cf80ad4ce8a3a50f9fe21edfb7dd02f321801a]:
+          revert with 0, 'Proxy: is not owner or upgrader'
+      if ext_code.size(newImplementation) <= 0:
+          revert with 0, 'Proxy: not a contract address'
+      uint256(stor84F9) = newImplementation
+      log Upgraded(address implementation=newImplementation)
+      if data.length:
+          mem[ceil32(ceil32(data.length)) + 181 len ceil32(data.length)] = data[all], Mask(8 * ceil32(data.length) - data.length, -(8 * ceil32(data.length) + -ceil32(ceil32(data.length)) + 31) + 256, 52) >> -(8 * ceil32(data.length) + -ceil32(ceil32(data.length)) + 31) + 256
+          if ceil32(data.length) > data.length:
+              mem[ceil32(ceil32(data.length)) + data.length + 181] = 0
+          delegate newImplementation.mem[ceil32(ceil32(data.length)) + 181 len 4] with:
+               gas gas_remaining wei
+              args mem[ceil32(ceil32(data.length)) + 185 len data.length - 4]
+          if not delegate.return_code:
+              revert with 0, 'Proxy: delegateCall failed'
+
+

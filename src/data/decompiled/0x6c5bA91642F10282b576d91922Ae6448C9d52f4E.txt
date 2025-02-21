@@ -1,0 +1,317 @@
+# Palkeoramix decompiler. 
+
+def storage:
+  balanceOf is mapping of uint256 at storage 0
+  allowance is mapping of uint256 at storage 1
+  totalSupply is uint256 at storage 2
+  name is array of uint256 at storage 3
+  symbol is array of uint256 at storage 4
+  decimals is uint8 at storage 5
+  stor6 is mapping of uint8 at storage 6
+  paused is uint8 at storage 7
+  owner is address at storage 7 offset 8
+
+def name() payable: 
+  return name[0 len name.length]
+
+def totalSupply() payable: 
+  return totalSupply
+
+def decimals() payable: 
+  return decimals
+
+def isPauser(address account) payable: 
+  require calldata.size - 4 >= 32
+  if not account:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  34,
+                  0x65526f6c65733a206163636f756e7420697320746865207a65726f20616464726573,
+                  mem[198 len 30]
+  return bool(stor6[address(account)])
+
+def paused() payable: 
+  return bool(paused)
+
+def balanceOf(address account) payable: 
+  require calldata.size - 4 >= 32
+  return balanceOf[address(account)]
+
+def owner() payable: 
+  return owner
+
+def symbol() payable: 
+  return symbol[0 len symbol.length]
+
+def allowance(address owner, address spender) payable: 
+  require calldata.size - 4 >= 64
+  return allowance[address(owner)][address(spender)]
+
+#
+#  Regular functions
+#
+
+def _fallback(?) payable: # default function
+  revert
+
+def isOwner() payable: 
+  return (caller == owner)
+
+def renounceOwnership() payable: 
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  log OwnershipTransferred(
+        address previousOwner=owner,
+        address newOwner=0)
+  owner = 0
+
+def transferOwnership(address newOwner) payable: 
+  require calldata.size - 4 >= 32
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  if not newOwner:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  38,
+                  0x654f776e61626c653a206e6577206f776e657220697320746865207a65726f20616464726573,
+                  mem[202 len 26]
+  log OwnershipTransferred(
+        address previousOwner=owner,
+        address newOwner=newOwner)
+  owner = newOwner
+
+def renouncePauser() payable: 
+  if not caller:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  34,
+                  0x65526f6c65733a206163636f756e7420697320746865207a65726f20616464726573,
+                  mem[198 len 30]
+  if not stor6[caller]:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  33,
+                  0x65526f6c65733a206163636f756e7420646f6573206e6f74206861766520726f6c,
+                  mem[197 len 31]
+  stor6[caller] = 0
+  log PauserRemoved(address account=caller)
+
+def pause() payable: 
+  if not caller:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  34,
+                  0x65526f6c65733a206163636f756e7420697320746865207a65726f20616464726573,
+                  mem[198 len 30]
+  if not stor6[caller]:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  48,
+                  0x73506175736572526f6c653a2063616c6c657220646f6573206e6f742068617665207468652050617573657220726f6c,
+                  mem[212 len 16]
+  if paused:
+      revert with 0, 'Pausable: paused'
+  paused = 1
+  log Paused(address account=caller)
+
+def unpause() payable: 
+  if not caller:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  34,
+                  0x65526f6c65733a206163636f756e7420697320746865207a65726f20616464726573,
+                  mem[198 len 30]
+  if not stor6[caller]:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  48,
+                  0x73506175736572526f6c653a2063616c6c657220646f6573206e6f742068617665207468652050617573657220726f6c,
+                  mem[212 len 16]
+  if not paused:
+      revert with 0, 'Pausable: not paused'
+  paused = 0
+  log Unpaused(address account=caller)
+
+def approve(address spender, uint256 amount) payable: 
+  require calldata.size - 4 >= 64
+  if owner != caller:
+      if paused:
+          revert with 0, 'Pausable: paused'
+  if not caller:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  36,
+                  0x7345524332303a20617070726f76652066726f6d20746865207a65726f20616464726573,
+                  mem[200 len 28]
+  if not spender:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  34,
+                  0x7345524332303a20617070726f766520746f20746865207a65726f20616464726573,
+                  mem[198 len 30]
+  allowance[caller][address(spender)] = amount
+  log Approval(
+        address owner=amount,
+        address spender=caller,
+        uint256 value=spender)
+  return 1
+
+def addPauser(address account) payable: 
+  require calldata.size - 4 >= 32
+  if not caller:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  34,
+                  0x65526f6c65733a206163636f756e7420697320746865207a65726f20616464726573,
+                  mem[198 len 30]
+  if not stor6[caller]:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  48,
+                  0x73506175736572526f6c653a2063616c6c657220646f6573206e6f742068617665207468652050617573657220726f6c,
+                  mem[212 len 16]
+  if not account:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  34,
+                  0x65526f6c65733a206163636f756e7420697320746865207a65726f20616464726573,
+                  mem[198 len 30]
+  if stor6[address(account)]:
+      revert with 0, 'Roles: account already has role'
+  stor6[address(account)] = 1
+  log PauserAdded(address account=account)
+
+def decreaseAllowance(address spender, uint256 subtractedValue) payable: 
+  require calldata.size - 4 >= 64
+  if owner != caller:
+      if paused:
+          revert with 0, 'Pausable: paused'
+  if subtractedValue > allowance[caller][address(spender)]:
+      revert with 0, 
+                  32,
+                  37,
+                  0x7345524332303a2064656372656173656420616c6c6f77616e63652062656c6f77207a6572,
+                  mem[165 len 27],
+                  mem[219 len 5]
+  if not caller:
+      revert with 0, 32, 36, 0x7345524332303a20617070726f76652066726f6d20746865207a65726f20616464726573, mem[296 len 28]
+  if not spender:
+      revert with 0, 32, 34, 0x7345524332303a20617070726f766520746f20746865207a65726f20616464726573, mem[294 len 30]
+  allowance[caller][address(spender)] -= subtractedValue
+  log Approval(
+        address owner=(allowance[caller][address(spender)] - subtractedValue),
+        address spender=caller,
+        uint256 value=spender)
+  return 1
+
+def increaseAllowance(address spender, uint256 addedValue) payable: 
+  require calldata.size - 4 >= 64
+  if owner != caller:
+      if paused:
+          revert with 0, 'Pausable: paused'
+  if allowance[caller][address(spender)] + addedValue < allowance[caller][address(spender)]:
+      revert with 0, 'SafeMath: addition overflow'
+  if not caller:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  36,
+                  0x7345524332303a20617070726f76652066726f6d20746865207a65726f20616464726573,
+                  mem[200 len 28]
+  if not spender:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  34,
+                  0x7345524332303a20617070726f766520746f20746865207a65726f20616464726573,
+                  mem[198 len 30]
+  allowance[caller][address(spender)] += addedValue
+  log Approval(
+        address owner=(allowance[caller][address(spender)] + addedValue),
+        address spender=caller,
+        uint256 value=spender)
+  return 1
+
+def transfer(address recipient, uint256 amount) payable: 
+  require calldata.size - 4 >= 64
+  if owner != caller:
+      if paused:
+          revert with 0, 'Pausable: paused'
+  if not caller:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  37,
+                  0x7345524332303a207472616e736665722066726f6d20746865207a65726f20616464726573,
+                  mem[201 len 27]
+  if not recipient:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  35,
+                  0xfe45524332303a207472616e7366657220746f20746865207a65726f20616464726573,
+                  mem[199 len 29]
+  if amount > balanceOf[caller]:
+      revert with 0, 
+                  32,
+                  38,
+                  0x7345524332303a207472616e7366657220616d6f756e7420657863656564732062616c616e63,
+                  mem[166 len 26],
+                  mem[218 len 6]
+  balanceOf[caller] -= amount
+  if balanceOf[address(recipient)] + amount < balanceOf[address(recipient)]:
+      revert with 0, 'SafeMath: addition overflow'
+  balanceOf[address(recipient)] += amount
+  log Transfer(
+        address from=amount,
+        address to=caller,
+        uint256 value=recipient)
+  return 1
+
+def transferFrom(address sender, address recipient, uint256 amount) payable: 
+  require calldata.size - 4 >= 96
+  if sender != owner:
+      if paused:
+          revert with 0, 'Pausable: paused'
+  if not sender:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  37,
+                  0x7345524332303a207472616e736665722066726f6d20746865207a65726f20616464726573,
+                  mem[201 len 27]
+  if not recipient:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  35,
+                  0xfe45524332303a207472616e7366657220746f20746865207a65726f20616464726573,
+                  mem[199 len 29]
+  if amount > balanceOf[address(sender)]:
+      revert with 0, 
+                  32,
+                  38,
+                  0x7345524332303a207472616e7366657220616d6f756e7420657863656564732062616c616e63,
+                  mem[166 len 26],
+                  mem[218 len 6]
+  balanceOf[address(sender)] -= amount
+  if balanceOf[address(recipient)] + amount < balanceOf[address(recipient)]:
+      revert with 0, 'SafeMath: addition overflow'
+  balanceOf[address(recipient)] += amount
+  log Transfer(
+        address from=amount,
+        address to=sender,
+        uint256 value=recipient)
+  if amount > allowance[address(sender)][caller]:
+      revert with 0, 
+                  32,
+                  40,
+                  0x6545524332303a207472616e7366657220616d6f756e74206578636565647320616c6c6f77616e63,
+                  mem[264 len 24],
+                  mem[312 len 8]
+  if not sender:
+      revert with 0, 32, 36, 0x7345524332303a20617070726f76652066726f6d20746865207a65726f20616464726573, mem[392 len 28]
+  if not caller:
+      revert with 0, 32, 34, 0x7345524332303a20617070726f766520746f20746865207a65726f20616464726573, mem[390 len 30]
+  allowance[address(sender)][caller] -= amount
+  log Approval(
+        address owner=(allowance[address(sender)][caller] - amount),
+        address spender=sender,
+        uint256 value=caller)
+  return 1
+
+

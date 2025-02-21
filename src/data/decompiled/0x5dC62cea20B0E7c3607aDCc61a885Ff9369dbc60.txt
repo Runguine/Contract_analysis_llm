@@ -1,0 +1,2099 @@
+# Palkeoramix decompiler. 
+
+def storage:
+  stor0 is uint8 at storage 0
+  stor0 is address at storage 0 offset 8
+  stor1 is mapping of uint256 at storage 1
+  stor2 is mapping of uint256 at storage 2
+  stor3 is uint8 at storage 3 offset 160
+  stor3 is uint128 at storage 3 offset 160
+  stor3 is address at storage 3
+  stor4 is address at storage 4
+  stor8 is address at storage 8
+  stor9 is uint256 at storage 9
+  stor10 is uint128 at storage 10
+  stor10 is uint128 at storage 10 offset 128
+  stor10 is uint256 at storage 10
+
+def unpause(): # not payable
+  if address(stor0.field_8) != caller:
+      revert with 0, '!O'
+  uint8(stor0.field_0) = 0
+
+def unknown9b7c9306(): # not payable
+  if address(stor0.field_8) != caller:
+      revert with 0, '!O'
+  uint256(stor10.field_0) = uint128(stor10.field_0)
+
+def setWETHAddress(address weth): # not payable
+  require calldata.size - 4 >=′ 32
+  require weth == weth
+  if address(stor0.field_8) != caller:
+      revert with 0, '!O'
+  address(stor3.field_0) = weth
+
+def unknownb4019dee(uint256 _param1): # not payable
+  require calldata.size - 4 >=′ 32
+  require _param1 == address(_param1)
+  if address(stor0.field_8) != caller:
+      revert with 0, '!O'
+  stor8 = address(_param1)
+
+def unknownf98c4904(uint256 _param1): # not payable
+  require calldata.size - 4 >=′ 32
+  require _param1 == address(_param1)
+  if address(stor0.field_8) != caller:
+      revert with 0, '!O'
+  stor4 = address(_param1)
+
+def unknown6389654e(uint256 _param1): # not payable
+  require calldata.size - 4 >=′ 32
+  require _param1 == _param1
+  if address(stor0.field_8) != caller:
+      revert with 0, '!O'
+  if _param1 >= unknown10000000():
+      revert with 0, 'GWLO'
+  stor9 = _param1
+
+def transferOwnership(address newOwner): # not payable
+  require calldata.size - 4 >=′ 32
+  require newOwner == newOwner
+  if address(stor0.field_8) != caller:
+      revert with 0, '!O'
+  if not newOwner:
+      revert with 0, 'ZO'
+  address(stor0.field_8) = newOwner
+
+def pause(): # not payable
+  if address(stor0.field_8) != caller:
+      if uint8(stor0.field_0):
+          revert with 0, 'P'
+  if stor1[caller] != 1:
+      if stor1[tx.origin] != 1:
+          revert with 0, '!A'
+  uint8(stor0.field_0) = 1
+
+def toggleOperator(address _operator): # not payable
+  require calldata.size - 4 >=′ 32
+  require _operator == _operator
+  if address(stor0.field_8) != caller:
+      revert with 0, '!O'
+  stor1[address(_operator)] = stor1[address(_operator)] xor 1
+
+def unknownbb628130(uint256 _param1): # not payable
+  require calldata.size - 4 >=′ 32
+  require _param1 == address(_param1)
+  if address(stor0.field_8) != caller:
+      revert with 0, '!O'
+  stor2[address(_param1)] = stor2[address(_param1)] xor 1
+
+def unknown901cc3c4(): # not payable
+  if address(stor0.field_8) != caller:
+      if uint8(stor0.field_0):
+          revert with 0, 'P'
+  if stor1[caller] != 1:
+      if stor1[tx.origin] != 1:
+          revert with 0, '!A'
+  Mask(96, 0, stor3.field_160) = Mask(96, 0, not bool(uint8(stor3.field_160)))
+
+def wrapETH(uint256 value): # not payable
+  require calldata.size - 4 >=′ 32
+  require value == value
+  if address(stor0.field_8) != caller:
+      if uint8(stor0.field_0):
+          revert with 0, 'P'
+  if stor1[caller] != 1:
+      if stor1[tx.origin] != 1:
+          revert with 0, '!A'
+  require ext_code.size(address(stor3.field_0))
+  call address(stor3.field_0).deposit() with:
+     value value wei
+       gas gas_remaining wei
+  if not ext_call.success:
+      revert with ext_call.return_data[0 len return_data.size]
+
+def unknownd2a69501(uint256 _param1): # not payable
+  require calldata.size - 4 >=′ 32
+  require _param1 == _param1
+  if address(stor0.field_8) != caller:
+      if uint8(stor0.field_0):
+          revert with 0, 'P'
+  if stor1[caller] != 1:
+      if stor1[tx.origin] != 1:
+          revert with 0, '!A'
+  require ext_code.size(address(stor3.field_0))
+  call address(stor3.field_0).withdraw(uint256 amount) with:
+       gas gas_remaining wei
+      args _param1
+  if not ext_call.success:
+      revert with ext_call.return_data[0 len return_data.size]
+
+def sendETH(address _account, uint256 _amount): # not payable
+  require calldata.size - 4 >=′ 64
+  require _account == _account
+  require _amount == _amount
+  if stor2[address(_account)] != 1:
+      revert with 0, '!W'
+  if address(stor0.field_8) != caller:
+      if uint8(stor0.field_0):
+          revert with 0, 'P'
+  if stor1[caller] != 1:
+      if stor1[tx.origin] != 1:
+          revert with 0, '!A'
+  call _account with:
+     value _amount wei
+       gas gas_remaining wei
+  if not ext_call.success:
+      revert with 0, 'SEr'
+
+def _fallback(?) payable: # default function
+  if address(stor0.field_8) != caller:
+      if uint8(stor0.field_0):
+          revert with 0, 'P'
+  if stor1[caller] != 1:
+      if stor1[tx.origin] != 1:
+          revert with 0, '!A'
+  if not stor4:
+      revert with 0, 'NFB'
+  mem[96 len calldata.size] = call.data[0 len calldata.size]
+  mem[calldata.size + 96] = 0
+  delegate stor4 with:
+     funct call.data[0 len 4]
+       gas gas_remaining wei
+      args call.data[4 len calldata.size - 4]
+  if not return_data.size:
+      if not delegate.return_code:
+          revert with memory
+            from 128
+             len mem[96]
+      return memory
+        from 128
+         len mem[96]
+  if not delegate.return_code:
+      revert with ext_call.return_data[0 len return_data.size]
+  return ext_call.return_data[0 len return_data.size]
+
+def delegatecall(address dest, bytes data): # not payable
+  require calldata.size - 4 >=′ 64
+  require dest == dest
+  require data <= LOCK8605463013()
+  require data + 35 <′ calldata.size
+  require data.length <= LOCK8605463013()
+  require data + data.length + 36 <= calldata.size
+  if address(stor0.field_8) != caller:
+      revert with 0, '!O'
+  mem[96 len data.length] = data[all]
+  mem[data.length + 96] = 0
+  delegate dest with:
+       gas gas_remaining wei
+      args data[all]
+  if not return_data.size:
+      if not delegate.return_code:
+          revert with memory
+            from 128
+             len mem[96]
+      return ' '
+  if not delegate.return_code:
+      revert with ext_call.return_data[0 len return_data.size]
+  return Array(len=return_data.size, data=ext_call.return_data[0 len return_data.size])
+
+def unknownc9bbea99(uint256 _param1, uint256 _param2): # not payable
+  require calldata.size - 4 >=′ 64
+  require _param1 == address(_param1)
+  require _param2 == _param2
+  if stor2[address(_param1)] != 1:
+      revert with 0, '!W'
+  if address(stor0.field_8) != caller:
+      if uint8(stor0.field_0):
+          revert with 0, 'P'
+  if stor1[caller] != 1:
+      if stor1[tx.origin] != 1:
+          revert with 0, '!A'
+  require ext_code.size(address(stor3.field_0))
+  call address(stor3.field_0).withdraw(uint256 amount) with:
+       gas gas_remaining wei
+      args _param2
+  if not ext_call.success:
+      revert with ext_call.return_data[0 len return_data.size]
+  call address(_param1) with:
+     value _param2 wei
+       gas gas_remaining wei
+  if not ext_call.success:
+      revert with 0, 'SUWr'
+
+def unknown7714f7c4(uint256 _param1, uint256 _param2, uint256 _param3, uint256 _param4, uint256 _param5, uint256 _param6) payable: 
+  require calldata.size - 4 >=′ 192
+  require _param1 == address(_param1)
+  require _param2 == _param2
+  require _param3 == _param3
+  require _param4 == _param4
+  require _param5 == _param5
+  require _param6 == _param6
+  if address(stor0.field_8) != caller:
+      if uint8(stor0.field_0):
+          revert with 0, 'P'
+  if stor1[caller] != 1:
+      if stor1[tx.origin] != 1:
+          revert with 0, '!A'
+  if uint32(_param6):
+      if uint32(_param6) != block.number:
+          revert with 0, 'BN'
+  if uint32(_param6):
+      if block.timestamp > uint32(_param6):
+          revert with 0, 'BT'
+  ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+
+def unknown166847df(uint256 _param1, uint256 _param2, array _param3): # not payable
+  require calldata.size - 4 >=′ 96
+  require _param1 == address(_param1)
+  require _param2 == _param2
+  require _param3 <= LOCK8605463013()
+  require _param3 + 35 <′ calldata.size
+  require _param3.length <= LOCK8605463013()
+  require _param3 + _param3.length + 36 <= calldata.size
+  if address(stor0.field_8) != caller:
+      revert with 0, '!O'
+  mem[96 len _param3.length] = _param3[all]
+  mem[_param3.length + 96] = 0
+  call address(_param1) with:
+     value _param2 wei
+       gas gas_remaining wei
+      args _param3[all]
+  if not return_data.size:
+      if not ext_call.success:
+          revert with memory
+            from 128
+             len mem[96]
+      return ' '
+  if not ext_call.success:
+      revert with ext_call.return_data[0 len return_data.size]
+  return Array(len=return_data.size, data=ext_call.return_data[0 len return_data.size])
+
+def uniswapV2Call(address sender, uint256 amount0, uint256 amount1, bytes data): # not payable
+  require calldata.size - 4 >=′ 128
+  require sender == sender
+  require amount0 == amount0
+  require amount1 == amount1
+  require data <= LOCK8605463013()
+  require data + 35 <′ calldata.size
+  require data.length <= LOCK8605463013()
+  require data + data.length + 36 <= calldata.size
+  if address(stor0.field_8) != caller:
+      if uint8(stor0.field_0):
+          revert with 0, 'P'
+  if stor1[caller] != 1:
+      if stor1[tx.origin] != 1:
+          revert with 0, '!A'
+  mem[96 len calldata.size] = call.data[0 len calldata.size]
+  mem[calldata.size + 96] = 0
+  delegate stor4 with:
+     funct call.data[0 len 4]
+       gas gas_remaining wei
+      args call.data[4 len calldata.size - 4]
+  if not return_data.size:
+      if not delegate.return_code:
+          revert with memory
+            from 128
+             len mem[96]
+  else:
+      if not delegate.return_code:
+          revert with ext_call.return_data[0 len return_data.size]
+  ('bool', 'delegate.return_code')
+
+def unknown8862fb23(uint256 _param1, uint256 _param2, uint256 _param3, uint256 _param4, uint256 _param5, uint256 _param6) payable: 
+  require calldata.size - 4 >=′ 192
+  require _param1 == _param1
+  require _param2 == _param2
+  require _param3 == _param3
+  require _param4 == address(_param4)
+  require _param5 == address(_param5)
+  require _param6 == _param6
+  if address(stor0.field_8) != caller:
+      if uint8(stor0.field_0):
+          revert with 0, 'P'
+  if stor1[caller] != 1:
+      if stor1[tx.origin] != 1:
+          revert with 0, '!A'
+  if uint32(_param6):
+      if uint32(_param6) != block.number:
+          revert with 0, 'BN'
+  if uint32(_param6):
+      if block.timestamp > uint32(_param6):
+          revert with 0, 'BT'
+  if _param2 <′ 0:
+      if _param2 == 0x8000000000000000000000000000000000000000000000000000000000000000:
+          revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+  ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+
+def uniswapV3SwapCallback(int256 amount0Delta, int256 amount1Delta, bytes data): # not payable
+  require calldata.size - 4 >=′ 96
+  require amount0Delta == amount0Delta
+  require amount1Delta == amount1Delta
+  require data <= LOCK8605463013()
+  require data + 35 <′ calldata.size
+  require data.length <= LOCK8605463013()
+  require data + data.length + 36 <= calldata.size
+  if address(stor0.field_8) != caller:
+      if uint8(stor0.field_0):
+          revert with 0, 'P'
+  if stor1[caller] != 1:
+      if stor1[tx.origin] != 1:
+          revert with 0, '!A'
+  if 0 >= data.length:
+      revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+  mem[96 len calldata.size] = call.data[0 len calldata.size]
+  mem[calldata.size + 96] = 0
+  delegate stor4 with:
+     funct call.data[0 len 4]
+       gas gas_remaining wei
+      args call.data[4 len calldata.size - 4]
+  if not return_data.size:
+      if not delegate.return_code:
+          revert with memory
+            from 128
+             len mem[96]
+  else:
+      if not delegate.return_code:
+          revert with ext_call.return_data[0 len return_data.size]
+  ('bool', 'delegate.return_code')
+
+def uniswapV3MintCallback(uint256 amount0, uint256 amount1, bytes data): # not payable
+  require calldata.size - 4 >=′ 96
+  require amount0 == amount0
+  require amount1 == amount1
+  require data <= LOCK8605463013()
+  require data + 35 <′ calldata.size
+  require data.length <= LOCK8605463013()
+  require data + data.length + 36 <= calldata.size
+  if address(stor0.field_8) != caller:
+      if uint8(stor0.field_0):
+          revert with 0, 'P'
+  if stor1[caller] != 1:
+      if stor1[tx.origin] != 1:
+          revert with 0, '!A'
+  if 0 >= data.length:
+      revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+  require data.length >=′ 96
+  require cd[(data + 36)] == address(cd[(data + 36)])
+  require cd[(data + 68)] == address(cd[(data + 68)])
+  require cd[(data + 100)] == cd[(data + 100)]
+  if amount0 > 0:
+      if uint128(cd[(data + 100)]) > 0:
+          if amount0 > uint128(cd[(data + 100)]):
+              revert with 0, 'V3ML0'
+  else:
+      if amount1 <= 0:
+          stop
+      if uint128(cd[(data + 100)]) >> 128 > 0:
+          if amount1 > uint128(cd[(data + 100)]) >> 128:
+              revert with 0, 'V3ML1'
+  if not caller:
+      revert with 0, 'TTZ'
+  ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+
+def approve(address erc20, address who, uint256 amount): # not payable
+  require calldata.size - 4 >=′ 96
+  require erc20 == erc20
+  require who == who
+  require amount == amount
+  if stor2[address(who)] != 1:
+      revert with 0, '!W'
+  if address(stor0.field_8) != caller:
+      if uint8(stor0.field_0):
+          revert with 0, 'P'
+  if stor1[caller] != 1:
+      if stor1[tx.origin] != 1:
+          revert with 0, '!A'
+  if not who:
+      revert with 0, 'SAZ'
+  mem[196 len 96] = approve(address spender, uint256 amount), address(who) << 64, 0, amount, mem[196 len 28]
+  call erc20.mem[196 len 4] with:
+       gas gas_remaining wei
+      args mem[200 len 64]
+  if not return_data.size:
+      if not ext_call.success:
+          revert with 0, 'SAF'
+      require approve(address spender, uint256 amount), address(who) << 64 == bool(approve(address spender, uint256 amount), address(who) << 64)
+      if not approve(address spender, uint256 amount), address(who) << 64:
+          revert with 0, 'SAFF'
+  else:
+      mem[228 len return_data.size] = ext_call.return_data[0 len return_data.size]
+      if not ext_call.success:
+          revert with 0, 'SAF'
+      if return_data.size > 0:
+          require return_data.size >=′ 32
+          require mem[228] == bool(mem[228])
+          if not mem[228]:
+              revert with 0, 'SAFF'
+
+def unknownc0319321(uint256 _param1): # not payable
+  require calldata.size - 4 >=′ 32
+  require _param1 == _param1
+  if address(stor0.field_8) != caller:
+      if uint8(stor0.field_0):
+          revert with 0, 'P'
+  if stor1[caller] != 1:
+      if stor1[tx.origin] != 1:
+          revert with 0, '!A'
+  if _param1 <= 0:
+      revert with 0, 'BZ'
+  if _param1 >= unknown10000000():
+      revert with 0, 'GWAO'
+  if uint128(stor10.field_0) != uint128(uint128(block.number) / 2 * 3600):
+      uint128(stor10.field_0) = uint128(uint128(block.number) / 2 * 3600)
+      uint256(stor10.field_0) = uint128(stor10.field_0)
+  if uint128(stor10.field_128) > -_param1 - 1:
+      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+  if uint128(stor10.field_128) + _param1 > stor9:
+      revert with 0, 'GWLE'
+  if uint128(stor10.field_128) > -uint128(_param1) + LOCK8605463013():
+      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+  uint128(stor10.field_128) = uint128(uint128(stor10.field_128) + uint128(_param1))
+  call block.coinbase with:
+     value _param1 wei
+       gas gas_remaining wei
+  if not ext_call.success:
+      revert with 0, 'BF'
+
+def transferToken(address _tokenContract, address _transferTo, uint256 _value): # not payable
+  require calldata.size - 4 >=′ 96
+  require _tokenContract == _tokenContract
+  require _transferTo == _transferTo
+  require _value == _value
+  if stor2[address(_transferTo)] != 1:
+      revert with 0, '!W'
+  if address(stor0.field_8) != caller:
+      if uint8(stor0.field_0):
+          revert with 0, 'P'
+  if stor1[caller] != 1:
+      if stor1[tx.origin] != 1:
+          revert with 0, '!A'
+  if not _transferTo:
+      revert with 0, 'TTZ'
+  mem[196 len 96] = transfer(address recipient, uint256 amount), address(_transferTo) << 64, 0, _value, mem[196 len 28]
+  call _tokenContract.mem[196 len 4] with:
+       gas gas_remaining wei
+      args mem[200 len 64]
+  if not return_data.size:
+      if not ext_call.success:
+          revert with 0, 'TF'
+      require transfer(address recipient, uint256 amount), address(_transferTo) << 64 == bool(transfer(address recipient, uint256 amount), address(_transferTo) << 64)
+      if not transfer(address recipient, uint256 amount), address(_transferTo) << 64:
+          revert with 0, 'TFF'
+  else:
+      mem[228 len return_data.size] = ext_call.return_data[0 len return_data.size]
+      if not ext_call.success:
+          revert with 0, 'TF'
+      if return_data.size > 0:
+          require return_data.size >=′ 32
+          require mem[228] == bool(mem[228])
+          if not mem[228]:
+              revert with 0, 'TFF'
+
+def unknowne54ea3a9(uint256 _param1): # not payable
+  require calldata.size - 4 >=′ 32
+  require _param1 == _param1
+  if address(stor0.field_8) != caller:
+      if uint8(stor0.field_0):
+          revert with 0, 'P'
+  if stor1[caller] != 1:
+      if stor1[tx.origin] != 1:
+          revert with 0, '!A'
+  if _param1 >= unknown10000000():
+      revert with 0, 'GWAO'
+  if uint128(stor10.field_0) != uint128(uint128(block.number) / 2 * 3600):
+      uint128(stor10.field_0) = uint128(uint128(block.number) / 2 * 3600)
+      uint256(stor10.field_0) = uint128(stor10.field_0)
+  if uint128(stor10.field_128) > -_param1 - 1:
+      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+  if uint128(stor10.field_128) + _param1 > stor9:
+      revert with 0, 'GWLE'
+  if uint128(stor10.field_128) > -uint128(_param1) + LOCK8605463013():
+      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+  uint128(stor10.field_128) = uint128(uint128(stor10.field_128) + uint128(_param1))
+  require ext_code.size(address(stor3.field_0))
+  call address(stor3.field_0).withdraw(uint256 amount) with:
+       gas gas_remaining wei
+      args _param1
+  if not ext_call.success:
+      revert with ext_call.return_data[0 len return_data.size]
+  call caller with:
+     value _param1 wei
+       gas gas_remaining wei
+  if not ext_call.success:
+      revert with 0, 'SUWr'
+
+def unknown59037dbc(uint256 _param1, uint256 _param2, uint256 _param3, uint256 _param4, uint256 _param5, uint256 _param6, uint256 _param7, uint256 _param8) payable: 
+  require calldata.size - 4 >=′ 256
+  require _param1 == address(_param1)
+  require _param2 == _param2
+  require _param3 == _param3
+  require _param4 == address(_param4)
+  require _param5 == address(_param5)
+  require _param6 == address(_param6)
+  require _param7 == address(_param7)
+  require _param8 == _param8
+  if address(stor0.field_8) != caller:
+      if uint8(stor0.field_0):
+          revert with 0, 'P'
+  if stor1[caller] != 1:
+      if stor1[tx.origin] != 1:
+          revert with 0, '!A'
+  if uint32(_param8):
+      if uint32(_param8) != block.number:
+          revert with 0, 'BN'
+  if uint32(_param8):
+      if block.timestamp > uint32(_param8):
+          revert with 0, 'BT'
+  if address(_param5) == address(_param4):
+      revert with 0, 'PEQ'
+  require ext_code.size(address(_param1))
+  static call address(_param1).slot0() with:
+          gas gas_remaining wei
+  if not ext_call.success:
+      revert with ext_call.return_data[0 len return_data.size]
+  require return_data.size >=′ 224
+  require ext_call.return_data[0] == ext_call.return_data[12 len 20]
+  require ext_call.return_data[32] == ('signextend', 2, ('ext_call.return_data', 32, 32))
+  require ext_call.return_data[64] == ext_call.return_data[94 len 2]
+  require ext_call.return_data[96] == ext_call.return_data[126 len 2]
+  require ext_call.return_data[128] == ext_call.return_data[158 len 2]
+  require ext_call.return_data[160] == ext_call.return_data[191 len 1]
+  require ext_call.return_data[192] == bool(ext_call.return_data[192])
+  if address(_param4):
+      if address(_param5) < address(_param4):
+          if ext_call.return_data[12 len 20] < address(_param4):
+              revert with 0, 'F'
+      else:
+          if ext_call.return_data[12 len 20] > address(_param4):
+              revert with 0, 'F'
+  else:
+      if address(_param5) < ext_call.return_data[12 len 20]:
+          if ext_call.return_data[12 len 20] < ext_call.return_data[12 len 20]:
+              revert with 0, 'F'
+      else:
+          if ext_call.return_data[12 len 20] > ext_call.return_data[12 len 20]:
+              revert with 0, 'F'
+  ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+
+def unknown3c59f598(uint256 _param1, uint256 _param2, uint256 _param3, uint256 _param4, uint256 _param5, uint256 _param6, uint256 _param7, uint256 _param8) payable: 
+  require calldata.size - 4 >=′ 256
+  require _param1 == address(_param1)
+  require _param2 == ('signextend', 15, ('param', '_param2'))
+  require _param3 == _param3
+  require _param4 == ('signextend', 2, ('param', '_param4'))
+  require _param5 == ('signextend', 2, ('param', '_param5'))
+  require _param6 == address(_param6)
+  require _param7 == address(_param7)
+  require _param8 == _param8
+  if address(stor0.field_8) != caller:
+      if uint8(stor0.field_0):
+          revert with 0, 'P'
+  if stor1[caller] != 1:
+      if stor1[tx.origin] != 1:
+          revert with 0, '!A'
+  if uint32(_param8):
+      if uint32(_param8) != block.number:
+          revert with 0, 'BN'
+  if uint32(_param8):
+      if block.timestamp > uint32(_param8):
+          revert with 0, 'BT'
+  if not ('signextend', 15, ('param', '_param2')):
+      revert with 0, 'V3LAZ'
+  if ('signextend', 15, ('param', '_param2')) <=′ 0:
+      if ('signextend', 15, ('param', '_param2')) == 0xffffffffffffffffffffffffffffffff80000000000000000000000000000000:
+          revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+      require ext_code.size(address(_param1))
+      call address(_param1).burn(int24 tickLower, int24 tickUpper, uint128 amount) with:
+           gas gas_remaining wei
+          args ('signextend', 2, ('param', '_param4')), ('signextend', 2, ('param', '_param5')), uint128(-('signextend', 15, ('param', '_param2')))
+      if not ext_call.success:
+          revert with ext_call.return_data[0 len return_data.size]
+      require return_data.size >=′ 64
+      require ext_call.return_data[0] == ext_call.return_data[0]
+      require ext_call.return_data[32] == ext_call.return_data[32]
+      require ext_code.size(address(_param1))
+      call address(_param1).collect(address recipient, int24 tickLower, int24 tickUpper, uint128 amount0Requested, uint128 amount1Requested) with:
+           gas gas_remaining wei
+          args address(this.address), ('signextend', 2, ('param', '_param4')), ('signextend', 2, ('param', '_param5')), LOCK8605463013(), LOCK8605463013()
+      if not ext_call.success:
+          revert with ext_call.return_data[0 len return_data.size]
+      require return_data.size >=′ 64
+      require ext_call.return_data[0] == ext_call.return_data[16 len 16]
+      require ext_call.return_data[32] == ext_call.return_data[48 len 16]
+  ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+
+def unknownd3d66dc5(uint256 _param1, uint256 _param2, uint256 _param3, uint256 _param4, uint256 _param5, uint256 _param6, uint256 _param7, uint256 _param8) payable: 
+  require calldata.size - 4 >=′ 256
+  require _param1 == address(_param1)
+  require _param2 == _param2
+  require _param3 == _param3
+  require _param4 == _param4
+  require _param5 == _param5
+  require _param6 == address(_param6)
+  require _param7 == address(_param7)
+  require _param8 == _param8
+  if caller == address(stor0.field_8):
+      if stor1[caller] != 1:
+          if stor1[tx.origin] != 1:
+              revert with 0, '!A'
+      if uint32(_param8):
+          if uint32(_param8) != block.number:
+              revert with 0, 'BN'
+      if uint32(_param8):
+          if block.timestamp > uint32(_param8):
+              revert with 0, 'BT'
+      if not _param3:
+          revert with 0, 'U2OZ'
+      require ext_code.size(address(_param1))
+      static call address(_param1).getReserves() with:
+              gas gas_remaining wei
+      if not ext_call.success:
+          revert with ext_call.return_data[0 len return_data.size]
+      require return_data.size >=′ 96
+      require ext_call.return_data[0] == ext_call.return_data[18 len 14]
+      require ext_call.return_data[32] == ext_call.return_data[50 len 14]
+      require ext_call.return_data[64] == ext_call.return_data[92 len 4]
+      if ext_call.return_data[50 len 14] and unknown10000000() > -1 / ext_call.return_data[50 len 14]:
+          revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+      if not ext_call.return_data[18 len 14]:
+          revert with Panic(18)  # If you divide or modulo by zero (e.g. 5 / 0 or 23 % 0).
+      if _param4:
+          if _param5 < _param4:
+              if Mask(112, 0, ext_call.return_data[32]) << 96 / ext_call.return_data[18 len 14] < _param4:
+                  revert with 0, 'F'
+          else:
+              if Mask(112, 0, ext_call.return_data[32]) << 96 / ext_call.return_data[18 len 14] > _param4:
+                  revert with 0, 'F'
+          if _param5 == _param4:
+              revert with 0, 'PEQ'
+      else:
+          if _param5 < Mask(112, 0, ext_call.return_data[32]) << 96 / ext_call.return_data[18 len 14]:
+              if Mask(112, 0, ext_call.return_data[32]) << 96 / ext_call.return_data[18 len 14] < Mask(112, 0, ext_call.return_data[32]) << 96 / ext_call.return_data[18 len 14]:
+                  revert with 0, 'F'
+          else:
+              if Mask(112, 0, ext_call.return_data[32]) << 96 / ext_call.return_data[18 len 14] > Mask(112, 0, ext_call.return_data[32]) << 96 / ext_call.return_data[18 len 14]:
+                  revert with 0, 'F'
+          if _param5 == Mask(112, 0, ext_call.return_data[32]) << 96 / ext_call.return_data[18 len 14]:
+              revert with 0, 'PEQ'
+      if uint8(_param8) == 1:
+  else:
+      if uint8(stor0.field_0):
+          revert with 0, 'P'
+      if stor1[caller] == 1:
+          if uint32(_param8):
+              if uint32(_param8) != block.number:
+                  revert with 0, 'BN'
+          if uint32(_param8):
+              if block.timestamp > uint32(_param8):
+                  revert with 0, 'BT'
+          if not _param3:
+              revert with 0, 'U2OZ'
+          require ext_code.size(address(_param1))
+          static call address(_param1).getReserves() with:
+                  gas gas_remaining wei
+          if not ext_call.success:
+              revert with ext_call.return_data[0 len return_data.size]
+          require return_data.size >=′ 96
+          require ext_call.return_data[0] == ext_call.return_data[18 len 14]
+          require ext_call.return_data[32] == ext_call.return_data[50 len 14]
+          require ext_call.return_data[64] == ext_call.return_data[92 len 4]
+          if ext_call.return_data[50 len 14] and unknown10000000() > -1 / ext_call.return_data[50 len 14]:
+              revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+          if not ext_call.return_data[18 len 14]:
+              revert with Panic(18)  # If you divide or modulo by zero (e.g. 5 / 0 or 23 % 0).
+          if _param4:
+              if _param5 < _param4:
+                  if Mask(112, 0, ext_call.return_data[32]) << 96 / ext_call.return_data[18 len 14] < _param4:
+                      revert with 0, 'F'
+              else:
+                  if Mask(112, 0, ext_call.return_data[32]) << 96 / ext_call.return_data[18 len 14] > _param4:
+                      revert with 0, 'F'
+              if _param5 == _param4:
+                  revert with 0, 'PEQ'
+          else:
+              if _param5 < Mask(112, 0, ext_call.return_data[32]) << 96 / ext_call.return_data[18 len 14]:
+                  if Mask(112, 0, ext_call.return_data[32]) << 96 / ext_call.return_data[18 len 14] < Mask(112, 0, ext_call.return_data[32]) << 96 / ext_call.return_data[18 len 14]:
+                      revert with 0, 'F'
+              else:
+                  if Mask(112, 0, ext_call.return_data[32]) << 96 / ext_call.return_data[18 len 14] > Mask(112, 0, ext_call.return_data[32]) << 96 / ext_call.return_data[18 len 14]:
+                      revert with 0, 'F'
+              if _param5 == Mask(112, 0, ext_call.return_data[32]) << 96 / ext_call.return_data[18 len 14]:
+                  revert with 0, 'PEQ'
+          if uint8(_param8) == 1:
+      else:
+          if stor1[tx.origin] != 1:
+              revert with 0, '!A'
+          if not uint32(_param8):
+              if uint32(_param8):
+                  if block.timestamp > uint32(_param8):
+                      revert with 0, 'BT'
+              if not _param3:
+                  revert with 0, 'U2OZ'
+              require ext_code.size(address(_param1))
+              static call address(_param1).getReserves() with:
+                      gas gas_remaining wei
+              if not ext_call.success:
+                  revert with ext_call.return_data[0 len return_data.size]
+              require return_data.size >=′ 96
+              require ext_call.return_data[0] == ext_call.return_data[18 len 14]
+              require ext_call.return_data[32] == ext_call.return_data[50 len 14]
+              require ext_call.return_data[64] == ext_call.return_data[92 len 4]
+              if ext_call.return_data[50 len 14] and unknown10000000() > -1 / ext_call.return_data[50 len 14]:
+                  revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+              if not ext_call.return_data[18 len 14]:
+                  revert with Panic(18)  # If you divide or modulo by zero (e.g. 5 / 0 or 23 % 0).
+              if _param4:
+                  if _param5 < _param4:
+                      if Mask(112, 0, ext_call.return_data[32]) << 96 / ext_call.return_data[18 len 14] < _param4:
+                          revert with 0, 'F'
+                  else:
+                      if Mask(112, 0, ext_call.return_data[32]) << 96 / ext_call.return_data[18 len 14] > _param4:
+                          revert with 0, 'F'
+                  if _param5 == _param4:
+                      revert with 0, 'PEQ'
+              else:
+                  if _param5 < Mask(112, 0, ext_call.return_data[32]) << 96 / ext_call.return_data[18 len 14]:
+                      if Mask(112, 0, ext_call.return_data[32]) << 96 / ext_call.return_data[18 len 14] < Mask(112, 0, ext_call.return_data[32]) << 96 / ext_call.return_data[18 len 14]:
+                          revert with 0, 'F'
+                  else:
+                      if Mask(112, 0, ext_call.return_data[32]) << 96 / ext_call.return_data[18 len 14] > Mask(112, 0, ext_call.return_data[32]) << 96 / ext_call.return_data[18 len 14]:
+                          revert with 0, 'F'
+                  if _param5 == Mask(112, 0, ext_call.return_data[32]) << 96 / ext_call.return_data[18 len 14]:
+                      revert with 0, 'PEQ'
+              if uint8(_param8) == 1:
+          else:
+              if uint32(_param8) != block.number:
+                  revert with 0, 'BN'
+              if not uint32(_param8):
+                  if not _param3:
+                      revert with 0, 'U2OZ'
+                  require ext_code.size(address(_param1))
+                  static call address(_param1).getReserves() with:
+                          gas gas_remaining wei
+                  if not ext_call.success:
+                      revert with ext_call.return_data[0 len return_data.size]
+                  require return_data.size >=′ 96
+                  require ext_call.return_data[0] == ext_call.return_data[18 len 14]
+                  require ext_call.return_data[32] == ext_call.return_data[50 len 14]
+                  require ext_call.return_data[64] == ext_call.return_data[92 len 4]
+                  if ext_call.return_data[50 len 14] and unknown10000000() > -1 / ext_call.return_data[50 len 14]:
+                      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+                  if not ext_call.return_data[18 len 14]:
+                      revert with Panic(18)  # If you divide or modulo by zero (e.g. 5 / 0 or 23 % 0).
+                  if _param4:
+                      if _param5 < _param4:
+                          if Mask(112, 0, ext_call.return_data[32]) << 96 / ext_call.return_data[18 len 14] < _param4:
+                              revert with 0, 'F'
+                      else:
+                          if Mask(112, 0, ext_call.return_data[32]) << 96 / ext_call.return_data[18 len 14] > _param4:
+                              revert with 0, 'F'
+                      if _param5 == _param4:
+                          revert with 0, 'PEQ'
+                  else:
+                      if _param5 < Mask(112, 0, ext_call.return_data[32]) << 96 / ext_call.return_data[18 len 14]:
+                          if Mask(112, 0, ext_call.return_data[32]) << 96 / ext_call.return_data[18 len 14] < Mask(112, 0, ext_call.return_data[32]) << 96 / ext_call.return_data[18 len 14]:
+                              revert with 0, 'F'
+                      else:
+                          if Mask(112, 0, ext_call.return_data[32]) << 96 / ext_call.return_data[18 len 14] > Mask(112, 0, ext_call.return_data[32]) << 96 / ext_call.return_data[18 len 14]:
+                              revert with 0, 'F'
+                      if _param5 == Mask(112, 0, ext_call.return_data[32]) << 96 / ext_call.return_data[18 len 14]:
+                          revert with 0, 'PEQ'
+                  if uint8(_param8) == 1:
+              else:
+                  if block.timestamp > uint32(_param8):
+                      revert with 0, 'BT'
+                  if not _param3:
+                      revert with 0, 'U2OZ'
+                  require ext_code.size(address(_param1))
+                  static call address(_param1).getReserves() with:
+                          gas gas_remaining wei
+                  if not ext_call.success:
+                      revert with ext_call.return_data[0 len return_data.size]
+                  require return_data.size >=′ 96
+                  require ext_call.return_data[0] == ext_call.return_data[18 len 14]
+                  require ext_call.return_data[32] == ext_call.return_data[50 len 14]
+                  require ext_call.return_data[64] == ext_call.return_data[92 len 4]
+                  if ext_call.return_data[50 len 14] and unknown10000000() > -1 / ext_call.return_data[50 len 14]:
+                      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+                  if not ext_call.return_data[18 len 14]:
+                      revert with Panic(18)  # If you divide or modulo by zero (e.g. 5 / 0 or 23 % 0).
+                  if not _param4:
+                      if _param5 < Mask(112, 0, ext_call.return_data[32]) << 96 / ext_call.return_data[18 len 14]:
+                          if Mask(112, 0, ext_call.return_data[32]) << 96 / ext_call.return_data[18 len 14] < Mask(112, 0, ext_call.return_data[32]) << 96 / ext_call.return_data[18 len 14]:
+                              revert with 0, 'F'
+                      else:
+                          if Mask(112, 0, ext_call.return_data[32]) << 96 / ext_call.return_data[18 len 14] > Mask(112, 0, ext_call.return_data[32]) << 96 / ext_call.return_data[18 len 14]:
+                              revert with 0, 'F'
+                      if _param5 != Mask(112, 0, ext_call.return_data[32]) << 96 / ext_call.return_data[18 len 14]:
+                  else:
+                      if _param5 < _param4:
+                          if Mask(112, 0, ext_call.return_data[32]) << 96 / ext_call.return_data[18 len 14] < _param4:
+                              revert with 0, 'F'
+                      else:
+                          if Mask(112, 0, ext_call.return_data[32]) << 96 / ext_call.return_data[18 len 14] > _param4:
+                              revert with 0, 'F'
+                      if _param5 == _param4:
+                          revert with 0, 'PEQ'
+                      if uint8(_param8) == 1:
+  ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+
+def multicall(bytes[] data): # not payable
+  require calldata.size - 4 >=′ 32
+  require data <= LOCK8605463013()
+  require data + 35 <′ calldata.size
+  require data.length <= LOCK8605463013()
+  require data + (32 * data.length) + 36 <= calldata.size
+  if caller == address(stor0.field_8):
+      mem[0] = caller
+      mem[32] = 1
+      if stor1[caller] == 1:
+          if data.length > LOCK8605463013():
+              revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+          mem[96] = data.length
+          mem[64] = (32 * data.length) + 128
+          if not data.length:
+              idx = 0
+              while idx < data.length:
+                  require cd[(data + (32 * idx) + 36)] <′ calldata.size + -data - 67
+                  require cd[(data + cd[(data + (32 * idx) + 36)] + 36)] <= LOCK8605463013()
+                  require data + cd[(data + (32 * idx) + 36)] + 68 <=′ calldata.size - cd[(data + cd[(data + (32 * idx) + 36)] + 36)]
+                  mem[mem[64] len cd[(data + cd[(data + (32 * idx) + 36)] + 36)]] = call.data[data + cd[(data + (32 * idx) + 36)] + 68 len cd[(data + cd[(data + (32 * idx) + 36)] + 36)]]
+                  mem[mem[64] + cd[(data + cd[(data + (32 * idx) + 36)] + 36)]] = 0
+                  delegate this.address with:
+                       gas gas_remaining wei
+                      args call.data[data + cd[(data + (32 * idx) + 36)] + 68 len cd[(data + cd[(data + (32 * idx) + 36)] + 36)]]
+                  if not return_data.size:
+                      if not delegate.return_code:
+                          revert with memory
+                            from 128
+                             len mem[96]
+                      if idx >= mem[96]:
+                          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                      mem[(32 * idx) + 128] = 96
+                  else:
+                      _163 = mem[64]
+                      mem[64] = mem[64] + ceil32(return_data.size) + 1
+                      mem[_163] = return_data.size
+                      mem[_163 + 32 len return_data.size] = ext_call.return_data[0 len return_data.size]
+                      if not delegate.return_code:
+                          revert with ext_call.return_data[0 len return_data.size]
+                      if idx >= mem[96]:
+                          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                      mem[(32 * idx) + 128] = _163
+                  if idx == -1:
+                      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+                  idx = idx + 1
+                  continue 
+              _119 = mem[64]
+              mem[mem[64]] = 32
+              _123 = mem[96]
+              mem[mem[64] + 32] = mem[96]
+              idx = 0
+              s = 128
+              t = mem[64] + (32 * mem[96]) + 64
+              u = mem[64] + 64
+              while idx < _123:
+                  mem[u] = t + -_119 - 64
+                  _223 = mem[s]
+                  _235 = mem[mem[s]]
+                  mem[t] = mem[mem[s]]
+                  v = 0
+                  while v < _235:
+                      mem[t + v + 32] = mem[_223 + v + 32]
+                      v = v + 32
+                      continue 
+                  if ceil32(_235) > _235:
+                      mem[t + _235 + 32] = 0
+                  idx = idx + 1
+                  s = s + 32
+                  t = t + ceil32(_235) + 32
+                  u = u + 32
+                  continue 
+          else:
+              mem[128] = 96
+              s = 128
+              idx = data.length
+              while idx - 1:
+                  mem[s + 32] = 96
+                  s = s + 32
+                  idx = idx - 1
+                  continue 
+              idx = 0
+              while idx < data.length:
+                  require cd[(data + (32 * idx) + 36)] <′ calldata.size + -data - 67
+                  require cd[(data + cd[(data + (32 * idx) + 36)] + 36)] <= LOCK8605463013()
+                  require data + cd[(data + (32 * idx) + 36)] + 68 <=′ calldata.size - cd[(data + cd[(data + (32 * idx) + 36)] + 36)]
+                  mem[mem[64] len cd[(data + cd[(data + (32 * idx) + 36)] + 36)]] = call.data[data + cd[(data + (32 * idx) + 36)] + 68 len cd[(data + cd[(data + (32 * idx) + 36)] + 36)]]
+                  mem[mem[64] + cd[(data + cd[(data + (32 * idx) + 36)] + 36)]] = 0
+                  delegate this.address with:
+                       gas gas_remaining wei
+                      args call.data[data + cd[(data + (32 * idx) + 36)] + 68 len cd[(data + cd[(data + (32 * idx) + 36)] + 36)]]
+                  if not return_data.size:
+                      if not delegate.return_code:
+                          revert with memory
+                            from 128
+                             len mem[96]
+                      if idx >= mem[96]:
+                          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                      mem[(32 * idx) + 128] = 96
+                  else:
+                      _267 = mem[64]
+                      mem[64] = mem[64] + ceil32(return_data.size) + 1
+                      mem[_267] = return_data.size
+                      mem[_267 + 32 len return_data.size] = ext_call.return_data[0 len return_data.size]
+                      if not delegate.return_code:
+                          revert with ext_call.return_data[0 len return_data.size]
+                      if idx >= mem[96]:
+                          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                      mem[(32 * idx) + 128] = _267
+                  if idx == -1:
+                      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+                  idx = idx + 1
+                  continue 
+              _227 = mem[64]
+              mem[mem[64]] = 32
+              _239 = mem[96]
+              mem[mem[64] + 32] = mem[96]
+              idx = 0
+              s = 128
+              t = mem[64] + (32 * mem[96]) + 64
+              u = mem[64] + 64
+              while idx < _239:
+                  mem[u] = t + -_227 - 64
+                  _292 = mem[s]
+                  _303 = mem[mem[s]]
+                  mem[t] = mem[mem[s]]
+                  v = 0
+                  while v < _303:
+                      mem[t + v + 32] = mem[_292 + v + 32]
+                      v = v + 32
+                      continue 
+                  if ceil32(_303) > _303:
+                      mem[t + _303 + 32] = 0
+                  idx = idx + 1
+                  s = s + 32
+                  t = t + ceil32(_303) + 32
+                  u = u + 32
+                  continue 
+      else:
+          mem[0] = tx.origin
+          mem[32] = 1
+          if stor1[tx.origin] != 1:
+              revert with 0, '!A'
+          if data.length > LOCK8605463013():
+              revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+          mem[96] = data.length
+          mem[64] = (32 * data.length) + 128
+          if not data.length:
+              idx = 0
+              while idx < data.length:
+                  require cd[(data + (32 * idx) + 36)] <′ calldata.size + -data - 67
+                  require cd[(data + cd[(data + (32 * idx) + 36)] + 36)] <= LOCK8605463013()
+                  require data + cd[(data + (32 * idx) + 36)] + 68 <=′ calldata.size - cd[(data + cd[(data + (32 * idx) + 36)] + 36)]
+                  _133 = mem[64]
+                  mem[mem[64] len cd[(data + cd[(data + (32 * idx) + 36)] + 36)]] = call.data[data + cd[(data + (32 * idx) + 36)] + 68 len cd[(data + cd[(data + (32 * idx) + 36)] + 36)]]
+                  mem[mem[64] + cd[(data + cd[(data + (32 * idx) + 36)] + 36)]] = 0
+                  delegate this.address.mem[mem[64] len 4] with:
+                       gas gas_remaining wei
+                      args mem[mem[64] + 4 len _133 + cd[(data + cd[(data + (32 * idx) + 36)] + 36)] + -mem[64] - 4]
+                  if not return_data.size:
+                      if not delegate.return_code:
+                          revert with memory
+                            from 128
+                             len mem[96]
+                      if idx >= mem[96]:
+                          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                      mem[(32 * idx) + 128] = 96
+                  else:
+                      _165 = mem[64]
+                      mem[64] = mem[64] + ceil32(return_data.size) + 1
+                      mem[_165] = return_data.size
+                      mem[_165 + 32 len return_data.size] = ext_call.return_data[0 len return_data.size]
+                      if not delegate.return_code:
+                          revert with ext_call.return_data[0 len return_data.size]
+                      if idx >= mem[96]:
+                          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                      mem[(32 * idx) + 128] = _165
+                  if idx == -1:
+                      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+                  idx = idx + 1
+                  continue 
+              _120 = mem[64]
+              mem[mem[64]] = 32
+              _125 = mem[96]
+              mem[mem[64] + 32] = mem[96]
+              idx = 0
+              s = 128
+              t = mem[64] + (32 * mem[96]) + 64
+              u = mem[64] + 64
+              while idx < _125:
+                  mem[u] = t + -_120 - 64
+                  _224 = mem[s]
+                  _236 = mem[mem[s]]
+                  mem[t] = mem[mem[s]]
+                  v = 0
+                  while v < _236:
+                      mem[t + v + 32] = mem[_224 + v + 32]
+                      v = v + 32
+                      continue 
+                  if ceil32(_236) > _236:
+                      mem[t + _236 + 32] = 0
+                  idx = idx + 1
+                  s = s + 32
+                  t = t + ceil32(_236) + 32
+                  u = u + 32
+                  continue 
+          else:
+              mem[128] = 96
+              s = 128
+              idx = data.length
+              while idx - 1:
+                  mem[s + 32] = 96
+                  s = s + 32
+                  idx = idx - 1
+                  continue 
+              idx = 0
+              while idx < data.length:
+                  require cd[(data + (32 * idx) + 36)] <′ calldata.size + -data - 67
+                  require cd[(data + cd[(data + (32 * idx) + 36)] + 36)] <= LOCK8605463013()
+                  require data + cd[(data + (32 * idx) + 36)] + 68 <=′ calldata.size - cd[(data + cd[(data + (32 * idx) + 36)] + 36)]
+                  mem[mem[64] len cd[(data + cd[(data + (32 * idx) + 36)] + 36)]] = call.data[data + cd[(data + (32 * idx) + 36)] + 68 len cd[(data + cd[(data + (32 * idx) + 36)] + 36)]]
+                  mem[mem[64] + cd[(data + cd[(data + (32 * idx) + 36)] + 36)]] = 0
+                  delegate this.address with:
+                       gas gas_remaining wei
+                      args call.data[data + cd[(data + (32 * idx) + 36)] + 68 len cd[(data + cd[(data + (32 * idx) + 36)] + 36)]]
+                  if not return_data.size:
+                      if not delegate.return_code:
+                          revert with memory
+                            from 128
+                             len mem[96]
+                      if idx >= mem[96]:
+                          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                      mem[(32 * idx) + 128] = 96
+                  else:
+                      _268 = mem[64]
+                      mem[64] = mem[64] + ceil32(return_data.size) + 1
+                      mem[_268] = return_data.size
+                      mem[_268 + 32 len return_data.size] = ext_call.return_data[0 len return_data.size]
+                      if not delegate.return_code:
+                          revert with ext_call.return_data[0 len return_data.size]
+                      if idx >= mem[96]:
+                          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                      mem[(32 * idx) + 128] = _268
+                  if idx == -1:
+                      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+                  idx = idx + 1
+                  continue 
+              _228 = mem[64]
+              mem[mem[64]] = 32
+              _240 = mem[96]
+              mem[mem[64] + 32] = mem[96]
+              idx = 0
+              s = 128
+              t = mem[64] + (32 * mem[96]) + 64
+              u = mem[64] + 64
+              while idx < _240:
+                  mem[u] = t + -_228 - 64
+                  _294 = mem[s]
+                  _304 = mem[mem[s]]
+                  mem[t] = mem[mem[s]]
+                  v = 0
+                  while v < _304:
+                      mem[t + v + 32] = mem[_294 + v + 32]
+                      v = v + 32
+                      continue 
+                  if ceil32(_304) > _304:
+                      mem[t + _304 + 32] = 0
+                  idx = idx + 1
+                  s = s + 32
+                  t = t + ceil32(_304) + 32
+                  u = u + 32
+                  continue 
+  else:
+      if uint8(stor0.field_0):
+          revert with 0, 'P'
+      mem[0] = caller
+      mem[32] = 1
+      if stor1[caller] == 1:
+          if data.length > LOCK8605463013():
+              revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+          mem[96] = data.length
+          mem[64] = (32 * data.length) + 128
+          if not data.length:
+              idx = 0
+              while idx < data.length:
+                  require cd[(data + (32 * idx) + 36)] <′ calldata.size + -data - 67
+                  require cd[(data + cd[(data + (32 * idx) + 36)] + 36)] <= LOCK8605463013()
+                  require data + cd[(data + (32 * idx) + 36)] + 68 <=′ calldata.size - cd[(data + cd[(data + (32 * idx) + 36)] + 36)]
+                  _135 = mem[64]
+                  mem[mem[64] len cd[(data + cd[(data + (32 * idx) + 36)] + 36)]] = call.data[data + cd[(data + (32 * idx) + 36)] + 68 len cd[(data + cd[(data + (32 * idx) + 36)] + 36)]]
+                  mem[mem[64] + cd[(data + cd[(data + (32 * idx) + 36)] + 36)]] = 0
+                  delegate this.address.mem[mem[64] len 4] with:
+                       gas gas_remaining wei
+                      args mem[mem[64] + 4 len _135 + cd[(data + cd[(data + (32 * idx) + 36)] + 36)] + -mem[64] - 4]
+                  if not return_data.size:
+                      if not delegate.return_code:
+                          revert with memory
+                            from 128
+                             len mem[96]
+                      if idx >= mem[96]:
+                          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                      mem[(32 * idx) + 128] = 96
+                  else:
+                      _167 = mem[64]
+                      mem[64] = mem[64] + ceil32(return_data.size) + 1
+                      mem[_167] = return_data.size
+                      mem[_167 + 32 len return_data.size] = ext_call.return_data[0 len return_data.size]
+                      if not delegate.return_code:
+                          revert with ext_call.return_data[0 len return_data.size]
+                      if idx >= mem[96]:
+                          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                      mem[(32 * idx) + 128] = _167
+                  if idx == -1:
+                      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+                  idx = idx + 1
+                  continue 
+              _121 = mem[64]
+              mem[mem[64]] = 32
+              _127 = mem[96]
+              mem[mem[64] + 32] = mem[96]
+              idx = 0
+              s = 128
+              t = mem[64] + (32 * mem[96]) + 64
+              u = mem[64] + 64
+              while idx < _127:
+                  mem[u] = t + -_121 - 64
+                  _225 = mem[s]
+                  _237 = mem[mem[s]]
+                  mem[t] = mem[mem[s]]
+                  v = 0
+                  while v < _237:
+                      mem[t + v + 32] = mem[_225 + v + 32]
+                      v = v + 32
+                      continue 
+                  if ceil32(_237) > _237:
+                      mem[t + _237 + 32] = 0
+                  idx = idx + 1
+                  s = s + 32
+                  t = t + ceil32(_237) + 32
+                  u = u + 32
+                  continue 
+          else:
+              mem[128] = 96
+              s = 128
+              idx = data.length
+              while idx - 1:
+                  mem[s + 32] = 96
+                  s = s + 32
+                  idx = idx - 1
+                  continue 
+              idx = 0
+              while idx < data.length:
+                  require cd[(data + (32 * idx) + 36)] <′ calldata.size + -data - 67
+                  require cd[(data + cd[(data + (32 * idx) + 36)] + 36)] <= LOCK8605463013()
+                  require data + cd[(data + (32 * idx) + 36)] + 68 <=′ calldata.size - cd[(data + cd[(data + (32 * idx) + 36)] + 36)]
+                  mem[mem[64] len cd[(data + cd[(data + (32 * idx) + 36)] + 36)]] = call.data[data + cd[(data + (32 * idx) + 36)] + 68 len cd[(data + cd[(data + (32 * idx) + 36)] + 36)]]
+                  mem[mem[64] + cd[(data + cd[(data + (32 * idx) + 36)] + 36)]] = 0
+                  delegate this.address with:
+                       gas gas_remaining wei
+                      args call.data[data + cd[(data + (32 * idx) + 36)] + 68 len cd[(data + cd[(data + (32 * idx) + 36)] + 36)]]
+                  if not return_data.size:
+                      if not delegate.return_code:
+                          revert with memory
+                            from 128
+                             len mem[96]
+                      if idx >= mem[96]:
+                          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                      mem[(32 * idx) + 128] = 96
+                  else:
+                      _269 = mem[64]
+                      mem[64] = mem[64] + ceil32(return_data.size) + 1
+                      mem[_269] = return_data.size
+                      mem[_269 + 32 len return_data.size] = ext_call.return_data[0 len return_data.size]
+                      if not delegate.return_code:
+                          revert with ext_call.return_data[0 len return_data.size]
+                      if idx >= mem[96]:
+                          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                      mem[(32 * idx) + 128] = _269
+                  if idx == -1:
+                      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+                  idx = idx + 1
+                  continue 
+              _229 = mem[64]
+              mem[mem[64]] = 32
+              _241 = mem[96]
+              mem[mem[64] + 32] = mem[96]
+              idx = 0
+              s = 128
+              t = mem[64] + (32 * mem[96]) + 64
+              u = mem[64] + 64
+              while idx < _241:
+                  mem[u] = t + -_229 - 64
+                  _296 = mem[s]
+                  _305 = mem[mem[s]]
+                  mem[t] = mem[mem[s]]
+                  v = 0
+                  while v < _305:
+                      mem[t + v + 32] = mem[_296 + v + 32]
+                      v = v + 32
+                      continue 
+                  if ceil32(_305) > _305:
+                      mem[t + _305 + 32] = 0
+                  idx = idx + 1
+                  s = s + 32
+                  t = t + ceil32(_305) + 32
+                  u = u + 32
+                  continue 
+      else:
+          mem[0] = tx.origin
+          mem[32] = 1
+          if stor1[tx.origin] != 1:
+              revert with 0, '!A'
+          if data.length > LOCK8605463013():
+              revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+          mem[96] = data.length
+          mem[64] = (32 * data.length) + 128
+          if not data.length:
+              idx = 0
+              while idx < data.length:
+                  require cd[(data + (32 * idx) + 36)] <′ calldata.size + -data - 67
+                  require cd[(data + cd[(data + (32 * idx) + 36)] + 36)] <= LOCK8605463013()
+                  require data + cd[(data + (32 * idx) + 36)] + 68 <=′ calldata.size - cd[(data + cd[(data + (32 * idx) + 36)] + 36)]
+                  mem[mem[64] len cd[(data + cd[(data + (32 * idx) + 36)] + 36)]] = call.data[data + cd[(data + (32 * idx) + 36)] + 68 len cd[(data + cd[(data + (32 * idx) + 36)] + 36)]]
+                  mem[mem[64] + cd[(data + cd[(data + (32 * idx) + 36)] + 36)]] = 0
+                  delegate this.address with:
+                       gas gas_remaining wei
+                      args call.data[data + cd[(data + (32 * idx) + 36)] + 68 len cd[(data + cd[(data + (32 * idx) + 36)] + 36)]]
+                  if not return_data.size:
+                      if not delegate.return_code:
+                          revert with memory
+                            from 128
+                             len mem[96]
+                      if idx >= mem[96]:
+                          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                      mem[(32 * idx) + 128] = 96
+                  else:
+                      _169 = mem[64]
+                      mem[64] = mem[64] + ceil32(return_data.size) + 1
+                      mem[_169] = return_data.size
+                      mem[_169 + 32 len return_data.size] = ext_call.return_data[0 len return_data.size]
+                      if not delegate.return_code:
+                          revert with ext_call.return_data[0 len return_data.size]
+                      if idx >= mem[96]:
+                          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                      mem[(32 * idx) + 128] = _169
+                  if idx == -1:
+                      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+                  idx = idx + 1
+                  continue 
+              _122 = mem[64]
+              mem[mem[64]] = 32
+              _129 = mem[96]
+              mem[mem[64] + 32] = mem[96]
+              idx = 0
+              s = 128
+              t = mem[64] + (32 * mem[96]) + 64
+              u = mem[64] + 64
+              while idx < _129:
+                  mem[u] = t + -_122 - 64
+                  _226 = mem[s]
+                  _238 = mem[mem[s]]
+                  mem[t] = mem[mem[s]]
+                  v = 0
+                  while v < _238:
+                      mem[t + v + 32] = mem[_226 + v + 32]
+                      v = v + 32
+                      continue 
+                  if ceil32(_238) > _238:
+                      mem[t + _238 + 32] = 0
+                  idx = idx + 1
+                  s = s + 32
+                  t = t + ceil32(_238) + 32
+                  u = u + 32
+                  continue 
+          else:
+              mem[128] = 96
+              s = 128
+              idx = data.length
+              while idx - 1:
+                  mem[s + 32] = 96
+                  s = s + 32
+                  idx = idx - 1
+                  continue 
+              idx = 0
+              while idx < data.length:
+                  require cd[(data + (32 * idx) + 36)] <′ calldata.size + -data - 67
+                  require cd[(data + cd[(data + (32 * idx) + 36)] + 36)] <= LOCK8605463013()
+                  require data + cd[(data + (32 * idx) + 36)] + 68 <=′ calldata.size - cd[(data + cd[(data + (32 * idx) + 36)] + 36)]
+                  mem[mem[64] len cd[(data + cd[(data + (32 * idx) + 36)] + 36)]] = call.data[data + cd[(data + (32 * idx) + 36)] + 68 len cd[(data + cd[(data + (32 * idx) + 36)] + 36)]]
+                  mem[mem[64] + cd[(data + cd[(data + (32 * idx) + 36)] + 36)]] = 0
+                  delegate this.address with:
+                       gas gas_remaining wei
+                      args call.data[data + cd[(data + (32 * idx) + 36)] + 68 len cd[(data + cd[(data + (32 * idx) + 36)] + 36)]]
+                  if not return_data.size:
+                      if not delegate.return_code:
+                          revert with memory
+                            from 128
+                             len mem[96]
+                      if idx >= mem[96]:
+                          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                      mem[(32 * idx) + 128] = 96
+                  else:
+                      _270 = mem[64]
+                      mem[64] = mem[64] + ceil32(return_data.size) + 1
+                      mem[_270] = return_data.size
+                      mem[_270 + 32 len return_data.size] = ext_call.return_data[0 len return_data.size]
+                      if not delegate.return_code:
+                          revert with ext_call.return_data[0 len return_data.size]
+                      if idx >= mem[96]:
+                          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                      mem[(32 * idx) + 128] = _270
+                  if idx == -1:
+                      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+                  idx = idx + 1
+                  continue 
+              _230 = mem[64]
+              mem[mem[64]] = 32
+              _242 = mem[96]
+              mem[mem[64] + 32] = mem[96]
+              idx = 0
+              s = 128
+              t = mem[64] + (32 * mem[96]) + 64
+              u = mem[64] + 64
+              while idx < _242:
+                  mem[u] = t + -_230 - 64
+                  _298 = mem[s]
+                  _306 = mem[mem[s]]
+                  mem[t] = mem[mem[s]]
+                  v = 0
+                  while v < _306:
+                      mem[t + v + 32] = mem[_298 + v + 32]
+                      v = v + 32
+                      continue 
+                  if ceil32(_306) > _306:
+                      mem[t + _306 + 32] = 0
+                  idx = idx + 1
+                  s = s + 32
+                  t = t + ceil32(_306) + 32
+                  u = u + 32
+                  continue 
+  return memory
+    from mem[64]
+     len t - mem[64]
+
+def unknown62da6dcd(uint256 _param1, uint256 _param2, uint256 _param3, uint256 _param4, uint256 _param5, uint256 _param6, uint256 _param7) payable: 
+  require calldata.size - 4 >=′ 224
+  require _param1 == address(_param1)
+  require _param2 == _param2
+  require _param3 == _param3
+  require _param4 == _param4
+  require _param5 == address(_param5)
+  require _param6 == address(_param6)
+  require _param7 == _param7
+  if caller == address(stor0.field_8):
+      if stor1[caller] == 1:
+          if not uint32(_param7):
+              if not uint32(_param7):
+                  if _param2 <′ 0:
+                      if _param2 == 0x8000000000000000000000000000000000000000000000000000000000000000:
+                          require ext_code.size(address(_param1))
+                          static call address(_param1).balanceOf(address account) with:
+                                  gas gas_remaining wei
+                                 args this.address
+                          if not ext_call.success:
+                              revert with ext_call.return_data[0 len return_data.size]
+                          require return_data.size >=′ 32
+                          require ext_call.return_data[0] == ext_call.return_data[0]
+                      if not address(_param1):
+                          revert with 0, 'TTZ'
+                  else:
+                      if _param3 > 0:
+                          if not address(_param1):
+                              revert with 0, 'TTZ'
+                      else:
+                          if _param4 > 0:
+                              if not address(_param1):
+                                  revert with 0, 'TTZ'
+                          else:
+                              require ext_code.size(address(_param1))
+                              call address(_param1).mint(address to) with:
+                                   gas gas_remaining wei
+                                  args this.address
+                              if not ext_call.success:
+                                  revert with ext_call.return_data[0 len return_data.size]
+                              require return_data.size >=′ 32
+                              require ext_call.return_data[0] == ext_call.return_data[0]
+                              if not _param2:
+                                  if Mask(168, 56, _param7) >> 72 <= 0:
+                                      stop
+                                  if caller == address(stor0.field_8):
+                                      if stor1[caller] != 1:
+                                  else:
+                                      if not uint8(stor0.field_0):
+                                          if stor1[caller] != 1:
+                              else:
+                                  if ext_call.return_data[0] < _param2:
+                                      revert with 0, 'U2LM'
+                                  if Mask(168, 56, _param7) >> 72 <= 0:
+                                      stop
+                                  if caller == address(stor0.field_8):
+                                      if stor1[caller] != 1:
+                                  else:
+                                      if not uint8(stor0.field_0):
+              else:
+                  if block.timestamp > uint32(_param7):
+                      revert with 0, 'BT'
+                  if _param2 <′ 0:
+                      if _param2 == 0x8000000000000000000000000000000000000000000000000000000000000000:
+                          require ext_code.size(address(_param1))
+                          static call address(_param1).balanceOf(address account) with:
+                                  gas gas_remaining wei
+                                 args this.address
+                          if not ext_call.success:
+                              revert with ext_call.return_data[0 len return_data.size]
+                          require return_data.size >=′ 32
+                          require ext_call.return_data[0] == ext_call.return_data[0]
+                      if not address(_param1):
+                          revert with 0, 'TTZ'
+                  else:
+                      if _param3 > 0:
+                          if not address(_param1):
+                              revert with 0, 'TTZ'
+                      else:
+                          if _param4 > 0:
+                              if not address(_param1):
+                                  revert with 0, 'TTZ'
+                          else:
+                              require ext_code.size(address(_param1))
+                              call address(_param1).mint(address to) with:
+                                   gas gas_remaining wei
+                                  args this.address
+                              if not ext_call.success:
+                                  revert with ext_call.return_data[0 len return_data.size]
+                              require return_data.size >=′ 32
+                              require ext_call.return_data[0] == ext_call.return_data[0]
+                              if not _param2:
+                                  if Mask(168, 56, _param7) >> 72 <= 0:
+                                      stop
+                                  if caller == address(stor0.field_8):
+                                      if stor1[caller] != 1:
+                                  else:
+                                      if not uint8(stor0.field_0):
+                              else:
+                                  if ext_call.return_data[0] >= _param2:
+                                      if Mask(168, 56, _param7) >> 72 <= 0:
+                                          stop
+                                      if address(stor0.field_8) != caller:
+                                          if not uint8(stor0.field_0):
+          else:
+              if uint32(_param7) != block.number:
+                  revert with 0, 'BN'
+              if not uint32(_param7):
+                  if _param2 <′ 0:
+                      if _param2 == 0x8000000000000000000000000000000000000000000000000000000000000000:
+                          require ext_code.size(address(_param1))
+                          static call address(_param1).balanceOf(address account) with:
+                                  gas gas_remaining wei
+                                 args this.address
+                          if not ext_call.success:
+                              revert with ext_call.return_data[0 len return_data.size]
+                          require return_data.size >=′ 32
+                          require ext_call.return_data[0] == ext_call.return_data[0]
+                      if not address(_param1):
+                          revert with 0, 'TTZ'
+                  else:
+                      if _param3 > 0:
+                          if not address(_param1):
+                              revert with 0, 'TTZ'
+                      else:
+                          if _param4 > 0:
+                              if not address(_param1):
+                                  revert with 0, 'TTZ'
+                          else:
+                              require ext_code.size(address(_param1))
+                              call address(_param1).mint(address to) with:
+                                   gas gas_remaining wei
+                                  args this.address
+                              if not ext_call.success:
+                                  revert with ext_call.return_data[0 len return_data.size]
+                              require return_data.size >=′ 32
+                              require ext_call.return_data[0] == ext_call.return_data[0]
+                              if not _param2:
+                                  if Mask(168, 56, _param7) >> 72 <= 0:
+                                      stop
+                                  if caller == address(stor0.field_8):
+                                      if stor1[caller] != 1:
+                                  else:
+                                      if not uint8(stor0.field_0):
+                              else:
+                                  if ext_call.return_data[0] >= _param2:
+                                      if Mask(168, 56, _param7) >> 72 <= 0:
+                                          stop
+                                      if address(stor0.field_8) != caller:
+                                          if not uint8(stor0.field_0):
+              else:
+                  if block.timestamp > uint32(_param7):
+                      revert with 0, 'BT'
+                  if _param2 <′ 0:
+                      if _param2 != 0x8000000000000000000000000000000000000000000000000000000000000000:
+                          if not address(_param1):
+                              revert with 0, 'TTZ'
+                      else:
+                          require ext_code.size(address(_param1))
+                          static call address(_param1).balanceOf(address account) with:
+                                  gas gas_remaining wei
+                                 args this.address
+                          if not ext_call.success:
+                              revert with ext_call.return_data[0 len return_data.size]
+                          require return_data.size >=′ 32
+                          require ext_call.return_data[0] == ext_call.return_data[0]
+                  else:
+                      if _param3 > 0:
+                          if not address(_param1):
+                              revert with 0, 'TTZ'
+                      else:
+                          if _param4 > 0:
+                              if not address(_param1):
+                                  revert with 0, 'TTZ'
+                          else:
+                              require ext_code.size(address(_param1))
+                              call address(_param1).mint(address to) with:
+                                   gas gas_remaining wei
+                                  args this.address
+                              if not ext_call.success:
+                                  revert with ext_call.return_data[0 len return_data.size]
+                              require return_data.size >=′ 32
+                              require ext_call.return_data[0] == ext_call.return_data[0]
+                              if not _param2:
+                                  if Mask(168, 56, _param7) >> 72 <= 0:
+                                      stop
+                                  if address(stor0.field_8) != caller:
+                                      if not uint8(stor0.field_0):
+                              else:
+                                  if ext_call.return_data[0] >= _param2:
+                                      if Mask(168, 56, _param7) >> 72 <= 0:
+                                          stop
+                                      if address(stor0.field_8) != caller:
+      else:
+          if stor1[tx.origin] != 1:
+              revert with 0, '!A'
+          if not uint32(_param7):
+              if not uint32(_param7):
+                  if _param2 <′ 0:
+                      if _param2 == 0x8000000000000000000000000000000000000000000000000000000000000000:
+                          require ext_code.size(address(_param1))
+                          static call address(_param1).balanceOf(address account) with:
+                                  gas gas_remaining wei
+                                 args this.address
+                          if not ext_call.success:
+                              revert with ext_call.return_data[0 len return_data.size]
+                          require return_data.size >=′ 32
+                          require ext_call.return_data[0] == ext_call.return_data[0]
+                      if not address(_param1):
+                          revert with 0, 'TTZ'
+                  else:
+                      if _param3 > 0:
+                          if not address(_param1):
+                              revert with 0, 'TTZ'
+                      else:
+                          if _param4 > 0:
+                              if not address(_param1):
+                                  revert with 0, 'TTZ'
+                          else:
+                              require ext_code.size(address(_param1))
+                              call address(_param1).mint(address to) with:
+                                   gas gas_remaining wei
+                                  args this.address
+                              if not ext_call.success:
+                                  revert with ext_call.return_data[0 len return_data.size]
+                              require return_data.size >=′ 32
+                              require ext_call.return_data[0] == ext_call.return_data[0]
+                              if not _param2:
+                                  if Mask(168, 56, _param7) >> 72 <= 0:
+                                      stop
+                                  if caller == address(stor0.field_8):
+                                      if stor1[caller] != 1:
+                                  else:
+                                      if not uint8(stor0.field_0):
+                              else:
+                                  if ext_call.return_data[0] >= _param2:
+                                      if Mask(168, 56, _param7) >> 72 <= 0:
+                                          stop
+                                      if address(stor0.field_8) != caller:
+                                          if not uint8(stor0.field_0):
+              else:
+                  if block.timestamp > uint32(_param7):
+                      revert with 0, 'BT'
+                  if _param2 <′ 0:
+                      if _param2 != 0x8000000000000000000000000000000000000000000000000000000000000000:
+                          if not address(_param1):
+                              revert with 0, 'TTZ'
+                      else:
+                          require ext_code.size(address(_param1))
+                          static call address(_param1).balanceOf(address account) with:
+                                  gas gas_remaining wei
+                                 args this.address
+                          if not ext_call.success:
+                              revert with ext_call.return_data[0 len return_data.size]
+                          require return_data.size >=′ 32
+                          require ext_call.return_data[0] == ext_call.return_data[0]
+                  else:
+                      if _param3 > 0:
+                          if not address(_param1):
+                              revert with 0, 'TTZ'
+                      else:
+                          if _param4 > 0:
+                              if not address(_param1):
+                                  revert with 0, 'TTZ'
+                          else:
+                              require ext_code.size(address(_param1))
+                              call address(_param1).mint(address to) with:
+                                   gas gas_remaining wei
+                                  args this.address
+                              if not ext_call.success:
+                                  revert with ext_call.return_data[0 len return_data.size]
+                              require return_data.size >=′ 32
+                              require ext_call.return_data[0] == ext_call.return_data[0]
+                              if not _param2:
+                                  if Mask(168, 56, _param7) >> 72 <= 0:
+                                      stop
+                                  if address(stor0.field_8) != caller:
+                                      if not uint8(stor0.field_0):
+                              else:
+                                  if ext_call.return_data[0] >= _param2:
+                                      if Mask(168, 56, _param7) >> 72 <= 0:
+                                          stop
+                                      if address(stor0.field_8) != caller:
+          else:
+              if uint32(_param7) != block.number:
+                  revert with 0, 'BN'
+              if not uint32(_param7):
+                  if _param2 <′ 0:
+                      if _param2 != 0x8000000000000000000000000000000000000000000000000000000000000000:
+                          if not address(_param1):
+                              revert with 0, 'TTZ'
+                      else:
+                          require ext_code.size(address(_param1))
+                          static call address(_param1).balanceOf(address account) with:
+                                  gas gas_remaining wei
+                                 args this.address
+                          if not ext_call.success:
+                              revert with ext_call.return_data[0 len return_data.size]
+                          require return_data.size >=′ 32
+                          require ext_call.return_data[0] == ext_call.return_data[0]
+                  else:
+                      if _param3 > 0:
+                          if not address(_param1):
+                              revert with 0, 'TTZ'
+                      else:
+                          if _param4 > 0:
+                              if not address(_param1):
+                                  revert with 0, 'TTZ'
+                          else:
+                              require ext_code.size(address(_param1))
+                              call address(_param1).mint(address to) with:
+                                   gas gas_remaining wei
+                                  args this.address
+                              if not ext_call.success:
+                                  revert with ext_call.return_data[0 len return_data.size]
+                              require return_data.size >=′ 32
+                              require ext_call.return_data[0] == ext_call.return_data[0]
+                              if not _param2:
+                                  if Mask(168, 56, _param7) >> 72 <= 0:
+                                      stop
+                                  if address(stor0.field_8) != caller:
+                                      if not uint8(stor0.field_0):
+                              else:
+                                  if ext_call.return_data[0] >= _param2:
+                                      if Mask(168, 56, _param7) >> 72 <= 0:
+                                          stop
+                                      if address(stor0.field_8) != caller:
+              else:
+                  if block.timestamp > uint32(_param7):
+                      revert with 0, 'BT'
+                  if _param2 <′ 0:
+                      if _param2 != 0x8000000000000000000000000000000000000000000000000000000000000000:
+                          if not address(_param1):
+                              revert with 0, 'TTZ'
+                      else:
+                          require ext_code.size(address(_param1))
+                          static call address(_param1).balanceOf(address account) with:
+                                  gas gas_remaining wei
+                                 args this.address
+                          if not ext_call.success:
+                              revert with ext_call.return_data[0 len return_data.size]
+                          require return_data.size >=′ 32
+                          require ext_call.return_data[0] == ext_call.return_data[0]
+                  else:
+                      if _param3 > 0:
+                          if not address(_param1):
+                              revert with 0, 'TTZ'
+                      else:
+                          if _param4 > 0:
+                              if not address(_param1):
+                                  revert with 0, 'TTZ'
+                          else:
+                              require ext_code.size(address(_param1))
+                              call address(_param1).mint(address to) with:
+                                   gas gas_remaining wei
+                                  args this.address
+                              if not ext_call.success:
+                                  revert with ext_call.return_data[0 len return_data.size]
+                              require return_data.size >=′ 32
+                              require ext_call.return_data[0] == ext_call.return_data[0]
+                              if not _param2:
+                                  if Mask(168, 56, _param7) >> 72 <= 0:
+                                      stop
+                                  if address(stor0.field_8) != caller:
+                              else:
+                                  if ext_call.return_data[0] >= _param2:
+                                      if Mask(168, 56, _param7) >> 72 <= 0:
+                                          stop
+  else:
+      if uint8(stor0.field_0):
+          revert with 0, 'P'
+      if stor1[caller] == 1:
+          if not uint32(_param7):
+              if not uint32(_param7):
+                  if _param2 <′ 0:
+                      if _param2 == 0x8000000000000000000000000000000000000000000000000000000000000000:
+                          require ext_code.size(address(_param1))
+                          static call address(_param1).balanceOf(address account) with:
+                                  gas gas_remaining wei
+                                 args this.address
+                          if not ext_call.success:
+                              revert with ext_call.return_data[0 len return_data.size]
+                          require return_data.size >=′ 32
+                          require ext_call.return_data[0] == ext_call.return_data[0]
+                      if not address(_param1):
+                          revert with 0, 'TTZ'
+                  else:
+                      if _param3 > 0:
+                          if not address(_param1):
+                              revert with 0, 'TTZ'
+                      else:
+                          if _param4 > 0:
+                              if not address(_param1):
+                                  revert with 0, 'TTZ'
+                          else:
+                              require ext_code.size(address(_param1))
+                              call address(_param1).mint(address to) with:
+                                   gas gas_remaining wei
+                                  args this.address
+                              if not ext_call.success:
+                                  revert with ext_call.return_data[0 len return_data.size]
+                              require return_data.size >=′ 32
+                              require ext_call.return_data[0] == ext_call.return_data[0]
+                              if not _param2:
+                                  if Mask(168, 56, _param7) >> 72 <= 0:
+                                      stop
+                                  if caller == address(stor0.field_8):
+                                      if stor1[caller] != 1:
+                                  else:
+                                      if not uint8(stor0.field_0):
+                              else:
+                                  if ext_call.return_data[0] >= _param2:
+                                      if Mask(168, 56, _param7) >> 72 <= 0:
+                                          stop
+                                      if address(stor0.field_8) != caller:
+                                          if not uint8(stor0.field_0):
+              else:
+                  if block.timestamp > uint32(_param7):
+                      revert with 0, 'BT'
+                  if _param2 <′ 0:
+                      if _param2 != 0x8000000000000000000000000000000000000000000000000000000000000000:
+                          if not address(_param1):
+                              revert with 0, 'TTZ'
+                      else:
+                          require ext_code.size(address(_param1))
+                          static call address(_param1).balanceOf(address account) with:
+                                  gas gas_remaining wei
+                                 args this.address
+                          if not ext_call.success:
+                              revert with ext_call.return_data[0 len return_data.size]
+                          require return_data.size >=′ 32
+                          require ext_call.return_data[0] == ext_call.return_data[0]
+                  else:
+                      if _param3 > 0:
+                          if not address(_param1):
+                              revert with 0, 'TTZ'
+                      else:
+                          if _param4 > 0:
+                              if not address(_param1):
+                                  revert with 0, 'TTZ'
+                          else:
+                              require ext_code.size(address(_param1))
+                              call address(_param1).mint(address to) with:
+                                   gas gas_remaining wei
+                                  args this.address
+                              if not ext_call.success:
+                                  revert with ext_call.return_data[0 len return_data.size]
+                              require return_data.size >=′ 32
+                              require ext_call.return_data[0] == ext_call.return_data[0]
+                              if not _param2:
+                                  if Mask(168, 56, _param7) >> 72 <= 0:
+                                      stop
+                                  if address(stor0.field_8) != caller:
+                                      if not uint8(stor0.field_0):
+                              else:
+                                  if ext_call.return_data[0] >= _param2:
+                                      if Mask(168, 56, _param7) >> 72 <= 0:
+                                          stop
+                                      if address(stor0.field_8) != caller:
+          else:
+              if uint32(_param7) != block.number:
+                  revert with 0, 'BN'
+              if not uint32(_param7):
+                  if _param2 <′ 0:
+                      if _param2 != 0x8000000000000000000000000000000000000000000000000000000000000000:
+                          if not address(_param1):
+                              revert with 0, 'TTZ'
+                      else:
+                          require ext_code.size(address(_param1))
+                          static call address(_param1).balanceOf(address account) with:
+                                  gas gas_remaining wei
+                                 args this.address
+                          if not ext_call.success:
+                              revert with ext_call.return_data[0 len return_data.size]
+                          require return_data.size >=′ 32
+                          require ext_call.return_data[0] == ext_call.return_data[0]
+                  else:
+                      if _param3 > 0:
+                          if not address(_param1):
+                              revert with 0, 'TTZ'
+                      else:
+                          if _param4 > 0:
+                              if not address(_param1):
+                                  revert with 0, 'TTZ'
+                          else:
+                              require ext_code.size(address(_param1))
+                              call address(_param1).mint(address to) with:
+                                   gas gas_remaining wei
+                                  args this.address
+                              if not ext_call.success:
+                                  revert with ext_call.return_data[0 len return_data.size]
+                              require return_data.size >=′ 32
+                              require ext_call.return_data[0] == ext_call.return_data[0]
+                              if not _param2:
+                                  if Mask(168, 56, _param7) >> 72 <= 0:
+                                      stop
+                                  if address(stor0.field_8) != caller:
+                                      if not uint8(stor0.field_0):
+                              else:
+                                  if ext_call.return_data[0] >= _param2:
+                                      if Mask(168, 56, _param7) >> 72 <= 0:
+                                          stop
+                                      if address(stor0.field_8) != caller:
+              else:
+                  if block.timestamp > uint32(_param7):
+                      revert with 0, 'BT'
+                  if _param2 <′ 0:
+                      if _param2 != 0x8000000000000000000000000000000000000000000000000000000000000000:
+                          if not address(_param1):
+                              revert with 0, 'TTZ'
+                      else:
+                          require ext_code.size(address(_param1))
+                          static call address(_param1).balanceOf(address account) with:
+                                  gas gas_remaining wei
+                                 args this.address
+                          if not ext_call.success:
+                              revert with ext_call.return_data[0 len return_data.size]
+                          require return_data.size >=′ 32
+                          require ext_call.return_data[0] == ext_call.return_data[0]
+                  else:
+                      if _param3 > 0:
+                          if not address(_param1):
+                              revert with 0, 'TTZ'
+                      else:
+                          if _param4 > 0:
+                              if not address(_param1):
+                                  revert with 0, 'TTZ'
+                          else:
+                              require ext_code.size(address(_param1))
+                              call address(_param1).mint(address to) with:
+                                   gas gas_remaining wei
+                                  args this.address
+                              if not ext_call.success:
+                                  revert with ext_call.return_data[0 len return_data.size]
+                              require return_data.size >=′ 32
+                              require ext_call.return_data[0] == ext_call.return_data[0]
+                              if not _param2:
+                                  if Mask(168, 56, _param7) >> 72 <= 0:
+                                      stop
+                                  if address(stor0.field_8) != caller:
+                              else:
+                                  if ext_call.return_data[0] >= _param2:
+                                      if Mask(168, 56, _param7) >> 72 <= 0:
+                                          stop
+      else:
+          if stor1[tx.origin] != 1:
+              revert with 0, '!A'
+          if not uint32(_param7):
+              if not uint32(_param7):
+                  if _param2 <′ 0:
+                      if _param2 != 0x8000000000000000000000000000000000000000000000000000000000000000:
+                          if not address(_param1):
+                              revert with 0, 'TTZ'
+                      else:
+                          require ext_code.size(address(_param1))
+                          static call address(_param1).balanceOf(address account) with:
+                                  gas gas_remaining wei
+                                 args this.address
+                          if not ext_call.success:
+                              revert with ext_call.return_data[0 len return_data.size]
+                          require return_data.size >=′ 32
+                          require ext_call.return_data[0] == ext_call.return_data[0]
+                  else:
+                      if _param3 > 0:
+                          if not address(_param1):
+                              revert with 0, 'TTZ'
+                      else:
+                          if _param4 > 0:
+                              if not address(_param1):
+                                  revert with 0, 'TTZ'
+                          else:
+                              require ext_code.size(address(_param1))
+                              call address(_param1).mint(address to) with:
+                                   gas gas_remaining wei
+                                  args this.address
+                              if not ext_call.success:
+                                  revert with ext_call.return_data[0 len return_data.size]
+                              require return_data.size >=′ 32
+                              require ext_call.return_data[0] == ext_call.return_data[0]
+                              if not _param2:
+                                  if Mask(168, 56, _param7) >> 72 <= 0:
+                                      stop
+                                  if address(stor0.field_8) != caller:
+                                      if not uint8(stor0.field_0):
+                              else:
+                                  if ext_call.return_data[0] >= _param2:
+                                      if Mask(168, 56, _param7) >> 72 <= 0:
+                                          stop
+                                      if address(stor0.field_8) != caller:
+              else:
+                  if block.timestamp > uint32(_param7):
+                      revert with 0, 'BT'
+                  if _param2 <′ 0:
+                      if _param2 != 0x8000000000000000000000000000000000000000000000000000000000000000:
+                          if not address(_param1):
+                              revert with 0, 'TTZ'
+                      else:
+                          require ext_code.size(address(_param1))
+                          static call address(_param1).balanceOf(address account) with:
+                                  gas gas_remaining wei
+                                 args this.address
+                          if not ext_call.success:
+                              revert with ext_call.return_data[0 len return_data.size]
+                          require return_data.size >=′ 32
+                          require ext_call.return_data[0] == ext_call.return_data[0]
+                  else:
+                      if _param3 > 0:
+                          if not address(_param1):
+                              revert with 0, 'TTZ'
+                      else:
+                          if _param4 > 0:
+                              if not address(_param1):
+                                  revert with 0, 'TTZ'
+                          else:
+                              require ext_code.size(address(_param1))
+                              call address(_param1).mint(address to) with:
+                                   gas gas_remaining wei
+                                  args this.address
+                              if not ext_call.success:
+                                  revert with ext_call.return_data[0 len return_data.size]
+                              require return_data.size >=′ 32
+                              require ext_call.return_data[0] == ext_call.return_data[0]
+                              if not _param2:
+                                  if Mask(168, 56, _param7) >> 72 <= 0:
+                                      stop
+                                  if address(stor0.field_8) != caller:
+                              else:
+                                  if ext_call.return_data[0] >= _param2:
+                                      if Mask(168, 56, _param7) >> 72 <= 0:
+                                          stop
+          else:
+              if uint32(_param7) != block.number:
+                  revert with 0, 'BN'
+              if not uint32(_param7):
+                  if _param2 <′ 0:
+                      if _param2 != 0x8000000000000000000000000000000000000000000000000000000000000000:
+                          if not address(_param1):
+                              revert with 0, 'TTZ'
+                      else:
+                          require ext_code.size(address(_param1))
+                          static call address(_param1).balanceOf(address account) with:
+                                  gas gas_remaining wei
+                                 args this.address
+                          if not ext_call.success:
+                              revert with ext_call.return_data[0 len return_data.size]
+                          require return_data.size >=′ 32
+                          require ext_call.return_data[0] == ext_call.return_data[0]
+                  else:
+                      if _param3 > 0:
+                          if not address(_param1):
+                              revert with 0, 'TTZ'
+                      else:
+                          if _param4 > 0:
+                              if not address(_param1):
+                                  revert with 0, 'TTZ'
+                          else:
+                              require ext_code.size(address(_param1))
+                              call address(_param1).mint(address to) with:
+                                   gas gas_remaining wei
+                                  args this.address
+                              if not ext_call.success:
+                                  revert with ext_call.return_data[0 len return_data.size]
+                              require return_data.size >=′ 32
+                              require ext_call.return_data[0] == ext_call.return_data[0]
+                              if not _param2:
+                                  if Mask(168, 56, _param7) >> 72 <= 0:
+                                      stop
+                                  if address(stor0.field_8) != caller:
+                              else:
+                                  if ext_call.return_data[0] >= _param2:
+                                      if Mask(168, 56, _param7) >> 72 <= 0:
+                                          stop
+              else:
+                  if block.timestamp > uint32(_param7):
+                      revert with 0, 'BT'
+                  if _param2 <′ 0:
+                      if _param2 != 0x8000000000000000000000000000000000000000000000000000000000000000:
+                          if not address(_param1):
+                              revert with 0, 'TTZ'
+                      else:
+                          require ext_code.size(address(_param1))
+                          static call address(_param1).balanceOf(address account) with:
+                                  gas gas_remaining wei
+                                 args this.address
+                          if not ext_call.success:
+                              revert with ext_call.return_data[0 len return_data.size]
+                          require return_data.size >=′ 32
+                          require ext_call.return_data[0] == ext_call.return_data[0]
+                  else:
+                      if _param3 > 0:
+                          if not address(_param1):
+                              revert with 0, 'TTZ'
+                      else:
+                          if _param4 > 0:
+                              if not address(_param1):
+                                  revert with 0, 'TTZ'
+                          else:
+                              require ext_code.size(address(_param1))
+                              call address(_param1).mint(address to) with:
+                                   gas gas_remaining wei
+                                  args this.address
+                              if not ext_call.success:
+                                  revert with ext_call.return_data[0 len return_data.size]
+                              require return_data.size >=′ 32
+                              require ext_call.return_data[0] == ext_call.return_data[0]
+                              if not _param2:
+                                  if Mask(168, 56, _param7) >> 72 <= 0:
+                                      stop
+                              else:
+                                  if ext_call.return_data[0] >= _param2:
+                                      if Mask(168, 56, _param7) >> 72 <= 0:
+                                          stop
+  ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+
+

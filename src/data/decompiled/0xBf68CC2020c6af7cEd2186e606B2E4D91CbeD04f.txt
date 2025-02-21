@@ -1,0 +1,187 @@
+# Palkeoramix decompiler. 
+
+def storage:
+  stor0 is uint256 at storage 0
+
+def _fallback(?) payable: # default function
+  revert
+
+def unknowne55b6492() payable: 
+  require calldata.size - 4 >=′ 64
+  require cd[4] <= LOCK8605463013()
+  require cd[4] + 35 <′ calldata.size
+  require ('cd', 4).length <= LOCK8605463013()
+  require cd[4] + (32 * ('cd', 4).length) + 36 <= calldata.size
+  require cd[36] == address(cd[36])
+  if not stor0 - 2:
+      revert with 1055239861
+  stor0 = 2
+  if not -('cd', 4).length:
+      revert with EmptyArray()
+  if address(cd[36]) != caller:
+      revert with InvalidRecipient()
+  if ('cd', 4).length > LOCK8605463013():
+      revert with 0, 65
+  mem[96] = ('cd', 4).length
+  mem[64] = (32 * ('cd', 4).length) + 128
+  if not ('cd', 4).length:
+      idx = 0
+      while idx < ('cd', 4).length:
+          require cd[(cd[4] + (32 * idx) + 36)] <′ calldata.size + -cd[4] - 163
+          require calldata.size + -cd[(cd[4] + (32 * idx) + 36)] + -cd[4] - 36 >=′ 128
+          _60 = mem[64]
+          if mem[64] + 128 < mem[64] or mem[64] + 128 > LOCK8605463013():
+              revert with 0, 65
+          mem[64] = mem[64] + 128
+          require cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 36)] == address(cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 36)])
+          mem[_60] = cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 36)]
+          require cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 68)] == bool(cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 68)])
+          mem[_60 + 32] = cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 68)]
+          mem[_60 + 64] = cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 100)]
+          require cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 132)] <= LOCK8605463013()
+          require cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 132)] + 67 <′ calldata.size
+          if cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 132)] + 36)] > LOCK8605463013():
+              revert with 0, 65
+          _62 = mem[64]
+          if mem[64] + ceil32(ceil32(cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 132)] + 36)])) + 1 < mem[64] or mem[64] + ceil32(ceil32(cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 132)] + 36)])) + 1 > LOCK8605463013():
+              revert with 0, 65
+          mem[64] = mem[64] + ceil32(ceil32(cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 132)] + 36)])) + 1
+          mem[_62] = cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 132)] + 36)]
+          require cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 132)] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 132)] + 36)] + 68 <= calldata.size
+          mem[_62 + 32 len cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 132)] + 36)]] = call.data[cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 132)] + 68 len cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 132)] + 36)]]
+          mem[_62 + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 132)] + 36)] + 32] = 0
+          mem[_60 + 96] = _62
+          if idx >= mem[96]:
+              revert with 0, 50
+          mem[(32 * idx) + 128] = address(cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 36)])
+          if not cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 68)]:
+              mem[mem[64]] = 0xa5eb206e00000000000000000000000000000000000000000000000000000000
+              mem[mem[64] + 4] = caller
+              mem[mem[64] + 36] = cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 100)]
+              mem[mem[64] + 68] = address(cd[36])
+              require ext_code.size(address(cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 36)]))
+              call address(cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 36)]).0xa5eb206e with:
+                   gas gas_remaining wei
+                  args caller, cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 100)], address(cd[36])
+          else:
+              if not -cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 132)] + 36)]:
+                  revert with 346985018
+              _83 = mem[64]
+              mem[mem[64]] = 0x97cce6f600000000000000000000000000000000000000000000000000000000
+              mem[mem[64] + 4] = caller
+              mem[mem[64] + 36] = 96
+              mem[mem[64] + 100] = cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 132)] + 36)]
+              s = 0
+              while s < cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 132)] + 36)]:
+                  mem[s + mem[64] + 132] = mem[s + _62 + 32]
+                  s = s + 32
+                  continue 
+              mem[mem[64] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 132)] + 36)] + 132] = 0
+              mem[mem[64] + 68] = address(cd[36])
+              require ext_code.size(address(cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 36)]))
+              call address(cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 36)]).mem[mem[64] len 4] with:
+                   gas gas_remaining wei
+                  args mem[mem[64] + 4 len _83 + ceil32(cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 132)] + 36)]) + -mem[64] + 128]
+          if not ext_call.success:
+              revert with ext_call.return_data[0 len return_data.size]
+          if not idx + 1:
+              revert with 0, 17
+          idx = idx + 1
+          continue 
+      _52 = mem[64]
+      mem[mem[64]] = 64
+      _54 = mem[96]
+      mem[mem[64] + 64] = mem[96]
+      idx = 0
+      s = 128
+      t = mem[64] + 96
+      while idx < _54:
+          mem[t] = mem[s + 12 len 20]
+          idx = idx + 1
+          s = s + 32
+          t = t + 32
+          continue 
+      mem[_52 + 32] = address(cd[36])
+      log 0x39c2dfae: mem[mem[64] len _52 + (32 * _54) + -mem[64] + 96], caller
+  else:
+      mem[128 len 32 * ('cd', 4).length] = call.data[calldata.size len 32 * ('cd', 4).length]
+      idx = 0
+      while idx < ('cd', 4).length:
+          require cd[(cd[4] + (32 * idx) + 36)] <′ calldata.size + -cd[4] - 163
+          require calldata.size + -cd[(cd[4] + (32 * idx) + 36)] + -cd[4] - 36 >=′ 128
+          _61 = mem[64]
+          if mem[64] + 128 < mem[64] or mem[64] + 128 > LOCK8605463013():
+              revert with 0, 65
+          mem[64] = mem[64] + 128
+          require cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 36)] == address(cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 36)])
+          mem[_61] = cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 36)]
+          require cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 68)] == bool(cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 68)])
+          mem[_61 + 32] = cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 68)]
+          mem[_61 + 64] = cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 100)]
+          require cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 132)] <= LOCK8605463013()
+          require cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 132)] + 67 <′ calldata.size
+          if cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 132)] + 36)] > LOCK8605463013():
+              revert with 0, 65
+          _63 = mem[64]
+          if mem[64] + ceil32(ceil32(cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 132)] + 36)])) + 1 < mem[64] or mem[64] + ceil32(ceil32(cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 132)] + 36)])) + 1 > LOCK8605463013():
+              revert with 0, 65
+          mem[64] = mem[64] + ceil32(ceil32(cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 132)] + 36)])) + 1
+          mem[_63] = cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 132)] + 36)]
+          require cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 132)] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 132)] + 36)] + 68 <= calldata.size
+          mem[_63 + 32 len cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 132)] + 36)]] = call.data[cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 132)] + 68 len cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 132)] + 36)]]
+          mem[_63 + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 132)] + 36)] + 32] = 0
+          mem[_61 + 96] = _63
+          if idx >= mem[96]:
+              revert with 0, 50
+          mem[(32 * idx) + 128] = address(cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 36)])
+          if not cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 68)]:
+              mem[mem[64]] = 0xa5eb206e00000000000000000000000000000000000000000000000000000000
+              mem[mem[64] + 4] = caller
+              mem[mem[64] + 36] = cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 100)]
+              mem[mem[64] + 68] = address(cd[36])
+              require ext_code.size(address(cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 36)]))
+              call address(cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 36)]).0xa5eb206e with:
+                   gas gas_remaining wei
+                  args caller, cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 100)], address(cd[36])
+          else:
+              if not -cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 132)] + 36)]:
+                  revert with 346985018
+              mem[mem[64]] = 0x97cce6f600000000000000000000000000000000000000000000000000000000
+              mem[mem[64] + 4] = caller
+              mem[mem[64] + 36] = 96
+              mem[mem[64] + 100] = cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 132)] + 36)]
+              s = 0
+              while s < cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 132)] + 36)]:
+                  mem[s + mem[64] + 132] = mem[s + _63 + 32]
+                  s = s + 32
+                  continue 
+              mem[mem[64] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 132)] + 36)] + 132] = 0
+              mem[mem[64] + 68] = address(cd[36])
+              require ext_code.size(address(cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 36)]))
+              call address(cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 36)]).0x97cce6f6 with:
+                   gas gas_remaining wei
+                  args caller, Array(len=cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 132)] + 36)], data=mem[mem[64] + 132 len ceil32(cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 132)] + 36)])]), address(cd[36])
+          if not ext_call.success:
+              revert with ext_call.return_data[0 len return_data.size]
+          if not idx + 1:
+              revert with 0, 17
+          idx = idx + 1
+          continue 
+      _53 = mem[64]
+      mem[mem[64]] = 64
+      _55 = mem[96]
+      mem[mem[64] + 64] = mem[96]
+      idx = 0
+      s = 128
+      t = mem[64] + 96
+      while idx < _55:
+          mem[t] = mem[s + 12 len 20]
+          idx = idx + 1
+          s = s + 32
+          t = t + 32
+          continue 
+      mem[_53 + 32] = address(cd[36])
+      log 0x39c2dfae: mem[mem[64] len _53 + (32 * _55) + -mem[64] + 96], caller
+  stor0 = 1
+
+

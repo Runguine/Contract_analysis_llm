@@ -1,0 +1,732 @@
+# Palkeoramix decompiler. 
+
+def storage:
+  stor0 is uint256 at storage 0
+  stor1 is uint8 at storage 1
+  stor1 is address at storage 1 offset 8
+  stor1 is address at storage 1
+
+def onERC721Received(address _param1, address _param2, uint256 _param3, bytes _param4): # not payable
+  require calldata.size - 4 >=′ 128
+  require not Mask(96, 160, _param1)
+  require not Mask(96, 160, _param2)
+  require _param4 <= LOCK8605463013()
+  require _param4 + 35 <′ calldata.size
+  require _param4.length <= LOCK8605463013()
+  require _param4 + _param4.length + 36 <= calldata.size
+  return 0x150b7a0200000000000000000000000000000000000000000000000000000000
+
+def onERC1155Received(address _param1, address _param2, uint256 _param3, uint256 _param4, bytes _param5): # not payable
+  require calldata.size - 4 >=′ 160
+  require not Mask(96, 160, _param1)
+  require not Mask(96, 160, _param2)
+  require _param5 <= LOCK8605463013()
+  require _param5 + 35 <′ calldata.size
+  require _param5.length <= LOCK8605463013()
+  require _param5 + _param5.length + 36 <= calldata.size
+  return 0xf23a6e6100000000000000000000000000000000000000000000000000000000
+
+def supportsInterface(bytes4 interfaceId): # not payable
+  require calldata.size - 4 >=′ 32
+  require not interfaceId - Mask(32, 224, interfaceId)
+  if Mask(32, 224, interfaceId) == 0x4e2312e000000000000000000000000000000000000000000000000000000000:
+      return True
+  if Mask(32, 224, interfaceId) != 0x150b7a0200000000000000000000000000000000000000000000000000000000:
+      return (Mask(32, 224, interfaceId) == 0x1ffc9a700000000000000000000000000000000000000000000000000000000)
+  return (Mask(32, 224, interfaceId) == 0x150b7a0200000000000000000000000000000000000000000000000000000000)
+
+def onERC1155BatchReceived(address _param1, address _param2, uint256[] _param3, uint256[] _param4, bytes _param5): # not payable
+  require calldata.size - 4 >=′ 160
+  require not Mask(96, 160, _param1)
+  require not Mask(96, 160, _param2)
+  require _param3 <= LOCK8605463013()
+  require _param3 + 35 <′ calldata.size
+  require _param3.length <= LOCK8605463013()
+  require (32 * _param3.length) + _param3 + 36 <= calldata.size
+  require _param4 <= LOCK8605463013()
+  require _param4 + 35 <′ calldata.size
+  require _param4.length <= LOCK8605463013()
+  require (32 * _param4.length) + _param4 + 36 <= calldata.size
+  require _param5 <= LOCK8605463013()
+  require _param5 + 35 <′ calldata.size
+  require _param5.length <= LOCK8605463013()
+  require _param5 + _param5.length + 36 <= calldata.size
+  return 0xbc197c8100000000000000000000000000000000000000000000000000000000
+
+def execute(bytes commands, bytes[] inputs) payable: 
+  require calldata.size - 4 >=′ 64
+  require commands <= LOCK8605463013()
+  require commands + 35 <′ calldata.size
+  require commands.length <= LOCK8605463013()
+  require commands + commands.length + 36 <= calldata.size
+  require inputs <= LOCK8605463013()
+  require inputs + 35 <′ calldata.size
+  require inputs.length <= LOCK8605463013()
+  require (32 * inputs.length) + inputs + 36 <= calldata.size
+  if this.address == caller:
+      if inputs.length - commands.length:
+          revert with LengthMismatch()
+      if 0 >= commands.length:
+          return 0
+  else:
+      if address(stor1.field_0) - 1:
+          revert with ContractLocked()
+      address(stor1.field_0) = caller
+      if inputs.length - commands.length:
+          revert with LengthMismatch()
+      if 0 >= commands.length:
+          uint8(stor1.field_0) = 1
+          Mask(152, 0, stor1.field_8) = 0
+          return 0
+  ('lt', 0, ('cd', ('add', 4, ('param', 'commands'))))
+  if 0 >= inputs.length:
+      revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+  require cd[(inputs + 36)] <′ calldata.size + -inputs - 67
+  require cd[(inputs + cd[(inputs + 36)] + 36)] <= LOCK8605463013()
+  require inputs + cd[(inputs + 36)] + 68 <=′ calldata.size - cd[(inputs + cd[(inputs + 36)] + 36)]
+  if cd[(inputs + cd[(inputs + 36)] + cd[(inputs + cd[(inputs + 36)] + 164)] + 68)] > cd[(inputs + cd[(inputs + 36)] + cd[(inputs + cd[(inputs + 36)] + 164)] + 68)] + cd[(inputs + cd[(inputs + 36)] + 164)] + 32:
+      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+  if cd[(inputs + cd[(inputs + 36)] + cd[(inputs + cd[(inputs + 36)] + 164)] + 68)] + cd[(inputs + cd[(inputs + 36)] + 164)] + 32 > cd[(inputs + cd[(inputs + 36)] + 36)]:
+      revert with SliceOutOfBounds()
+  if address(cd[(inputs + cd[(inputs + 36)] + 68)]) - 1:
+  if cd[(inputs + cd[(inputs + 36)] + 100)] == 0x8000000000000000000000000000000000000000000000000000000000000000:
+      if cd[(inputs + cd[(inputs + 36)] + cd[(inputs + cd[(inputs + 36)] + 164)] + 68)] < 20:
+          revert with SliceOutOfBounds()
+      static call address(cd[(inputs + cd[(inputs + 36)] + cd[(inputs + cd[(inputs + 36)] + 164)] + 100)]) >> 96.balanceOf(address account) with:
+              gas gas_remaining wei
+             args this.address
+      if not ext_call.success:
+          revert with ext_call.return_data[0 len return_data.size]
+      if ext_call.success:
+          if 32 > return_data.size:
+              if ceil32(return_data.size) + 96 > LOCK8605463013() or ceil32(return_data.size) + 96 < 96:
+                  revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+              require return_data.size >=′ 32
+  ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+
+def execute(bytes commands, bytes[] inputs, uint256 deadline) payable: 
+  require calldata.size - 4 >=′ 96
+  require commands <= LOCK8605463013()
+  require commands + 35 <′ calldata.size
+  require commands.length <= LOCK8605463013()
+  require commands + commands.length + 36 <= calldata.size
+  require inputs <= LOCK8605463013()
+  require inputs + 35 <′ calldata.size
+  require inputs.length <= LOCK8605463013()
+  require (32 * inputs.length) + inputs + 36 <= calldata.size
+  if block.timestamp > deadline:
+      revert with TransactionDeadlinePassed()
+  if this.address == caller:
+      if inputs.length - commands.length:
+          revert with LengthMismatch()
+      if 0 >= commands.length:
+          return 0
+  else:
+      if address(stor1.field_0) - 1:
+          revert with ContractLocked()
+      address(stor1.field_0) = caller
+      if inputs.length - commands.length:
+          revert with LengthMismatch()
+      if 0 >= commands.length:
+          uint8(stor1.field_0) = 1
+          Mask(152, 0, stor1.field_8) = 0
+          return 0
+  ('lt', 0, ('cd', ('add', 4, ('param', 'commands'))))
+  if 0 >= inputs.length:
+      revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+  require cd[(inputs + 36)] <′ calldata.size + -inputs - 67
+  require cd[(inputs + cd[(inputs + 36)] + 36)] <= LOCK8605463013()
+  require inputs + cd[(inputs + 36)] + 68 <=′ calldata.size - cd[(inputs + cd[(inputs + 36)] + 36)]
+  if cd[(inputs + cd[(inputs + 36)] + cd[(inputs + cd[(inputs + 36)] + 164)] + 68)] > cd[(inputs + cd[(inputs + 36)] + cd[(inputs + cd[(inputs + 36)] + 164)] + 68)] + cd[(inputs + cd[(inputs + 36)] + 164)] + 32:
+      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+  if cd[(inputs + cd[(inputs + 36)] + cd[(inputs + cd[(inputs + 36)] + 164)] + 68)] + cd[(inputs + cd[(inputs + 36)] + 164)] + 32 > cd[(inputs + cd[(inputs + 36)] + 36)]:
+      revert with SliceOutOfBounds()
+  if address(cd[(inputs + cd[(inputs + 36)] + 68)]) - 1:
+  if cd[(inputs + cd[(inputs + 36)] + 100)] == 0x8000000000000000000000000000000000000000000000000000000000000000:
+      if cd[(inputs + cd[(inputs + 36)] + cd[(inputs + cd[(inputs + 36)] + 164)] + 68)] < 20:
+          revert with SliceOutOfBounds()
+      static call address(cd[(inputs + cd[(inputs + 36)] + cd[(inputs + cd[(inputs + 36)] + 164)] + 100)]) >> 96.balanceOf(address account) with:
+              gas gas_remaining wei
+             args this.address
+      if not ext_call.success:
+          revert with ext_call.return_data[0 len return_data.size]
+      if ext_call.success:
+          if 32 > return_data.size:
+              if ceil32(return_data.size) + 96 > LOCK8605463013() or ceil32(return_data.size) + 96 < 96:
+                  revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+              require return_data.size >=′ 32
+  ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+
+def collectRewards(bytes looksRareClaim): # not payable
+  require calldata.size - 4 >=′ 32
+  require looksRareClaim <= LOCK8605463013()
+  require looksRareClaim + 35 <′ calldata.size
+  require looksRareClaim.length <= LOCK8605463013()
+  require looksRareClaim + looksRareClaim.length + 36 <= calldata.size
+  call 0x0554f068365ed43dcc98dcd7fd7a8208a5638c72 with:
+       gas gas_remaining wei
+      args looksRareClaim[all]
+  if not return_data.size:
+      if not ext_call.success:
+          revert with UnableToClaim()
+      static call 0xf4d2888d29d722226fafa5d9b24f9164c092421e.balanceOf(address account) with:
+              gas gas_remaining wei
+             args this.address
+      if not ext_call.success:
+          call 0xf4d2888d29d722226fafa5d9b24f9164c092421e.transfer(address recipient, uint256 amount) with:
+               gas gas_remaining wei
+              args 0xea37093ce161f090e443f304e1bf3a8f14d7bb40, 0
+          revert with ext_call.return_data[0 len return_data.size]
+      if 32 <= return_data.size:
+          call 0xf4d2888d29d722226fafa5d9b24f9164c092421e.transfer(address recipient, uint256 amount) with:
+               gas gas_remaining wei
+              args 0xea37093ce161f090e443f304e1bf3a8f14d7bb40, ext_call.return_data[0]
+          if not ext_call.success:
+              revert with ext_call.return_data[0 len return_data.size]
+          if ext_call.success:
+              if 32 > return_data.size:
+                  if ceil32(return_data.size) + 128 > LOCK8605463013() or ceil32(return_data.size) + 128 < 128:
+                      revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+                  require return_data.size >=′ 32
+              require not ext_call.return_data[0] - bool(ext_call.return_data[0])
+      else:
+          if ceil32(return_data.size) + 96 > LOCK8605463013() or ceil32(return_data.size) + 96 < 96:
+              revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+          require return_data.size >=′ 32
+          call 0xf4d2888d29d722226fafa5d9b24f9164c092421e.transfer(address recipient, uint256 amount) with:
+               gas gas_remaining wei
+              args 0xea37093ce161f090e443f304e1bf3a8f14d7bb40, ext_call.return_data[0]
+          if not ext_call.success:
+              revert with ext_call.return_data[0 len return_data.size]
+          if ext_call.success:
+              if 32 <= return_data.size:
+                  if ceil32(return_data.size) + 128 > LOCK8605463013() or 128 < 96:
+                      revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+              else:
+                  if (2 * ceil32(return_data.size)) + 96 > LOCK8605463013() or 2 * ceil32(return_data.size) < ceil32(return_data.size):
+                      revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+                  require return_data.size >=′ 32
+              require not ext_call.return_data[0] - bool(ext_call.return_data[0])
+  else:
+      if return_data.size > LOCK8605463013():
+          revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+      if ceil32(ceil32(return_data.size)) + 97 > LOCK8605463013() or ceil32(ceil32(return_data.size)) + 97 < 96:
+          revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+      if not ext_call.success:
+          revert with UnableToClaim()
+      static call 0xf4d2888d29d722226fafa5d9b24f9164c092421e.balanceOf(address account) with:
+              gas gas_remaining wei
+             args this.address
+      if not ext_call.success:
+          call 0xf4d2888d29d722226fafa5d9b24f9164c092421e.transfer(address recipient, uint256 amount) with:
+               gas gas_remaining wei
+              args 0xea37093ce161f090e443f304e1bf3a8f14d7bb40, 0
+          revert with ext_call.return_data[0 len return_data.size]
+      if 32 <= return_data.size:
+          if ceil32(ceil32(return_data.size)) + 129 > LOCK8605463013() or 129 < 97:
+              revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+          call 0xf4d2888d29d722226fafa5d9b24f9164c092421e.transfer(address recipient, uint256 amount) with:
+               gas gas_remaining wei
+              args 0xea37093ce161f090e443f304e1bf3a8f14d7bb40, ext_call.return_data[0]
+          if not ext_call.success:
+              revert with ext_call.return_data[0 len return_data.size]
+          if ext_call.success:
+              if 32 <= return_data.size:
+                  if ceil32(ceil32(return_data.size)) + 161 > LOCK8605463013() or 161 < 129:
+                      revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+              else:
+                  if ceil32(ceil32(return_data.size)) + ceil32(return_data.size) + 129 > LOCK8605463013() or ceil32(return_data.size) < 0:
+                      revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+                  require return_data.size >=′ 32
+              require not ext_call.return_data[0] - bool(ext_call.return_data[0])
+      else:
+          if ceil32(ceil32(return_data.size)) + ceil32(return_data.size) + 97 > LOCK8605463013() or ceil32(return_data.size) < 0:
+              revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+          require return_data.size >=′ 32
+          call 0xf4d2888d29d722226fafa5d9b24f9164c092421e.transfer(address recipient, uint256 amount) with:
+               gas gas_remaining wei
+              args 0xea37093ce161f090e443f304e1bf3a8f14d7bb40, ext_call.return_data[0]
+          if not ext_call.success:
+              revert with ext_call.return_data[0 len return_data.size]
+          if ext_call.success:
+              if 32 <= return_data.size:
+                  if ceil32(ceil32(return_data.size)) + ceil32(return_data.size) + 129 > LOCK8605463013() or 129 < 97:
+                      revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+              else:
+                  if ceil32(ceil32(return_data.size)) + (2 * ceil32(return_data.size)) + 97 > LOCK8605463013() or 2 * ceil32(return_data.size) < ceil32(return_data.size):
+                      revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+                  require return_data.size >=′ 32
+              require not ext_call.return_data[0] - bool(ext_call.return_data[0])
+  log RewardsSent(uint256 amount=ext_call.return_data[0])
+  return 0
+
+def _fallback(?) payable: # default function
+  if calldata.size < 4:
+      ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+  if supportsInterface(bytes4 interfaceId) == uint32(call.func_hash) >> 224:
+      require not call.value
+      require calldata.size - 4 >=′ 32
+      require not cd[4] - Mask(32, 224, cd[4])
+      if Mask(32, 224, cd[4]) != 0x4e2312e000000000000000000000000000000000000000000000000000000000:
+          if Mask(32, 224, cd[4]) != 0x150b7a0200000000000000000000000000000000000000000000000000000000:
+              return (Mask(32, 224, cd[4]) == 0x1ffc9a700000000000000000000000000000000000000000000000000000000)
+      ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+  if onERC721Received(address _param1, address _param2, uint256 _param3, bytes _param4) == uint32(call.func_hash) >> 224:
+      require not call.value
+      require calldata.size - 4 >=′ 128
+      require not Mask(96, 160, cd[4])
+      require not Mask(96, 160, cd[36])
+      require cd[100] <= LOCK8605463013()
+      require cd[100] + 35 <′ calldata.size
+      require ('cd', 100).length <= LOCK8605463013()
+      require cd[100] + ('cd', 100).length + 36 <= calldata.size
+      return 0x150b7a0200000000000000000000000000000000000000000000000000000000
+  if execute(bytes commands, bytes[] inputs) == uint32(call.func_hash) >> 224:
+      require calldata.size - 4 >=′ 64
+      require cd[4] <= LOCK8605463013()
+      require cd[4] + 35 <′ calldata.size
+      require ('cd', 4).length <= LOCK8605463013()
+      require cd[4] + ('cd', 4).length + 36 <= calldata.size
+      require cd[36] <= LOCK8605463013()
+      require cd[36] + 35 <′ calldata.size
+      require ('cd', 36).length <= LOCK8605463013()
+      require (32 * ('cd', 36).length) + cd[36] + 36 <= calldata.size
+      if this.address == caller:
+          if ('cd', 36).length - ('cd', 4).length:
+              revert with LengthMismatch()
+          if 0 >= ('cd', 4).length:
+              return 0
+      else:
+          if address(stor1.field_0) - 1:
+              revert with ContractLocked()
+          address(stor1.field_0) = caller
+          if ('cd', 36).length - ('cd', 4).length:
+              revert with LengthMismatch()
+          if 0 >= ('cd', 4).length:
+              uint8(stor1.field_0) = 1
+              Mask(152, 0, stor1.field_8) = 0
+              return 0
+      ('lt', 0, ('cd', ('add', 4, ('cd', 4))))
+      if 0 >= ('cd', 36).length:
+          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+      require ('cd', 36)[0] <′ calldata.size + -cd[36] - 67
+      require cd[(cd[36] + ('cd', 36)[0] + 36)] <= LOCK8605463013()
+      require cd[36] + ('cd', 36)[0] + 68 <=′ calldata.size - cd[(cd[36] + ('cd', 36)[0] + 36)]
+      if cd[(cd[36] + ('cd', 36)[0] + cd[(cd[36] + ('cd', 36)[0] + 164)] + 68)] > cd[(cd[36] + ('cd', 36)[0] + cd[(cd[36] + ('cd', 36)[0] + 164)] + 68)] + cd[(cd[36] + ('cd', 36)[0] + 164)] + 32:
+          revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+      if cd[(cd[36] + ('cd', 36)[0] + cd[(cd[36] + ('cd', 36)[0] + 164)] + 68)] + cd[(cd[36] + ('cd', 36)[0] + 164)] + 32 > cd[(cd[36] + ('cd', 36)[0] + 36)]:
+          revert with SliceOutOfBounds()
+      if address(cd[(cd[36] + ('cd', 36)[0] + 68)]) - 1:
+      if cd[(cd[36] + ('cd', 36)[0] + 100)] == 0x8000000000000000000000000000000000000000000000000000000000000000:
+          if cd[(cd[36] + ('cd', 36)[0] + cd[(cd[36] + ('cd', 36)[0] + 164)] + 68)] < 20:
+              revert with SliceOutOfBounds()
+          static call address(cd[(cd[36] + ('cd', 36)[0] + cd[(cd[36] + ('cd', 36)[0] + 164)] + 100)]) >> 96.balanceOf(address account) with:
+                  gas gas_remaining wei
+                 args this.address
+          if not ext_call.success:
+              revert with ext_call.return_data[0 len return_data.size]
+          if ext_call.success:
+              if 32 > return_data.size:
+                  if ceil32(return_data.size) + 160 > LOCK8605463013() or ceil32(return_data.size) + 160 < 160:
+                      revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+                  require return_data.size >=′ 32
+                  require ext_call.return_data[0] < 0x8000000000000000000000000000000000000000000000000000000000000000
+                  require 43 <= cd[(cd[36] + ('cd', 36)[0] + cd[(cd[36] + ('cd', 36)[0] + 164)] + 68)]
+                  if Mask(64, 96, cd[(cd[36] + ('cd', 36)[0] + cd[(cd[36] + ('cd', 36)[0] + 164)] + 100)]) >> 96 > Mask(64, 96, cd[(cd[36] + ('cd', 36)[0] + cd[(cd[36] + ('cd', 36)[0] + 164)] + 123)]) >> 96:
+                      if ceil32(return_data.size) + 288 > LOCK8605463013() or 288 < 160:
+                          revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+                      if ceil32(return_data.size) + 416 > LOCK8605463013() or 256 < 128:
+                          revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+                      if ceil32(return_data.size) + 608 > LOCK8605463013() or 608 < 416:
+                          revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+      ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+  if execute(bytes commands, bytes[] inputs, uint256 deadline) == uint32(call.func_hash) >> 224:
+      require calldata.size - 4 >=′ 96
+      require cd[4] <= LOCK8605463013()
+      require cd[4] + 35 <′ calldata.size
+      require ('cd', 4).length <= LOCK8605463013()
+      require cd[4] + ('cd', 4).length + 36 <= calldata.size
+      require cd[36] <= LOCK8605463013()
+      require cd[36] + 35 <′ calldata.size
+      require ('cd', 36).length <= LOCK8605463013()
+      require (32 * ('cd', 36).length) + cd[36] + 36 <= calldata.size
+      if block.timestamp > cd[68]:
+          revert with TransactionDeadlinePassed()
+      if this.address == caller:
+          if ('cd', 36).length - ('cd', 4).length:
+              revert with LengthMismatch()
+          if 0 >= ('cd', 4).length:
+              return 0
+      else:
+          if address(stor1.field_0) - 1:
+              revert with ContractLocked()
+          address(stor1.field_0) = caller
+          if ('cd', 36).length - ('cd', 4).length:
+              revert with LengthMismatch()
+          if 0 >= ('cd', 4).length:
+              uint8(stor1.field_0) = 1
+              Mask(152, 0, stor1.field_8) = 0
+              return 0
+      ('lt', 0, ('cd', ('add', 4, ('cd', 4))))
+      if 0 >= ('cd', 36).length:
+          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+      require ('cd', 36)[0] <′ calldata.size + -cd[36] - 67
+      require cd[(cd[36] + ('cd', 36)[0] + 36)] <= LOCK8605463013()
+      require cd[36] + ('cd', 36)[0] + 68 <=′ calldata.size - cd[(cd[36] + ('cd', 36)[0] + 36)]
+      if cd[(cd[36] + ('cd', 36)[0] + cd[(cd[36] + ('cd', 36)[0] + 164)] + 68)] > cd[(cd[36] + ('cd', 36)[0] + cd[(cd[36] + ('cd', 36)[0] + 164)] + 68)] + cd[(cd[36] + ('cd', 36)[0] + 164)] + 32:
+          revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+      if cd[(cd[36] + ('cd', 36)[0] + cd[(cd[36] + ('cd', 36)[0] + 164)] + 68)] + cd[(cd[36] + ('cd', 36)[0] + 164)] + 32 > cd[(cd[36] + ('cd', 36)[0] + 36)]:
+          revert with SliceOutOfBounds()
+      if address(cd[(cd[36] + ('cd', 36)[0] + 68)]) - 1:
+      if cd[(cd[36] + ('cd', 36)[0] + 100)] == 0x8000000000000000000000000000000000000000000000000000000000000000:
+          if cd[(cd[36] + ('cd', 36)[0] + cd[(cd[36] + ('cd', 36)[0] + 164)] + 68)] < 20:
+              revert with SliceOutOfBounds()
+          static call address(cd[(cd[36] + ('cd', 36)[0] + cd[(cd[36] + ('cd', 36)[0] + 164)] + 100)]) >> 96.balanceOf(address account) with:
+                  gas gas_remaining wei
+                 args this.address
+          if not ext_call.success:
+              revert with ext_call.return_data[0 len return_data.size]
+          if ext_call.success:
+              if 32 > return_data.size:
+                  if ceil32(return_data.size) + 160 > LOCK8605463013() or ceil32(return_data.size) + 160 < 160:
+                      revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+                  require return_data.size >=′ 32
+                  require ext_call.return_data[0] < 0x8000000000000000000000000000000000000000000000000000000000000000
+                  require 43 <= cd[(cd[36] + ('cd', 36)[0] + cd[(cd[36] + ('cd', 36)[0] + 164)] + 68)]
+                  if Mask(64, 96, cd[(cd[36] + ('cd', 36)[0] + cd[(cd[36] + ('cd', 36)[0] + 164)] + 100)]) >> 96 > Mask(64, 96, cd[(cd[36] + ('cd', 36)[0] + cd[(cd[36] + ('cd', 36)[0] + 164)] + 123)]) >> 96:
+                      if ceil32(return_data.size) + 288 > LOCK8605463013() or 288 < 160:
+                          revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+                      if ceil32(return_data.size) + 416 > LOCK8605463013() or 256 < 128:
+                          revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+                      if ceil32(return_data.size) + 608 > LOCK8605463013() or 608 < 416:
+                          revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+      ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+  if collectRewards(bytes looksRareClaim) == uint32(call.func_hash) >> 224:
+      require not call.value
+      require calldata.size - 4 >=′ 32
+      require cd[4] <= LOCK8605463013()
+      require cd[4] + 35 <′ calldata.size
+      require ('cd', 4).length <= LOCK8605463013()
+      require cd[4] + ('cd', 4).length + 36 <= calldata.size
+      call 0x0554f068365ed43dcc98dcd7fd7a8208a5638c72 with:
+           gas gas_remaining wei
+          args call.data[cd[4] + 36 len ('cd', 4).length]
+      if not return_data.size:
+          if not ext_call.success:
+              revert with UnableToClaim()
+          static call 0xf4d2888d29d722226fafa5d9b24f9164c092421e.balanceOf(address account) with:
+                  gas gas_remaining wei
+                 args this.address
+          if not ext_call.success:
+              ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+          if 32 <= return_data.size:
+              ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+          if ceil32(return_data.size) + 160 > LOCK8605463013() or ceil32(return_data.size) + 160 < 160:
+              revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+          require return_data.size >=′ 32
+          call 0xf4d2888d29d722226fafa5d9b24f9164c092421e.transfer(address recipient, uint256 amount) with:
+               gas gas_remaining wei
+              args 0xea37093ce161f090e443f304e1bf3a8f14d7bb40, ext_call.return_data[0]
+          if not ext_call.success:
+              revert with ext_call.return_data[0 len return_data.size]
+          if not ext_call.success:
+              ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+          if 32 <= return_data.size:
+              ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+          if (2 * ceil32(return_data.size)) + 160 > LOCK8605463013() or 2 * ceil32(return_data.size) < ceil32(return_data.size):
+              revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+      else:
+          if return_data.size > LOCK8605463013():
+              revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+          if ceil32(ceil32(return_data.size)) + 161 > LOCK8605463013() or ceil32(ceil32(return_data.size)) + 161 < 160:
+              revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+          if not ext_call.success:
+              revert with UnableToClaim()
+          static call 0xf4d2888d29d722226fafa5d9b24f9164c092421e.balanceOf(address account) with:
+                  gas gas_remaining wei
+                 args this.address
+          if not ext_call.success:
+              ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+          if 32 <= return_data.size:
+              ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+          if ceil32(ceil32(return_data.size)) + ceil32(return_data.size) + 161 > LOCK8605463013() or ceil32(return_data.size) < 0:
+              revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+          require return_data.size >=′ 32
+          call 0xf4d2888d29d722226fafa5d9b24f9164c092421e.transfer(address recipient, uint256 amount) with:
+               gas gas_remaining wei
+              args 0xea37093ce161f090e443f304e1bf3a8f14d7bb40, ext_call.return_data[0]
+          if not ext_call.success:
+              revert with ext_call.return_data[0 len return_data.size]
+          if not ext_call.success:
+              ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+          if 32 <= return_data.size:
+              ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+          if ceil32(ceil32(return_data.size)) + (2 * ceil32(return_data.size)) + 161 > LOCK8605463013() or 2 * ceil32(return_data.size) < ceil32(return_data.size):
+              revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+      require return_data.size >=′ 32
+      require not ext_call.return_data[0] - bool(ext_call.return_data[0])
+      log RewardsSent(uint256 amount=ext_call.return_data[0])
+  else:
+      if onERC1155BatchReceived(address _param1, address _param2, uint256[] _param3, uint256[] _param4, bytes _param5) == uint32(call.func_hash) >> 224:
+          require not call.value
+          require calldata.size - 4 >=′ 160
+          require not Mask(96, 160, cd[4])
+          require not Mask(96, 160, cd[36])
+          require cd[68] <= LOCK8605463013()
+          require cd[68] + 35 <′ calldata.size
+          require ('cd', 68).length <= LOCK8605463013()
+          require (32 * ('cd', 68).length) + cd[68] + 36 <= calldata.size
+          require cd[100] <= LOCK8605463013()
+          require cd[100] + 35 <′ calldata.size
+          require ('cd', 100).length <= LOCK8605463013()
+          require (32 * ('cd', 100).length) + cd[100] + 36 <= calldata.size
+          require cd[132] <= LOCK8605463013()
+          require cd[132] + 35 <′ calldata.size
+          require ('cd', 132).length <= LOCK8605463013()
+          require cd[132] + ('cd', 132).length + 36 <= calldata.size
+          return 0xbc197c8100000000000000000000000000000000000000000000000000000000
+      if onERC1155Received(address _param1, address _param2, uint256 _param3, uint256 _param4, bytes _param5) == uint32(call.func_hash) >> 224:
+          require not call.value
+          require calldata.size - 4 >=′ 160
+          require not Mask(96, 160, cd[4])
+          require not Mask(96, 160, cd[36])
+          require cd[132] <= LOCK8605463013()
+          require cd[132] + 35 <′ calldata.size
+          require ('cd', 132).length <= LOCK8605463013()
+          require cd[132] + ('cd', 132).length + 36 <= calldata.size
+          return 0xf23a6e6100000000000000000000000000000000000000000000000000000000
+      if -(uint32(call.func_hash) >> 224) + uniswapV3SwapCallback(int256 amount0Delta, int256 amount1Delta, bytes data):
+          require not calldata.size
+          stop
+      require not call.value
+      require calldata.size - 4 >=′ 96
+      require cd[68] <= LOCK8605463013()
+      require cd[68] + 35 <′ calldata.size
+      require ('cd', 68).length <= LOCK8605463013()
+      require cd[68] + ('cd', 68).length + 36 <= calldata.size
+      if cd[4] >′ 0:
+          ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+      if cd[36] <=′ 0:
+          revert with V3InvalidSwap()
+      require ('cd', 68).length >=′ 64
+      require ('cd', 68)[0] <= LOCK8605463013()
+      require cd[68] + ('cd', 68)[0] + 67 <′ cd[68] + ('cd', 68).length + 36
+      if cd[(cd[68] + ('cd', 68)[0] + 36)] > LOCK8605463013():
+          revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+      if ceil32(ceil32(cd[(cd[68] + ('cd', 68)[0] + 36)])) + 161 > LOCK8605463013() or ceil32(ceil32(cd[(cd[68] + ('cd', 68)[0] + 36)])) + 161 < 160:
+          revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+      require ('cd', 68)[0] + cd[(cd[68] + ('cd', 68)[0] + 36)] + 68 <= ('cd', 68).length + 36
+      require not Mask(96, 160, ('cd', 68)[1])
+      if cd[(cd[68] + ('cd', 68)[0] + 36)] > cd[(cd[68] + ('cd', 68)[0] + 36)] + ('cd', 68)[0] + 32:
+          revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+      if cd[(cd[68] + ('cd', 68)[0] + 36)] + ('cd', 68)[0] + 32 > ('cd', 68).length:
+          revert with SliceOutOfBounds()
+      if cd[(cd[68] + ('cd', 68)[0] + 36)] < 43:
+          revert with SliceOutOfBounds()
+      if Mask(64, 96, cd[(cd[68] + ('cd', 68)[0] + 68)]) >> 96 <= Mask(64, 96, cd[(cd[68] + ('cd', 68)[0] + 91)]) >> 96:
+          ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+      if ceil32(ceil32(cd[(cd[68] + ('cd', 68)[0] + 36)])) + 289 > LOCK8605463013() or 289 < 161:
+          revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+      if ceil32(ceil32(cd[(cd[68] + ('cd', 68)[0] + 36)])) + 417 > LOCK8605463013() or 256 < 128:
+          revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+      if address(sha3(0, 2276643401503442211, sha3(Mask(64, 96, cd[(cd[68] + ('cd', 68)[0] + 91)]) << 96, Mask(64, 96, cd[(cd[68] + ('cd', 68)[0] + 68)]) << 96, Mask(24, 72, cd[(cd[68] + ('cd', 68)[0] + 68)]) >> 72), 0xe34f199b19b2b4f47f68442619d555527d244f78a3297ea89325f843f87b8b54)) - caller:
+          revert with V3InvalidCaller()
+      if cd[4] <=′ 0:
+          if address(cd[(cd[68] + ('cd', 68)[0] + 91)]) >> 96 < address(cd[(cd[68] + ('cd', 68)[0] + 68)]) >> 96:
+              if this.address - address(('cd', 68)[1]):
+                  if cd[36] > 0xffffffffffffffffffffffffffffffffffffffff:
+                      revert with UnsafeCast()
+                  require ext_code.size(0x22d473030f116ddee9f6b43ac78ba3)
+                  call 0x000000000022d473030f116ddee9f6b43ac78ba3.transferFrom(address from, address to, uint160 amount, address token) with:
+                       gas gas_remaining wei
+                      args address(('cd', 68)[1]), caller, address(cd[36]), Mask(64, 96, cd[(cd[68] + ('cd', 68)[0] + 68)]) >> 96
+                  if not ext_call.success:
+                      revert with ext_call.return_data[0 len return_data.size]
+                  if ext_call.success:
+                      if ceil32(ceil32(cd[(cd[68] + ('cd', 68)[0] + 36)])) + 417 > LOCK8605463013():
+                          revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+              else:
+                  if not Mask(64, 96, cd[(cd[68] + ('cd', 68)[0] + 68)]) >> 96:
+                      call caller with:
+                         value cd[36] wei
+                           gas gas_remaining wei
+                      if not ext_call.success:
+                          revert with Error(string reason), 'ETH_TRANSFER_FAILED'
+                  else:
+                      if cd[36] != 0x8000000000000000000000000000000000000000000000000000000000000000:
+                          ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+                      static call Mask(64, 96, cd[(cd[68] + ('cd', 68)[0] + 68)]) >> 96.balanceOf(address account) with:
+                              gas gas_remaining wei
+                             args this.address
+                      if not ext_call.success:
+                          revert with ext_call.return_data[0 len return_data.size]
+                      if not ext_call.success:
+                          ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+                      if 32 <= return_data.size:
+                          ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+                      if ceil32(ceil32(cd[(cd[68] + ('cd', 68)[0] + 36)])) + ceil32(return_data.size) + 417 > LOCK8605463013() or ceil32(return_data.size) < 0:
+                          revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+                      require return_data.size >=′ 32
+                      call Mask(64, 96, cd[(cd[68] + ('cd', 68)[0] + 68)]) >> 96.transfer(address recipient, uint256 amount) with:
+                           gas gas_remaining wei
+                          args caller, ext_call.return_data[0]
+                      if ext_call.return_data[0] != 1 or return_data.size <= 31 and return_data.size or not ext_call.success:
+                          revert with Error(string reason), 'TRANSFER_FAILED'
+          else:
+              if cd[(cd[68] + ('cd', 68)[0] + 36)] >= 66:
+                  require 23 <= cd[(cd[68] + ('cd', 68)[0] + 36)]
+                  require cd[36] < 0x8000000000000000000000000000000000000000000000000000000000000000
+                  if cd[36] == 0x8000000000000000000000000000000000000000000000000000000000000000:
+                      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+                  if cd[(cd[68] + ('cd', 68)[0] + 36)] - 23 < 43:
+                      revert with SliceOutOfBounds()
+                  if Mask(64, 96, cd[(cd[68] + ('cd', 68)[0] + 91)]) >> 96 > Mask(64, 96, cd[(cd[68] + ('cd', 68)[0] + 114)]) >> 96:
+                      if ceil32(ceil32(cd[(cd[68] + ('cd', 68)[0] + 36)])) + 545 > LOCK8605463013() or 545 < 417:
+                          revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+                      if ceil32(ceil32(cd[(cd[68] + ('cd', 68)[0] + 36)])) + 673 > LOCK8605463013() or 256 < 128:
+                          revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+                      if ceil32(ceil32(cd[(cd[68] + ('cd', 68)[0] + 36)])) + ceil32(floor32(cd[(cd[68] + ('cd', 68)[0] + 36)] + 8)) + 677 > LOCK8605463013() or ceil32(floor32(cd[(cd[68] + ('cd', 68)[0] + 36)] + 8)) + 677 < 673:
+                          revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+                  ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+              if cd[36] > stor0:
+                  revert with V3TooMuchRequested()
+              if this.address - address(('cd', 68)[1]):
+                  if cd[36] > 0xffffffffffffffffffffffffffffffffffffffff:
+                      revert with UnsafeCast()
+                  require ext_code.size(0x22d473030f116ddee9f6b43ac78ba3)
+                  call 0x000000000022d473030f116ddee9f6b43ac78ba3.transferFrom(address from, address to, uint160 amount, address token) with:
+                       gas gas_remaining wei
+                      args address(('cd', 68)[1]), caller, address(cd[36]), Mask(64, 96, cd[(cd[68] + ('cd', 68)[0] + 91)]) >> 96
+                  if not ext_call.success:
+                      revert with ext_call.return_data[0 len return_data.size]
+                  if ext_call.success:
+                      if ceil32(ceil32(cd[(cd[68] + ('cd', 68)[0] + 36)])) + 417 > LOCK8605463013():
+                          revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+              else:
+                  if not Mask(64, 96, cd[(cd[68] + ('cd', 68)[0] + 91)]) >> 96:
+                      call caller with:
+                         value cd[36] wei
+                           gas gas_remaining wei
+                      if not ext_call.success:
+                          revert with Error(string reason), 'ETH_TRANSFER_FAILED'
+                  else:
+                      if cd[36] != 0x8000000000000000000000000000000000000000000000000000000000000000:
+                          ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+                      static call Mask(64, 96, cd[(cd[68] + ('cd', 68)[0] + 91)]) >> 96.balanceOf(address account) with:
+                              gas gas_remaining wei
+                             args this.address
+                      if not ext_call.success:
+                          revert with ext_call.return_data[0 len return_data.size]
+                      if not ext_call.success:
+                          ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+                      if 32 <= return_data.size:
+                          ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+                      if ceil32(ceil32(cd[(cd[68] + ('cd', 68)[0] + 36)])) + ceil32(return_data.size) + 417 > LOCK8605463013() or ceil32(return_data.size) < 0:
+                          revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+                      require return_data.size >=′ 32
+                      call Mask(64, 96, cd[(cd[68] + ('cd', 68)[0] + 91)]) >> 96.transfer(address recipient, uint256 amount) with:
+                           gas gas_remaining wei
+                          args caller, ext_call.return_data[0]
+                      if ext_call.return_data[0] != 1 or return_data.size <= 31 and return_data.size or not ext_call.success:
+                          revert with Error(string reason), 'TRANSFER_FAILED'
+      else:
+          if address(cd[(cd[68] + ('cd', 68)[0] + 68)]) >> 96 < address(cd[(cd[68] + ('cd', 68)[0] + 91)]) >> 96:
+              if this.address - address(('cd', 68)[1]):
+                  if cd[4] > 0xffffffffffffffffffffffffffffffffffffffff:
+                      revert with UnsafeCast()
+                  require ext_code.size(0x22d473030f116ddee9f6b43ac78ba3)
+                  call 0x000000000022d473030f116ddee9f6b43ac78ba3.transferFrom(address from, address to, uint160 amount, address token) with:
+                       gas gas_remaining wei
+                      args address(('cd', 68)[1]), caller, address(cd[4]), Mask(64, 96, cd[(cd[68] + ('cd', 68)[0] + 68)]) >> 96
+                  if not ext_call.success:
+                      revert with ext_call.return_data[0 len return_data.size]
+                  if ext_call.success:
+                      if ceil32(ceil32(cd[(cd[68] + ('cd', 68)[0] + 36)])) + 417 > LOCK8605463013():
+                          revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+              else:
+                  if not Mask(64, 96, cd[(cd[68] + ('cd', 68)[0] + 68)]) >> 96:
+                      call caller with:
+                         value cd[4] wei
+                           gas gas_remaining wei
+                      if not ext_call.success:
+                          revert with Error(string reason), 'ETH_TRANSFER_FAILED'
+                  else:
+                      if cd[4] != 0x8000000000000000000000000000000000000000000000000000000000000000:
+                          ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+                      static call Mask(64, 96, cd[(cd[68] + ('cd', 68)[0] + 68)]) >> 96.balanceOf(address account) with:
+                              gas gas_remaining wei
+                             args this.address
+                      if not ext_call.success:
+                          revert with ext_call.return_data[0 len return_data.size]
+                      if not ext_call.success:
+                          ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+                      if 32 <= return_data.size:
+                          ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+                      if ceil32(ceil32(cd[(cd[68] + ('cd', 68)[0] + 36)])) + ceil32(return_data.size) + 417 > LOCK8605463013() or ceil32(return_data.size) < 0:
+                          revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+                      require return_data.size >=′ 32
+                      call Mask(64, 96, cd[(cd[68] + ('cd', 68)[0] + 68)]) >> 96.transfer(address recipient, uint256 amount) with:
+                           gas gas_remaining wei
+                          args caller, ext_call.return_data[0]
+                      if ext_call.return_data[0] != 1 or return_data.size <= 31 and return_data.size or not ext_call.success:
+                          revert with Error(string reason), 'TRANSFER_FAILED'
+          else:
+              if cd[(cd[68] + ('cd', 68)[0] + 36)] >= 66:
+                  require 23 <= cd[(cd[68] + ('cd', 68)[0] + 36)]
+                  require cd[4] < 0x8000000000000000000000000000000000000000000000000000000000000000
+                  if cd[4] == 0x8000000000000000000000000000000000000000000000000000000000000000:
+                      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+                  if cd[(cd[68] + ('cd', 68)[0] + 36)] - 23 < 43:
+                      revert with SliceOutOfBounds()
+                  if Mask(64, 96, cd[(cd[68] + ('cd', 68)[0] + 91)]) >> 96 > Mask(64, 96, cd[(cd[68] + ('cd', 68)[0] + 114)]) >> 96:
+                      if ceil32(ceil32(cd[(cd[68] + ('cd', 68)[0] + 36)])) + 545 > LOCK8605463013() or 545 < 417:
+                          revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+                      if ceil32(ceil32(cd[(cd[68] + ('cd', 68)[0] + 36)])) + 673 > LOCK8605463013() or 256 < 128:
+                          revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+                      if ceil32(ceil32(cd[(cd[68] + ('cd', 68)[0] + 36)])) + ceil32(floor32(cd[(cd[68] + ('cd', 68)[0] + 36)] + 8)) + 677 > LOCK8605463013() or ceil32(floor32(cd[(cd[68] + ('cd', 68)[0] + 36)] + 8)) + 677 < 673:
+                          revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+                  ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+              if cd[4] > stor0:
+                  revert with V3TooMuchRequested()
+              if this.address - address(('cd', 68)[1]):
+                  if cd[4] > 0xffffffffffffffffffffffffffffffffffffffff:
+                      revert with UnsafeCast()
+                  require ext_code.size(0x22d473030f116ddee9f6b43ac78ba3)
+                  call 0x000000000022d473030f116ddee9f6b43ac78ba3.transferFrom(address from, address to, uint160 amount, address token) with:
+                       gas gas_remaining wei
+                      args address(('cd', 68)[1]), caller, address(cd[4]), Mask(64, 96, cd[(cd[68] + ('cd', 68)[0] + 91)]) >> 96
+                  if not ext_call.success:
+                      revert with ext_call.return_data[0 len return_data.size]
+                  if ext_call.success:
+                      if ceil32(ceil32(cd[(cd[68] + ('cd', 68)[0] + 36)])) + 417 > LOCK8605463013():
+                          revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+              else:
+                  if not Mask(64, 96, cd[(cd[68] + ('cd', 68)[0] + 91)]) >> 96:
+                      call caller with:
+                         value cd[4] wei
+                           gas gas_remaining wei
+                      if not ext_call.success:
+                          revert with Error(string reason), 'ETH_TRANSFER_FAILED'
+                  else:
+                      if cd[4] != 0x8000000000000000000000000000000000000000000000000000000000000000:
+                          ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+                      static call Mask(64, 96, cd[(cd[68] + ('cd', 68)[0] + 91)]) >> 96.balanceOf(address account) with:
+                              gas gas_remaining wei
+                             args this.address
+                      if not ext_call.success:
+                          revert with ext_call.return_data[0 len return_data.size]
+                      if not ext_call.success:
+                          ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+                      if 32 <= return_data.size:
+                          ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+                      if ceil32(ceil32(cd[(cd[68] + ('cd', 68)[0] + 36)])) + ceil32(return_data.size) + 417 > LOCK8605463013() or ceil32(return_data.size) < 0:
+                          revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+                      require return_data.size >=′ 32
+                      call Mask(64, 96, cd[(cd[68] + ('cd', 68)[0] + 91)]) >> 96.transfer(address recipient, uint256 amount) with:
+                           gas gas_remaining wei
+                          args caller, ext_call.return_data[0]
+                      if ext_call.return_data[0] != 1 or return_data.size <= 31 and return_data.size or not ext_call.success:
+                          revert with Error(string reason), 'TRANSFER_FAILED'
+  return 0
+
+

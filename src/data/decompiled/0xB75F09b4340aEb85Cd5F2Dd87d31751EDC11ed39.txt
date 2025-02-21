@@ -1,0 +1,3770 @@
+# Palkeoramix decompiler. 
+
+const withdrawAddress = 0xd1f124cc900624e1ff2d923180b3924147364380
+const MAX_SUPPLY = 24000
+const REFUND_ROLE = 0xaa4e0f6cdcea7b211950e8a75e39146abfef1b33054a194490366571502a5e48
+const SUPPORT_ROLE = 0xd8acb51ff3d48f690a25887aaf234c4ae5a66ab9839243cd8e2b639cade0663b
+const DEFAULT_ADMIN_ROLE = 0
+
+def storage:
+  stor0 is uint256 at storage 0
+  stor1 is uint256 at storage 1
+  stor2 is array of struct at storage 2
+  stor3 is array of struct at storage 3
+  stor4 is mapping of struct at storage 4
+  balanceOf is mapping of struct at storage 5
+  approved is mapping of address at storage 6
+  stor7 is mapping of uint8 at storage 7
+  stor8 is uint128 at storage 8 offset 160
+  stor8 is address at storage 8
+  stor8 is uint256 at storage 8
+  stor9 is mapping of struct at storage 9
+  stor10 is uint256 at storage 10
+  roleAdmin is mapping of struct at storage 11
+  owner is address at storage 12
+  minimumContribution is uint256 at storage 13
+  stor14 is array of struct at storage 14
+  stor15 is array of struct at storage 15
+  userData is mapping of struct at storage 16
+  price is uint256 at storage 17
+  auctionActive is uint8 at storage 18
+
+def getApproved(uint256 tokenId): # not payable
+  require calldata.size - 4 >=′ 32
+  if tokenId >= stor0:
+      revert with ApprovalQueryForNonexistentToken()
+  if stor4[tokenId].field_224:
+      revert with ApprovalQueryForNonexistentToken()
+  return approved[tokenId]
+
+def getRoleAdmin(bytes32 role): # not payable
+  require calldata.size - 4 >=′ 32
+  return roleAdmin[role].field_256
+
+def balanceOf(address account): # not payable
+  require calldata.size - 4 >=′ 32
+  require account == account
+  if not account:
+      revert with BalanceQueryForZeroAddress()
+  return balanceOf[address(account)].field_0
+
+def owner(): # not payable
+  return owner
+
+def hasRole(bytes32 role, address account): # not payable
+  require calldata.size - 4 >=′ 64
+  require account == account
+  return bool(roleAdmin[role][address(account)].field_0)
+
+def auctionActive(): # not payable
+  return bool(auctionActive)
+
+def minimumContribution(): # not payable
+  return minimumContribution
+
+def price(): # not payable
+  return price
+
+def userData(address _user): # not payable
+  require calldata.size - 4 >=′ 32
+  require _user == _user
+  return userData[_user].field_0, userData[_user].field_0, bool(userData[_user].field_248)
+
+def isApprovedForAll(address owner, address operator): # not payable
+  require calldata.size - 4 >=′ 64
+  require owner == owner
+  require operator == operator
+  return bool(stor7[address(owner)][address(operator)])
+
+#
+#  Regular functions
+#
+
+def _fallback(?) payable: # default function
+  revert
+
+def totalSupply(): # not payable
+  return (stor0 - stor1)
+
+def renounceOwnership(): # not payable
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  owner = 0
+  log OwnershipTransferred(
+        address previousOwner=owner,
+        address newOwner=0)
+
+def refundAmount(address a): # not payable
+  require calldata.size - 4 >=′ 32
+  require a == a
+  if not price:
+      revert with 0, 18
+  return (userData[address(a)].field_0 % price)
+
+def amountPurchased(address a): # not payable
+  require calldata.size - 4 >=′ 32
+  require a == a
+  if not price:
+      revert with 0, 18
+  return (userData[address(a)].field_0 / price)
+
+def withdraw(): # not payable
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  call 0xd1f124cc900624e1ff2d923180b3924147364380 with:
+     value eth.balance(this.address) wei
+       gas gas_remaining wei
+  if not ext_call.success:
+      revert with 0, 'Transfer failed.'
+
+def transferOwnership(address newOwner): # not payable
+  require calldata.size - 4 >=′ 32
+  require newOwner == newOwner
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  if not newOwner:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'Ownable: new owner is the zero address'
+  owner = newOwner
+  log OwnershipTransferred(
+        address previousOwner=owner,
+        address newOwner=newOwner)
+
+def setApprovalForAll(address operator, bool approved): # not payable
+  require calldata.size - 4 >=′ 64
+  require operator == operator
+  require approved == approved
+  if caller == operator:
+      revert with ApproveToCaller()
+  stor7[caller][address(operator)] = uint8(approved)
+  log ApprovalForAll(
+        address owner=approved,
+        address operator=caller,
+        bool approved=operator)
+
+def bid() payable: 
+  if not auctionActive:
+      revert with 0, 'Auction is not active'
+  if call.value + userData[caller].field_0 < minimumContribution:
+      revert with 0, 'Lower than min bid amount'
+  userData[caller].field_0 = Mask(216, 0, call.value + userData[caller].field_0)
+  log Bid(
+        address account=caller,
+        uint256 value=call.value,
+        uint256 auctionId=call.value + userData[caller].field_0,
+        uint256 time=eth.balance(this.address))
+
+def supportsInterface(bytes4 interfaceId): # not payable
+  require calldata.size - 4 >=′ 32
+  require interfaceId == Mask(32, 224, interfaceId)
+  if 0x7965db0b00000000000000000000000000000000000000000000000000000000 == Mask(32, 224, interfaceId):
+      return True
+  if '*U Z' == Mask(32, 224, interfaceId):
+      return True
+  if 0x80ac58cd00000000000000000000000000000000000000000000000000000000 == Mask(32, 224, interfaceId):
+      return True
+  if 0x5b5e139f00000000000000000000000000000000000000000000000000000000 == Mask(32, 224, interfaceId):
+      return True
+  return (Mask(32, 224, interfaceId) == 0x1ffc9a700000000000000000000000000000000000000000000000000000000)
+
+def renounceRole(bytes32 role, address account): # not payable
+  require calldata.size - 4 >=′ 64
+  require account == account
+  if account != caller:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'AccessControl: can only renounce roles for self'
+  if roleAdmin[role][address(account)].field_0:
+      roleAdmin[role][address(account)].field_0 = 0
+      log RoleRevoked(
+            bytes32 role=role,
+            address account=account,
+            address sender=caller)
+
+def royaltyInfo(uint256 _tokenId, uint256 _salePrice): # not payable
+  require calldata.size - 4 >=′ 64
+  if stor9[_tokenId].field_0:
+      if _salePrice and stor9[_tokenId].field_160 > -1 / _salePrice:
+          revert with 0, 17
+      return stor9[_tokenId].field_0, _salePrice * stor9[_tokenId].field_160 / 10000
+  if _salePrice and Mask(96, 0, stor8.field_160) > -1 / _salePrice:
+      revert with 0, 17
+  return address(stor8.field_0), _salePrice * Mask(96, 0, stor8.field_160) / 10000
+
+def deleteDefaultRoyalty(): # not payable
+  if roleAdmin[0xd8acb51ff3d48f690a25887aaf234c4ae5a66ab9839243cd8e2b639cade0663b][caller].field_0:
+      uint256(stor8.field_0) = 0
+      stop
+  mem[128 len 42] = call.data[calldata.size len 42]
+  idx = 41
+  s = caller
+  while idx > 1:
+      if s % 16 >= 16:
+          revert with 0, 50
+      if idx >= 42:
+          revert with 0, 50
+      mem[idx + 128 len 8] = Mask(8, -(0, 0) + 256, 0) << (0, 0) - 256
+      if not idx:
+          revert with 0, 17
+      idx = idx - 1
+      s = Mask(252, 0, s) * 0.0625
+      continue 
+  if caller + 10240:
+      revert with 0, 'Strings: hex length insufficient'
+  mem[224 len 66] = call.data[calldata.size len 66]
+  idx = 65
+  s = 0xd8acb51ff3d48f690a25887aaf234c4ae5a66ab9839243cd8e2b639cade0663b
+  while idx > 1:
+      if s % 16 >= 16:
+          revert with 0, 50
+      if idx >= 66:
+          revert with 0, 50
+      mem[idx + 224 len 8] = Mask(8, -(0, 0) + 256, 0) << (0, 0) - 256
+      if not idx:
+          revert with 0, 17
+      idx = idx - 1
+      s = Mask(252, 0, s) * 0.0625
+      continue 
+  revert with 0, 32, 148, 'AccessControl: account ', mem[160 len 42], ' is missing role ', mem[288 len 66], 0, 0 >> 928, 0
+
+def resetTokenRoyalty(uint256 tokenId): # not payable
+  require calldata.size - 4 >=′ 32
+  if roleAdmin[0xd8acb51ff3d48f690a25887aaf234c4ae5a66ab9839243cd8e2b639cade0663b][caller].field_0:
+      stor9[tokenId].field_0 = 0
+      stop
+  mem[128 len 42] = call.data[calldata.size len 42]
+  idx = 41
+  s = caller
+  while idx > 1:
+      if s % 16 >= 16:
+          revert with 0, 50
+      if idx >= 42:
+          revert with 0, 50
+      mem[idx + 128 len 8] = Mask(8, -(0, 0) + 256, 0) << (0, 0) - 256
+      if not idx:
+          revert with 0, 17
+      idx = idx - 1
+      s = Mask(252, 0, s) * 0.0625
+      continue 
+  if caller + 10240:
+      revert with 0, 'Strings: hex length insufficient'
+  mem[224 len 66] = call.data[calldata.size len 66]
+  idx = 65
+  s = 0xd8acb51ff3d48f690a25887aaf234c4ae5a66ab9839243cd8e2b639cade0663b
+  while idx > 1:
+      if s % 16 >= 16:
+          revert with 0, 50
+      if idx >= 66:
+          revert with 0, 50
+      mem[idx + 224 len 8] = Mask(8, -(0, 0) + 256, 0) << (0, 0) - 256
+      if not idx:
+          revert with 0, 17
+      idx = idx - 1
+      s = Mask(252, 0, s) * 0.0625
+      continue 
+  revert with 0, 32, 148, 'AccessControl: account ', mem[160 len 42], ' is missing role ', mem[288 len 66], 0, 0 >> 928, 0
+
+def setMinimumContribution(uint256 minimumContribution): # not payable
+  require calldata.size - 4 >=′ 32
+  if roleAdmin[0xd8acb51ff3d48f690a25887aaf234c4ae5a66ab9839243cd8e2b639cade0663b][caller].field_0:
+      minimumContribution = minimumContribution
+      stop
+  mem[128 len 42] = call.data[calldata.size len 42]
+  idx = 41
+  s = caller
+  while idx > 1:
+      if s % 16 >= 16:
+          revert with 0, 50
+      if idx >= 42:
+          revert with 0, 50
+      mem[idx + 128 len 8] = Mask(8, -(0, 0) + 256, 0) << (0, 0) - 256
+      if not idx:
+          revert with 0, 17
+      idx = idx - 1
+      s = Mask(252, 0, s) * 0.0625
+      continue 
+  if caller + 10240:
+      revert with 0, 'Strings: hex length insufficient'
+  mem[224 len 66] = call.data[calldata.size len 66]
+  idx = 65
+  s = 0xd8acb51ff3d48f690a25887aaf234c4ae5a66ab9839243cd8e2b639cade0663b
+  while idx > 1:
+      if s % 16 >= 16:
+          revert with 0, 50
+      if idx >= 66:
+          revert with 0, 50
+      mem[idx + 224 len 8] = Mask(8, -(0, 0) + 256, 0) << (0, 0) - 256
+      if not idx:
+          revert with 0, 17
+      idx = idx - 1
+      s = Mask(252, 0, s) * 0.0625
+      continue 
+  revert with 0, 32, 148, 'AccessControl: account ', mem[160 len 42], ' is missing role ', mem[288 len 66], 0, 0 >> 928, 0
+
+def setPrice(uint256 _price): # not payable
+  require calldata.size - 4 >=′ 32
+  if roleAdmin[0xd8acb51ff3d48f690a25887aaf234c4ae5a66ab9839243cd8e2b639cade0663b][caller].field_0:
+      if auctionActive:
+          revert with 0, 'Users can still add bids'
+      price = _price
+      stop
+  mem[128 len 42] = call.data[calldata.size len 42]
+  idx = 41
+  s = caller
+  while idx > 1:
+      if s % 16 >= 16:
+          revert with 0, 50
+      if idx >= 42:
+          revert with 0, 50
+      mem[idx + 128 len 8] = Mask(8, -(0, 0) + 256, 0) << (0, 0) - 256
+      if not idx:
+          revert with 0, 17
+      idx = idx - 1
+      s = Mask(252, 0, s) * 0.0625
+      continue 
+  if caller + 10240:
+      revert with 0, 'Strings: hex length insufficient'
+  mem[224 len 66] = call.data[calldata.size len 66]
+  idx = 65
+  s = 0xd8acb51ff3d48f690a25887aaf234c4ae5a66ab9839243cd8e2b639cade0663b
+  while idx > 1:
+      if s % 16 >= 16:
+          revert with 0, 50
+      if idx >= 66:
+          revert with 0, 50
+      mem[idx + 224 len 8] = Mask(8, -(0, 0) + 256, 0) << (0, 0) - 256
+      if not idx:
+          revert with 0, 17
+      idx = idx - 1
+      s = Mask(252, 0, s) * 0.0625
+      continue 
+  revert with 0, 32, 148, 'AccessControl: account ', mem[160 len 42], ' is missing role ', mem[288 len 66], 0, 0 >> 928, 0
+
+def setAuctionActive(bool _b): # not payable
+  require calldata.size - 4 >=′ 32
+  require _b == _b
+  if roleAdmin[0xd8acb51ff3d48f690a25887aaf234c4ae5a66ab9839243cd8e2b639cade0663b][caller].field_0:
+      if price:
+          revert with 0, 'Price has been set'
+      auctionActive = uint8(_b)
+      stop
+  mem[128 len 42] = call.data[calldata.size len 42]
+  idx = 41
+  s = caller
+  while idx > 1:
+      if s % 16 >= 16:
+          revert with 0, 50
+      if idx >= 42:
+          revert with 0, 50
+      mem[idx + 128 len 8] = Mask(8, -(0, 0) + 256, 0) << (0, 0) - 256
+      if not idx:
+          revert with 0, 17
+      idx = idx - 1
+      s = Mask(252, 0, s) * 0.0625
+      continue 
+  if caller + 10240:
+      revert with 0, 'Strings: hex length insufficient'
+  mem[224 len 66] = call.data[calldata.size len 66]
+  idx = 65
+  s = 0xd8acb51ff3d48f690a25887aaf234c4ae5a66ab9839243cd8e2b639cade0663b
+  while idx > 1:
+      if s % 16 >= 16:
+          revert with 0, 50
+      if idx >= 66:
+          revert with 0, 50
+      mem[idx + 224 len 8] = Mask(8, -(0, 0) + 256, 0) << (0, 0) - 256
+      if not idx:
+          revert with 0, 17
+      idx = idx - 1
+      s = Mask(252, 0, s) * 0.0625
+      continue 
+  revert with 0, 32, 148, 'AccessControl: account ', mem[160 len 42], ' is missing role ', mem[288 len 66], 0, 0 >> 928, 0
+
+def ownerOf(uint256 tokenId): # not payable
+  require calldata.size - 4 >=′ 32
+  mem[96] = 0
+  mem[128] = 0
+  mem[160] = 0
+  if tokenId >= stor0:
+      revert with OwnerQueryForNonexistentToken()
+  mem[192] = stor4[tokenId].field_0
+  mem[224] = stor4[tokenId].field_160
+  mem[256] = bool(stor4[tokenId].field_224)
+  if stor4[tokenId].field_224:
+      revert with OwnerQueryForNonexistentToken()
+  if stor4[tokenId].field_0:
+      return stor4[tokenId].field_0
+  mem[64] = 384
+  mem[288] = stor4[tokenId - 1].field_0
+  mem[320] = stor4[tokenId - 1].field_160
+  mem[352] = bool(stor4[tokenId - 1].field_224)
+  s = 192
+  s = tokenId
+  while not stor4[tokenId - 1].field_0:
+      mem[0] = s - 2
+      mem[32] = 4
+      mem[64] = mem[64] + 96
+      mem[288] = stor4[s - 2].field_0
+      mem[320] = stor4[tokenId - 1].field_160
+      mem[352] = bool(stor4[tokenId - 1].field_224)
+      s = 288
+      s = s - 1
+      continue 
+  mem[mem[64]] = mem[300 len 20]
+  return memory
+    from mem[64]
+     len 32
+
+def setDefaultRoyalty(address receiver, uint96 feeNumerator): # not payable
+  require calldata.size - 4 >=′ 64
+  require receiver == receiver
+  require feeNumerator == Mask(96, 0, feeNumerator)
+  if roleAdmin[0xd8acb51ff3d48f690a25887aaf234c4ae5a66ab9839243cd8e2b639cade0663b][caller].field_0:
+      if Mask(96, 0, feeNumerator) > 10000:
+          revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC2981: royalty fee will exceed salePrice'
+      if not receiver:
+          revert with 0, 'ERC2981: invalid receiver'
+      address(stor8.field_0) = receiver
+      Mask(96, 0, stor8.field_160) = Mask(96, 0, feeNumerator)
+      stop
+  mem[128 len 42] = call.data[calldata.size len 42]
+  idx = 41
+  s = caller
+  while idx > 1:
+      if s % 16 >= 16:
+          revert with 0, 50
+      if idx >= 42:
+          revert with 0, 50
+      mem[idx + 128 len 8] = Mask(8, -(0, 0) + 256, 0) << (0, 0) - 256
+      if not idx:
+          revert with 0, 17
+      idx = idx - 1
+      s = Mask(252, 0, s) * 0.0625
+      continue 
+  if caller + 10240:
+      revert with 0, 'Strings: hex length insufficient'
+  mem[224 len 66] = call.data[calldata.size len 66]
+  idx = 65
+  s = 0xd8acb51ff3d48f690a25887aaf234c4ae5a66ab9839243cd8e2b639cade0663b
+  while idx > 1:
+      if s % 16 >= 16:
+          revert with 0, 50
+      if idx >= 66:
+          revert with 0, 50
+      mem[idx + 224 len 8] = Mask(8, -(0, 0) + 256, 0) << (0, 0) - 256
+      if not idx:
+          revert with 0, 17
+      idx = idx - 1
+      s = Mask(252, 0, s) * 0.0625
+      continue 
+  revert with 0, 32, 148, 'AccessControl: account ', mem[160 len 42], ' is missing role ', mem[288 len 66], 0, 0 >> 928, 0
+
+def setTokenRoyalty(uint256 tokenId, address receiver, uint96 feeNumerator): # not payable
+  require calldata.size - 4 >=′ 96
+  require receiver == receiver
+  require feeNumerator == Mask(96, 0, feeNumerator)
+  if roleAdmin[0xd8acb51ff3d48f690a25887aaf234c4ae5a66ab9839243cd8e2b639cade0663b][caller].field_0:
+      if Mask(96, 0, feeNumerator) > 10000:
+          revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC2981: royalty fee will exceed salePrice'
+      if not receiver:
+          revert with 0, 'ERC2981: Invalid parameters'
+      stor9[tokenId].field_0 = receiver
+      stor9[tokenId].field_160 = Mask(96, 0, feeNumerator)
+      stop
+  mem[128 len 42] = call.data[calldata.size len 42]
+  idx = 41
+  s = caller
+  while idx > 1:
+      if s % 16 >= 16:
+          revert with 0, 50
+      if idx >= 42:
+          revert with 0, 50
+      mem[idx + 128 len 8] = Mask(8, -(0, 0) + 256, 0) << (0, 0) - 256
+      if not idx:
+          revert with 0, 17
+      idx = idx - 1
+      s = Mask(252, 0, s) * 0.0625
+      continue 
+  if caller + 10240:
+      revert with 0, 'Strings: hex length insufficient'
+  mem[224 len 66] = call.data[calldata.size len 66]
+  idx = 65
+  s = 0xd8acb51ff3d48f690a25887aaf234c4ae5a66ab9839243cd8e2b639cade0663b
+  while idx > 1:
+      if s % 16 >= 16:
+          revert with 0, 50
+      if idx >= 66:
+          revert with 0, 50
+      mem[idx + 224 len 8] = Mask(8, -(0, 0) + 256, 0) << (0, 0) - 256
+      if not idx:
+          revert with 0, 17
+      idx = idx - 1
+      s = Mask(252, 0, s) * 0.0625
+      continue 
+  revert with 0, 32, 148, 'AccessControl: account ', mem[160 len 42], ' is missing role ', mem[288 len 66], 0, 0 >> 928, 0
+
+def revokeRole(bytes32 role, address account): # not payable
+  require calldata.size - 4 >=′ 64
+  require account == account
+  if roleAdmin[roleAdmin[role].field_256][caller].field_0:
+      if roleAdmin[role][address(account)].field_0:
+          roleAdmin[role][address(account)].field_0 = 0
+          log RoleRevoked(
+                bytes32 role=role,
+                address account=account,
+                address sender=caller)
+      stop
+  mem[128 len 42] = call.data[calldata.size len 42]
+  idx = 41
+  s = caller
+  while idx > 1:
+      if s % 16 >= 16:
+          revert with 0, 50
+      if idx >= 42:
+          revert with 0, 50
+      mem[idx + 128 len 8] = Mask(8, -(0, 0) + 256, 0) << (0, 0) - 256
+      if not idx:
+          revert with 0, 17
+      idx = idx - 1
+      s = Mask(252, 0, s) * 0.0625
+      continue 
+  if caller + 10240:
+      revert with 0, 'Strings: hex length insufficient'
+  mem[224 len 66] = call.data[calldata.size len 66]
+  idx = 65
+  s = roleAdmin[role].field_256
+  while idx > 1:
+      if s % 16 >= 16:
+          revert with 0, 50
+      if idx >= 66:
+          revert with 0, 50
+      mem[idx + 224 len 8] = Mask(8, -(0, 0) + 256, 0) << (0, 0) - 256
+      if not idx:
+          revert with 0, 17
+      idx = idx - 1
+      s = Mask(252, 0, s) * 0.0625
+      continue 
+  if roleAdmin[role].field_256 + 16384:
+      revert with 0, 'Strings: hex length insufficient'
+  revert with 0, 32, 148, 'AccessControl: account ', mem[160 len 42], ' is missing role ', mem[288 len 66], 0, 0 >> 928, 0
+
+def grantRole(bytes32 role, address account): # not payable
+  require calldata.size - 4 >=′ 64
+  require account == account
+  if roleAdmin[roleAdmin[role].field_256][caller].field_0:
+      if not roleAdmin[role][address(account)].field_0:
+          roleAdmin[role][address(account)].field_0 = 1
+          log RoleGranted(
+                bytes32 role=role,
+                address account=account,
+                address sender=caller)
+      stop
+  mem[128 len 42] = call.data[calldata.size len 42]
+  idx = 41
+  s = caller
+  while idx > 1:
+      if s % 16 >= 16:
+          revert with 0, 50
+      if idx >= 42:
+          revert with 0, 50
+      mem[idx + 128 len 8] = Mask(8, -(0, 0) + 256, 0) << (0, 0) - 256
+      if not idx:
+          revert with 0, 17
+      idx = idx - 1
+      s = Mask(252, 0, s) * 0.0625
+      continue 
+  if caller + 10240:
+      revert with 0, 'Strings: hex length insufficient'
+  mem[224 len 66] = call.data[calldata.size len 66]
+  idx = 65
+  s = roleAdmin[role].field_256
+  while idx > 1:
+      if s % 16 >= 16:
+          revert with 0, 50
+      if idx >= 66:
+          revert with 0, 50
+      mem[idx + 224 len 8] = Mask(8, -(0, 0) + 256, 0) << (0, 0) - 256
+      if not idx:
+          revert with 0, 17
+      idx = idx - 1
+      s = Mask(252, 0, s) * 0.0625
+      continue 
+  if roleAdmin[role].field_256 + 16384:
+      revert with 0, 'Strings: hex length insufficient'
+  revert with 0, 32, 148, 'AccessControl: account ', mem[160 len 42], ' is missing role ', mem[288 len 66], 0, 0 >> 928, 0
+
+def approve(address spender, uint256 amount): # not payable
+  require calldata.size - 4 >=′ 64
+  require spender == spender
+  if amount >= stor0:
+      revert with OwnerQueryForNonexistentToken()
+  if stor4[amount].field_224:
+      revert with OwnerQueryForNonexistentToken()
+  if stor4[amount].field_0:
+      if spender == stor4[amount].field_0:
+          revert with ApprovalToCurrentOwner()
+      if stor4[amount].field_0 != caller:
+          if not stor7[stor4[amount].field_0][caller]:
+              revert with ApprovalCallerNotOwnerNorApproved()
+      approved[amount] = spender
+      log Approval(
+            address owner=stor4[amount].field_0,
+            address spender=spender,
+            uint256 value=amount)
+  else:
+      mem[64] = 384
+      mem[288] = stor4[amount - 1].field_0
+      s = 192
+      s = amount
+      while not stor4[amount - 1].field_0:
+          mem[0] = s - 2
+          mem[32] = 4
+          mem[64] = mem[64] + 96
+          mem[288] = stor4[s - 2].field_0
+          mem[320] = stor4[amount - 1].field_160
+          mem[352] = bool(stor4[amount - 1].field_224)
+          s = 288
+          s = s - 1
+          continue 
+      if spender == mem[300 len 20]:
+          revert with ApprovalToCurrentOwner()
+      if mem[300 len 20] != caller:
+          if not stor7[mem[300 len 20]][caller]:
+              revert with ApprovalCallerNotOwnerNorApproved()
+      approved[amount] = spender
+      log Approval(
+            address owner=mem[300 len 20],
+            address spender=spender,
+            uint256 value=amount)
+
+def sendRefund(address to): # not payable
+  require calldata.size - 4 >=′ 32
+  require to == to
+  if not roleAdmin[0xaa4e0f6cdcea7b211950e8a75e39146abfef1b33054a194490366571502a5e48][caller].field_0:
+      mem[128 len 42] = call.data[calldata.size len 42]
+      idx = 41
+      s = caller
+      while idx > 1:
+          if s % 16 >= 16:
+              revert with 0, 50
+          if idx >= 42:
+              revert with 0, 50
+          mem[idx + 128 len 8] = Mask(8, -(0, 0) + 256, 0) << (0, 0) - 256
+          if not idx:
+              revert with 0, 17
+          idx = idx - 1
+          s = Mask(252, 0, s) * 0.0625
+          continue 
+      if caller + 10240:
+          revert with 0, 'Strings: hex length insufficient'
+      mem[224 len 66] = call.data[calldata.size len 66]
+      idx = 65
+      s = 0xaa4e0f6cdcea7b211950e8a75e39146abfef1b33054a194490366571502a5e48
+      while idx > 1:
+          if s % 16 >= 16:
+              revert with 0, 50
+          if idx >= 66:
+              revert with 0, 50
+          mem[idx + 224 len 8] = Mask(8, -(0, 0) + 256, 0) << (0, 0) - 256
+          if not idx:
+              revert with 0, 17
+          idx = idx - 1
+          s = Mask(252, 0, s) * 0.0625
+          continue 
+      revert with 0, 32, 148, 'AccessControl: account ', mem[160 len 42], ' is missing role ', mem[288 len 66], 0, 0 >> 928, 0
+  if stor10 == 2:
+      revert with 0, 'ReentrancyGuard: reentrant call'
+  stor10 = 2
+  if not price:
+      revert with 0, 'Price has not been set'
+  if userData[address(to)].field_248:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'Address has already claimed their refund.'
+  userData[address(to)].field_248 = 1
+  if not price:
+      revert with 0, 18
+  call to with:
+     value userData[address(to)].field_0 % price wei
+       gas gas_remaining wei
+  if not ext_call.success:
+      revert with 0, 'Refund failed.'
+  stor10 = 1
+
+def reserve(uint256 n): # not payable
+  require calldata.size - 4 >=′ 32
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  if stor0 > !n:
+      revert with 0, 17
+  if stor0 + n > 24000:
+      revert with 0, 'Number would exceed max supply'
+  mem[64] = 128
+  mem[96] = 0
+  if not caller:
+      revert with MintToZeroAddress()
+  if not n:
+      revert with MintZeroQuantity()
+  balanceOf[caller].field_0 = uint64(n + balanceOf[caller].field_0)
+  balanceOf[caller].field_64 = uint64(n + balanceOf[caller].field_64)
+  mem[0] = stor0
+  mem[32] = 4
+  stor4[stor0].field_0 = caller
+  stor4[stor0].field_160 = uint64(block.timestamp)
+  log Transfer(
+        address from=0,
+        address to=caller,
+        uint256 value=stor0)
+  if not ext_code.size(caller):
+      idx = stor0
+      while idx + 1 != n + stor0:
+          log Transfer(
+                address from=0,
+                address to=caller,
+                uint256 value=idx + 1)
+          idx = idx + 1
+          continue 
+      stor0 = None + 3
+      stop
+  mem[128] = 0x150b7a0200000000000000000000000000000000000000000000000000000000
+  mem[var47001] = caller
+  mem[var47001 + 32] = 0
+  mem[var47001 + 64] = var47003
+  mem[var47001 + 96] = 128
+  mem[var49002] = 0
+  if var31001 < var51003:
+      mem[var31001 + var51002] = mem[var31001 + 128]
+      var31001 = var31001 + 32
+      continue 
+  if var31001 > var51003:
+      mem[var51003 + var51002] = 0
+  require ext_code.size(caller)
+  call caller.onERC721Received(address , address , uint256 , bytes ) with:
+       gas gas_remaining wei
+      args mem[132 len ceil32(var51005) + var51008 - 100]
+  mem[128] = ext_call.return_data[0]
+  if not ext_call.success:
+      if not return_data.size:
+          revert with TransferToNonERC721ReceiverImplementer()
+      if not return_data.size:
+          revert with TransferToNonERC721ReceiverImplementer()
+      revert with ext_call.return_data[0 len return_data.size]
+  mem[64] = ceil32(return_data.size) + 128
+  require return_data.size >=′ 32
+  require ext_call.return_data[0] == Mask(32, 224, ext_call.return_data[0])
+  if Mask(32, 224, ext_call.return_data[0]) != 0x150b7a0200000000000000000000000000000000000000000000000000000000:
+      revert with TransferToNonERC721ReceiverImplementer()
+  if var51026 == n + stor0:
+      require stor0 == stor0
+      stor0 = var51026
+      stop
+  log Transfer(
+        address from=0,
+        address to=caller,
+        uint256 value=var51026)
+  mem[ceil32(return_data.size) + 128] = 0x150b7a0200000000000000000000000000000000000000000000000000000000
+  mem[ceil32(return_data.size) + 132] = caller
+  mem[ceil32(return_data.size) + 164] = 0
+  mem[ceil32(return_data.size) + 196] = var51026
+  mem[ceil32(return_data.size) + 228] = 128
+  mem[ceil32(return_data.size) + 260] = 0
+  var31001 = 0
+  continue 
+
+def setBaseURI(string baseURI): # not payable
+  require calldata.size - 4 >=′ 32
+  require baseURI <= LOCK8605463013()
+  require calldata.size >′ baseURI + 35
+  if baseURI.length > LOCK8605463013():
+      revert with 0, 65
+  if ceil32(ceil32(baseURI.length)) + 97 < 96 or ceil32(ceil32(baseURI.length)) + 97 > LOCK8605463013():
+      revert with 0, 65
+  require baseURI + baseURI.length + 36 <= calldata.size
+  if roleAdmin[0xd8acb51ff3d48f690a25887aaf234c4ae5a66ab9839243cd8e2b639cade0663b][caller].field_0:
+      if bool(stor15.length):
+          if bool(stor15.length) == uint255(stor15.length) * 0.5 < 32:
+              revert with 0, 34
+          if baseURI.length:
+              stor15[].field_0 = Array(len=baseURI.length, data=baseURI[all])
+          else:
+              stor15.length = 0
+              idx = 0
+              while (uint255(stor15.length) * 0.5) + 31 / 32 > idx:
+                  stor15[idx].field_0 = 0
+                  idx = idx + 1
+                  continue 
+      else:
+          if bool(stor15.length) == stor15.length.field_1 < 32:
+              revert with 0, 34
+          if baseURI.length:
+              stor15[].field_0 = Array(len=baseURI.length, data=baseURI[all])
+          else:
+              stor15.length = 0
+              idx = 0
+              while stor15.length.field_1 + 31 / 32 > idx:
+                  stor15[idx].field_0 = 0
+                  idx = idx + 1
+                  continue 
+      stop
+  mem[ceil32(ceil32(baseURI.length)) + 129 len 42] = call.data[calldata.size len 42]
+  idx = 41
+  s = caller
+  while idx > 1:
+      if s % 16 >= 16:
+          revert with 0, 50
+      if idx >= 42:
+          revert with 0, 50
+      mem[idx + ceil32(ceil32(baseURI.length)) + 129 len 8] = Mask(8, -(0, 0) + 256, 0) << (0, 0) - 256
+      if not idx:
+          revert with 0, 17
+      idx = idx - 1
+      s = Mask(252, 0, s) * 0.0625
+      continue 
+  if caller + 10240:
+      revert with 0, 'Strings: hex length insufficient'
+  mem[ceil32(ceil32(baseURI.length)) + 225 len 66] = call.data[calldata.size len 66]
+  idx = 65
+  s = 0xd8acb51ff3d48f690a25887aaf234c4ae5a66ab9839243cd8e2b639cade0663b
+  while idx > 1:
+      if s % 16 >= 16:
+          revert with 0, 50
+      if idx >= 66:
+          revert with 0, 50
+      mem[idx + ceil32(ceil32(baseURI.length)) + 225 len 8] = Mask(8, -(0, 0) + 256, 0) << (0, 0) - 256
+      if not idx:
+          revert with 0, 17
+      idx = idx - 1
+      s = Mask(252, 0, s) * 0.0625
+      continue 
+  revert with 0, 
+              32,
+              148,
+              'AccessControl: account ', mem[ceil32(ceil32(baseURI.length)) + 161 len 42], ' is missing role ', mem[ceil32(ceil32(baseURI.length)) + 289 len 66], 0, 0 >> 928,
+              0
+
+def setProvenance(string provenance): # not payable
+  require calldata.size - 4 >=′ 32
+  require provenance <= LOCK8605463013()
+  require calldata.size >′ provenance + 35
+  if provenance.length > LOCK8605463013():
+      revert with 0, 65
+  if ceil32(ceil32(provenance.length)) + 97 < 96 or ceil32(ceil32(provenance.length)) + 97 > LOCK8605463013():
+      revert with 0, 65
+  require provenance + provenance.length + 36 <= calldata.size
+  if roleAdmin[0xd8acb51ff3d48f690a25887aaf234c4ae5a66ab9839243cd8e2b639cade0663b][caller].field_0:
+      if bool(stor14.length):
+          if bool(stor14.length) == uint255(stor14.length) * 0.5 < 32:
+              revert with 0, 34
+          if provenance.length:
+              stor14[].field_0 = Array(len=provenance.length, data=provenance[all])
+          else:
+              stor14.length = 0
+              idx = 0
+              while (uint255(stor14.length) * 0.5) + 31 / 32 > idx:
+                  stor14[idx].field_0 = 0
+                  idx = idx + 1
+                  continue 
+      else:
+          if bool(stor14.length) == stor14.length.field_1 < 32:
+              revert with 0, 34
+          if provenance.length:
+              stor14[].field_0 = Array(len=provenance.length, data=provenance[all])
+          else:
+              stor14.length = 0
+              idx = 0
+              while stor14.length.field_1 + 31 / 32 > idx:
+                  stor14[idx].field_0 = 0
+                  idx = idx + 1
+                  continue 
+      stop
+  mem[ceil32(ceil32(provenance.length)) + 129 len 42] = call.data[calldata.size len 42]
+  idx = 41
+  s = caller
+  while idx > 1:
+      if s % 16 >= 16:
+          revert with 0, 50
+      if idx >= 42:
+          revert with 0, 50
+      mem[idx + ceil32(ceil32(provenance.length)) + 129 len 8] = Mask(8, -(0, 0) + 256, 0) << (0, 0) - 256
+      if not idx:
+          revert with 0, 17
+      idx = idx - 1
+      s = Mask(252, 0, s) * 0.0625
+      continue 
+  if caller + 10240:
+      revert with 0, 'Strings: hex length insufficient'
+  mem[ceil32(ceil32(provenance.length)) + 225 len 66] = call.data[calldata.size len 66]
+  idx = 65
+  s = 0xd8acb51ff3d48f690a25887aaf234c4ae5a66ab9839243cd8e2b639cade0663b
+  while idx > 1:
+      if s % 16 >= 16:
+          revert with 0, 50
+      if idx >= 66:
+          revert with 0, 50
+      mem[idx + ceil32(ceil32(provenance.length)) + 225 len 8] = Mask(8, -(0, 0) + 256, 0) << (0, 0) - 256
+      if not idx:
+          revert with 0, 17
+      idx = idx - 1
+      s = Mask(252, 0, s) * 0.0625
+      continue 
+  revert with 0, 
+              32,
+              148,
+              'AccessControl: account ', mem[ceil32(ceil32(provenance.length)) + 161 len 42], ' is missing role ', mem[ceil32(ceil32(provenance.length)) + 289 len 66], 0, 0 >> 928,
+              0
+
+def transferFrom(address sender, address recipient, uint256 amount): # not payable
+  require calldata.size - 4 >=′ 96
+  require sender == sender
+  require recipient == recipient
+  if amount >= stor0:
+      revert with OwnerQueryForNonexistentToken()
+  if stor4[amount].field_224:
+      revert with OwnerQueryForNonexistentToken()
+  if stor4[amount].field_0:
+      if stor4[amount].field_0 != sender:
+          revert with TransferFromIncorrectOwner()
+      if sender != caller:
+          if not stor7[address(sender)][caller]:
+              if amount >= stor0:
+                  revert with ApprovalQueryForNonexistentToken()
+              if stor4[amount].field_224:
+                  revert with ApprovalQueryForNonexistentToken()
+              if approved[amount] != caller:
+                  revert with TransferCallerNotOwnerNorApproved()
+      if not recipient:
+          revert with TransferToZeroAddress()
+      approved[amount] = 0
+      log Approval(
+            address owner=sender,
+            address spender=0,
+            uint256 value=amount)
+      balanceOf[address(sender)].field_0 = uint64(balanceOf[address(sender)].field_0 - 1)
+      balanceOf[recipient].field_0 = uint64(balanceOf[recipient].field_0 + 1)
+      stor4[amount].field_0 = recipient
+      stor4[amount].field_160 = uint64(block.timestamp)
+      if not stor4[amount + 1].field_0:
+          if amount + 1 != stor0:
+              stor4[amount + 1].field_0 = sender
+              stor4[amount + 1].field_160 = stor4[amount].field_160
+  else:
+      mem[64] = 384
+      mem[288] = stor4[amount - 1].field_0
+      mem[320] = stor4[amount - 1].field_160
+      s = 192
+      s = amount
+      while not stor4[amount - 1].field_0:
+          mem[0] = s - 2
+          mem[32] = 4
+          mem[64] = mem[64] + 96
+          mem[288] = stor4[s - 2].field_0
+          mem[320] = stor4[amount - 1].field_160
+          mem[352] = bool(stor4[amount - 1].field_224)
+          s = 288
+          s = s - 1
+          continue 
+      if mem[300 len 20] != sender:
+          revert with TransferFromIncorrectOwner()
+      if sender != caller:
+          if not stor7[address(sender)][caller]:
+              if amount >= stor0:
+                  revert with ApprovalQueryForNonexistentToken()
+              if stor4[amount].field_224:
+                  revert with ApprovalQueryForNonexistentToken()
+              if approved[amount] != caller:
+                  revert with TransferCallerNotOwnerNorApproved()
+      if not recipient:
+          revert with TransferToZeroAddress()
+      approved[amount] = 0
+      log Approval(
+            address owner=sender,
+            address spender=0,
+            uint256 value=amount)
+      balanceOf[address(sender)].field_0 = uint64(balanceOf[address(sender)].field_0 - 1)
+      balanceOf[recipient].field_0 = uint64(balanceOf[recipient].field_0 + 1)
+      stor4[amount].field_0 = recipient
+      stor4[amount].field_160 = uint64(block.timestamp)
+      if not stor4[amount + 1].field_0:
+          if amount + 1 != stor0:
+              stor4[amount + 1].field_0 = sender
+              stor4[amount + 1].field_160 = mem[344 len 8]
+  log Transfer(
+        address from=sender,
+        address to=recipient,
+        uint256 value=amount)
+
+def burn(uint256 _value): # not payable
+  require calldata.size - 4 >=′ 32
+  if _value >= stor0:
+      revert with OwnerQueryForNonexistentToken()
+  if stor4[_value].field_224:
+      revert with OwnerQueryForNonexistentToken()
+  if stor4[_value].field_0:
+      if stor4[_value].field_0 != caller:
+          if not stor7[stor4[_value].field_0][caller]:
+              if _value >= stor0:
+                  revert with ApprovalQueryForNonexistentToken()
+              if stor4[_value].field_224:
+                  revert with ApprovalQueryForNonexistentToken()
+              if approved[_value] != caller:
+                  revert with TransferCallerNotOwnerNorApproved()
+      approved[_value] = 0
+      log Approval(
+            address owner=stor4[_value].field_0,
+            address spender=0,
+            uint256 value=_value)
+      balanceOf[stor4[_value].field_0].field_0 = 0xffffffffffffffff0000000000000000ffffffffffffffff0000000000000000 and balanceOf[stor4[_value].field_0].field_0 or uint64(balanceOf[stor4[_value].field_0].field_0 - 1) or uint64(balanceOf[stor4[_value].field_0].field_128 + 1) << 128
+      stor4[_value].field_0 = stor4[_value].field_0
+      stor4[_value].field_160 = uint64(block.timestamp)
+      stor4[_value].field_224 = 1
+      if not stor4[_value + 1].field_0:
+          if _value + 1 != stor0:
+              stor4[_value + 1].field_0 = stor4[_value].field_0
+              stor4[_value + 1].field_160 = stor4[_value].field_160
+      log Transfer(
+            address from=stor4[_value].field_0,
+            address to=0,
+            uint256 value=_value)
+  else:
+      mem[64] = 384
+      mem[288] = stor4[_value - 1].field_0
+      mem[320] = stor4[_value - 1].field_160
+      s = 192
+      s = _value
+      while not stor4[_value - 1].field_0:
+          mem[0] = s - 2
+          mem[32] = 4
+          mem[64] = mem[64] + 96
+          mem[288] = stor4[s - 2].field_0
+          mem[320] = stor4[_value - 1].field_160
+          mem[352] = bool(stor4[_value - 1].field_224)
+          s = 288
+          s = s - 1
+          continue 
+      if mem[300 len 20] != caller:
+          if not stor7[mem[300 len 20]][caller]:
+              if _value >= stor0:
+                  revert with ApprovalQueryForNonexistentToken()
+              if stor4[_value].field_224:
+                  revert with ApprovalQueryForNonexistentToken()
+              if approved[_value] != caller:
+                  revert with TransferCallerNotOwnerNorApproved()
+      approved[_value] = 0
+      log Approval(
+            address owner=mem[300 len 20],
+            address spender=0,
+            uint256 value=_value)
+      balanceOf[address(mem[288])].field_0 = 0xffffffffffffffff0000000000000000ffffffffffffffff0000000000000000 and balanceOf[address(mem[288])].field_0 or uint64(balanceOf[address(mem[288])].field_0 - 1) or uint64(balanceOf[address(mem[288])].field_128 + 1) << 128
+      stor4[_value].field_0 = mem[300 len 20]
+      stor4[_value].field_160 = uint64(block.timestamp)
+      stor4[_value].field_224 = 1
+      if not stor4[_value + 1].field_0:
+          if _value + 1 != stor0:
+              stor4[_value + 1].field_0 = mem[300 len 20]
+              stor4[_value + 1].field_160 = mem[344 len 8]
+      log Transfer(
+            address from=mem[300 len 20],
+            address to=0,
+            uint256 value=_value)
+  stor1++
+  stor9[_value].field_0 = 0
+
+def sendTokens(address _to, uint256 _amount): # not payable
+  require calldata.size - 4 >=′ 64
+  require _to == _to
+  if not roleAdmin[0xaa4e0f6cdcea7b211950e8a75e39146abfef1b33054a194490366571502a5e48][caller].field_0:
+      mem[128 len 42] = call.data[calldata.size len 42]
+      idx = 41
+      s = caller
+      while idx > 1:
+          if s % 16 >= 16:
+              revert with 0, 50
+          if idx >= 42:
+              revert with 0, 50
+          mem[idx + 128 len 8] = Mask(8, -(0, 0) + 256, 0) << (0, 0) - 256
+          if not idx:
+              revert with 0, 17
+          idx = idx - 1
+          s = Mask(252, 0, s) * 0.0625
+          continue 
+      if caller + 10240:
+          revert with 0, 'Strings: hex length insufficient'
+      mem[224 len 66] = call.data[calldata.size len 66]
+      idx = 65
+      s = 0xaa4e0f6cdcea7b211950e8a75e39146abfef1b33054a194490366571502a5e48
+      while idx > 1:
+          if s % 16 >= 16:
+              revert with 0, 50
+          if idx >= 66:
+              revert with 0, 50
+          mem[idx + 224 len 8] = Mask(8, -(0, 0) + 256, 0) << (0, 0) - 256
+          if not idx:
+              revert with 0, 17
+          idx = idx - 1
+          s = Mask(252, 0, s) * 0.0625
+          continue 
+      revert with 0, 32, 148, 'AccessControl: account ', mem[160 len 42], ' is missing role ', mem[288 len 66], 0, 0 >> 928, 0
+  if not price:
+      revert with 0, 'Price has not been set'
+  if userData[address(_to)].field_216 > !_amount:
+      revert with 0, 17
+  if not price:
+      revert with 0, 18
+  if userData[address(_to)].field_216 + _amount > userData[address(_to)].field_0 / price:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'Trying to send more than they purchased.'
+  userData[address(_to)].field_216 = uint32(userData[address(_to)].field_216 + _amount)
+  if stor0 > !_amount:
+      revert with 0, 17
+  if stor0 + _amount > 24000:
+      revert with 0, 'Number would exceed max supply'
+  mem[64] = 128
+  mem[96] = 0
+  if not _to:
+      revert with MintToZeroAddress()
+  if not _amount:
+      revert with MintZeroQuantity()
+  balanceOf[address(_to)].field_0 = uint64(_amount + balanceOf[address(_to)].field_0)
+  balanceOf[address(_to)].field_64 = uint64(_amount + balanceOf[address(_to)].field_64)
+  mem[0] = stor0
+  mem[32] = 4
+  stor4[stor0].field_0 = _to
+  stor4[stor0].field_160 = uint64(block.timestamp)
+  log Transfer(
+        address from=0,
+        address to=_to,
+        uint256 value=stor0)
+  if not ext_code.size(_to):
+      idx = stor0
+      while idx + 1 != _amount + stor0:
+          log Transfer(
+                address from=0,
+                address to=_to,
+                uint256 value=idx + 1)
+          idx = idx + 1
+          continue 
+      stor0 = None + 3
+      stop
+  mem[128] = 0x150b7a0200000000000000000000000000000000000000000000000000000000
+  mem[var63001] = caller
+  mem[var63001 + 32] = 0
+  mem[var63001 + 64] = var63003
+  mem[var63001 + 96] = 128
+  mem[var65002] = 0
+  if var47001 < var67003:
+      mem[var47001 + var67002] = mem[var47001 + 128]
+      var47001 = var47001 + 32
+      continue 
+  if var47001 > var67003:
+      mem[var67003 + var67002] = 0
+  require ext_code.size(_to)
+  call _to.onERC721Received(address , address , uint256 , bytes ) with:
+       gas gas_remaining wei
+      args mem[132 len ceil32(var67005) + var67008 - 100]
+  mem[128] = ext_call.return_data[0]
+  if not ext_call.success:
+      if not return_data.size:
+          revert with TransferToNonERC721ReceiverImplementer()
+      if not return_data.size:
+          revert with TransferToNonERC721ReceiverImplementer()
+      revert with ext_call.return_data[0 len return_data.size]
+  mem[64] = ceil32(return_data.size) + 128
+  require return_data.size >=′ 32
+  require ext_call.return_data[0] == Mask(32, 224, ext_call.return_data[0])
+  if Mask(32, 224, ext_call.return_data[0]) != 0x150b7a0200000000000000000000000000000000000000000000000000000000:
+      revert with TransferToNonERC721ReceiverImplementer()
+  if var67026 == _amount + stor0:
+      require stor0 == stor0
+      stor0 = var67026
+      stop
+  log Transfer(
+        address from=0,
+        address to=_to,
+        uint256 value=var67026)
+  mem[ceil32(return_data.size) + 128] = 0x150b7a0200000000000000000000000000000000000000000000000000000000
+  mem[ceil32(return_data.size) + 132] = caller
+  mem[ceil32(return_data.size) + 164] = 0
+  mem[ceil32(return_data.size) + 196] = var67026
+  mem[ceil32(return_data.size) + 228] = 128
+  mem[ceil32(return_data.size) + 260] = 0
+  var47001 = 0
+  continue 
+
+def name(): # not payable
+  if bool(stor2.length):
+      if bool(stor2.length) == uint255(stor2.length) * 0.5 < 32:
+          revert with 0, 34
+      if bool(stor2.length):
+          if bool(stor2.length) == uint255(stor2.length) * 0.5 < 32:
+              revert with 0, 34
+          if Mask(256, -1, stor2.length):
+              if 31 < uint255(stor2.length) * 0.5:
+                  mem[128] = uint256(stor2.field_0)
+                  idx = 128
+                  s = 0
+                  while (uint255(stor2.length) * 0.5) + 96 > idx:
+                      mem[idx + 32] = stor2[s].field_256
+                      idx = idx + 32
+                      s = s + 1
+                      continue 
+                  return Array(len=2 * Mask(256, -1, stor2.length), data=mem[128 len ceil32(uint255(stor2.length) * 0.5)])
+              mem[128] = 256 * stor2.length.field_8
+      else:
+          if bool(stor2.length) == stor2.length.field_1 < 32:
+              revert with 0, 34
+          if stor2.length.field_1:
+              if 31 < stor2.length.field_1:
+                  mem[128] = uint256(stor2.field_0)
+                  idx = 128
+                  s = 0
+                  while stor2.length.field_1 + 96 > idx:
+                      mem[idx + 32] = stor2[s].field_256
+                      idx = idx + 32
+                      s = s + 1
+                      continue 
+                  return Array(len=2 * Mask(256, -1, stor2.length), data=mem[128 len ceil32(uint255(stor2.length) * 0.5)])
+              mem[128] = 256 * stor2.length.field_8
+      mem[ceil32(uint255(stor2.length) * 0.5) + 192 len ceil32(uint255(stor2.length) * 0.5)] = mem[128 len ceil32(uint255(stor2.length) * 0.5)]
+      if ceil32(uint255(stor2.length) * 0.5) > uint255(stor2.length) * 0.5:
+          mem[(uint255(stor2.length) * 0.5) + ceil32(uint255(stor2.length) * 0.5) + 192] = 0
+      return Array(len=2 * Mask(256, -1, stor2.length), data=mem[128 len ceil32(uint255(stor2.length) * 0.5)], mem[(2 * ceil32(uint255(stor2.length) * 0.5)) + 192 len 2 * ceil32(uint255(stor2.length) * 0.5)]), 
+  if bool(stor2.length) == stor2.length.field_1 < 32:
+      revert with 0, 34
+  if bool(stor2.length):
+      if bool(stor2.length) == uint255(stor2.length) * 0.5 < 32:
+          revert with 0, 34
+      if Mask(256, -1, stor2.length):
+          if 31 < uint255(stor2.length) * 0.5:
+              mem[128] = uint256(stor2.field_0)
+              idx = 128
+              s = 0
+              while (uint255(stor2.length) * 0.5) + 96 > idx:
+                  mem[idx + 32] = stor2[s].field_256
+                  idx = idx + 32
+                  s = s + 1
+                  continue 
+              return Array(len=stor2.length % 128, data=mem[128 len ceil32(stor2.length.field_1)])
+          mem[128] = 256 * stor2.length.field_8
+  else:
+      if bool(stor2.length) == stor2.length.field_1 < 32:
+          revert with 0, 34
+      if stor2.length.field_1:
+          if 31 < stor2.length.field_1:
+              mem[128] = uint256(stor2.field_0)
+              idx = 128
+              s = 0
+              while stor2.length.field_1 + 96 > idx:
+                  mem[idx + 32] = stor2[s].field_256
+                  idx = idx + 32
+                  s = s + 1
+                  continue 
+              return Array(len=stor2.length % 128, data=mem[128 len ceil32(stor2.length.field_1)])
+          mem[128] = 256 * stor2.length.field_8
+  mem[ceil32(stor2.length.field_1) + 192 len ceil32(stor2.length.field_1)] = mem[128 len ceil32(stor2.length.field_1)]
+  if ceil32(stor2.length.field_1) > stor2.length.field_1:
+      mem[stor2.length.field_1 + ceil32(stor2.length.field_1) + 192] = 0
+  return Array(len=stor2.length % 128, data=mem[128 len ceil32(stor2.length.field_1)], mem[(2 * ceil32(stor2.length.field_1)) + 192 len 2 * ceil32(stor2.length.field_1)]), 
+
+def symbol(): # not payable
+  if bool(stor3.length):
+      if bool(stor3.length) == uint255(stor3.length) * 0.5 < 32:
+          revert with 0, 34
+      if bool(stor3.length):
+          if bool(stor3.length) == uint255(stor3.length) * 0.5 < 32:
+              revert with 0, 34
+          if Mask(256, -1, stor3.length):
+              if 31 < uint255(stor3.length) * 0.5:
+                  mem[128] = uint256(stor3.field_0)
+                  idx = 128
+                  s = 0
+                  while (uint255(stor3.length) * 0.5) + 96 > idx:
+                      mem[idx + 32] = stor3[s].field_256
+                      idx = idx + 32
+                      s = s + 1
+                      continue 
+                  return Array(len=2 * Mask(256, -1, stor3.length), data=mem[128 len ceil32(uint255(stor3.length) * 0.5)])
+              mem[128] = 256 * stor3.length.field_8
+      else:
+          if bool(stor3.length) == stor3.length.field_1 < 32:
+              revert with 0, 34
+          if stor3.length.field_1:
+              if 31 < stor3.length.field_1:
+                  mem[128] = uint256(stor3.field_0)
+                  idx = 128
+                  s = 0
+                  while stor3.length.field_1 + 96 > idx:
+                      mem[idx + 32] = stor3[s].field_256
+                      idx = idx + 32
+                      s = s + 1
+                      continue 
+                  return Array(len=2 * Mask(256, -1, stor3.length), data=mem[128 len ceil32(uint255(stor3.length) * 0.5)])
+              mem[128] = 256 * stor3.length.field_8
+      mem[ceil32(uint255(stor3.length) * 0.5) + 192 len ceil32(uint255(stor3.length) * 0.5)] = mem[128 len ceil32(uint255(stor3.length) * 0.5)]
+      if ceil32(uint255(stor3.length) * 0.5) > uint255(stor3.length) * 0.5:
+          mem[(uint255(stor3.length) * 0.5) + ceil32(uint255(stor3.length) * 0.5) + 192] = 0
+      return Array(len=2 * Mask(256, -1, stor3.length), data=mem[128 len ceil32(uint255(stor3.length) * 0.5)], mem[(2 * ceil32(uint255(stor3.length) * 0.5)) + 192 len 2 * ceil32(uint255(stor3.length) * 0.5)]), 
+  if bool(stor3.length) == stor3.length.field_1 < 32:
+      revert with 0, 34
+  if bool(stor3.length):
+      if bool(stor3.length) == uint255(stor3.length) * 0.5 < 32:
+          revert with 0, 34
+      if Mask(256, -1, stor3.length):
+          if 31 < uint255(stor3.length) * 0.5:
+              mem[128] = uint256(stor3.field_0)
+              idx = 128
+              s = 0
+              while (uint255(stor3.length) * 0.5) + 96 > idx:
+                  mem[idx + 32] = stor3[s].field_256
+                  idx = idx + 32
+                  s = s + 1
+                  continue 
+              return Array(len=stor3.length % 128, data=mem[128 len ceil32(stor3.length.field_1)])
+          mem[128] = 256 * stor3.length.field_8
+  else:
+      if bool(stor3.length) == stor3.length.field_1 < 32:
+          revert with 0, 34
+      if stor3.length.field_1:
+          if 31 < stor3.length.field_1:
+              mem[128] = uint256(stor3.field_0)
+              idx = 128
+              s = 0
+              while stor3.length.field_1 + 96 > idx:
+                  mem[idx + 32] = stor3[s].field_256
+                  idx = idx + 32
+                  s = s + 1
+                  continue 
+              return Array(len=stor3.length % 128, data=mem[128 len ceil32(stor3.length.field_1)])
+          mem[128] = 256 * stor3.length.field_8
+  mem[ceil32(stor3.length.field_1) + 192 len ceil32(stor3.length.field_1)] = mem[128 len ceil32(stor3.length.field_1)]
+  if ceil32(stor3.length.field_1) > stor3.length.field_1:
+      mem[stor3.length.field_1 + ceil32(stor3.length.field_1) + 192] = 0
+  return Array(len=stor3.length % 128, data=mem[128 len ceil32(stor3.length.field_1)], mem[(2 * ceil32(stor3.length.field_1)) + 192 len 2 * ceil32(stor3.length.field_1)]), 
+
+def provenance(): # not payable
+  if bool(stor14.length):
+      if bool(stor14.length) == uint255(stor14.length) * 0.5 < 32:
+          revert with 0, 34
+      if bool(stor14.length):
+          if bool(stor14.length) == uint255(stor14.length) * 0.5 < 32:
+              revert with 0, 34
+          if Mask(256, -1, stor14.length):
+              if 31 < uint255(stor14.length) * 0.5:
+                  mem[128] = uint256(stor14.field_0)
+                  idx = 128
+                  s = 0
+                  while (uint255(stor14.length) * 0.5) + 96 > idx:
+                      mem[idx + 32] = stor14[s].field_256
+                      idx = idx + 32
+                      s = s + 1
+                      continue 
+                  return Array(len=2 * Mask(256, -1, stor14.length), data=mem[128 len ceil32(uint255(stor14.length) * 0.5)])
+              mem[128] = 256 * stor14.length.field_8
+      else:
+          if bool(stor14.length) == stor14.length.field_1 < 32:
+              revert with 0, 34
+          if stor14.length.field_1:
+              if 31 < stor14.length.field_1:
+                  mem[128] = uint256(stor14.field_0)
+                  idx = 128
+                  s = 0
+                  while stor14.length.field_1 + 96 > idx:
+                      mem[idx + 32] = stor14[s].field_256
+                      idx = idx + 32
+                      s = s + 1
+                      continue 
+                  return Array(len=2 * Mask(256, -1, stor14.length), data=mem[128 len ceil32(uint255(stor14.length) * 0.5)])
+              mem[128] = 256 * stor14.length.field_8
+      mem[ceil32(uint255(stor14.length) * 0.5) + 192 len ceil32(uint255(stor14.length) * 0.5)] = mem[128 len ceil32(uint255(stor14.length) * 0.5)]
+      if ceil32(uint255(stor14.length) * 0.5) > uint255(stor14.length) * 0.5:
+          mem[(uint255(stor14.length) * 0.5) + ceil32(uint255(stor14.length) * 0.5) + 192] = 0
+      return Array(len=2 * Mask(256, -1, stor14.length), data=mem[128 len ceil32(uint255(stor14.length) * 0.5)], mem[(2 * ceil32(uint255(stor14.length) * 0.5)) + 192 len 2 * ceil32(uint255(stor14.length) * 0.5)]), 
+  if bool(stor14.length) == stor14.length.field_1 < 32:
+      revert with 0, 34
+  if bool(stor14.length):
+      if bool(stor14.length) == uint255(stor14.length) * 0.5 < 32:
+          revert with 0, 34
+      if Mask(256, -1, stor14.length):
+          if 31 < uint255(stor14.length) * 0.5:
+              mem[128] = uint256(stor14.field_0)
+              idx = 128
+              s = 0
+              while (uint255(stor14.length) * 0.5) + 96 > idx:
+                  mem[idx + 32] = stor14[s].field_256
+                  idx = idx + 32
+                  s = s + 1
+                  continue 
+              return Array(len=stor14.length % 128, data=mem[128 len ceil32(stor14.length.field_1)])
+          mem[128] = 256 * stor14.length.field_8
+  else:
+      if bool(stor14.length) == stor14.length.field_1 < 32:
+          revert with 0, 34
+      if stor14.length.field_1:
+          if 31 < stor14.length.field_1:
+              mem[128] = uint256(stor14.field_0)
+              idx = 128
+              s = 0
+              while stor14.length.field_1 + 96 > idx:
+                  mem[idx + 32] = stor14[s].field_256
+                  idx = idx + 32
+                  s = s + 1
+                  continue 
+              return Array(len=stor14.length % 128, data=mem[128 len ceil32(stor14.length.field_1)])
+          mem[128] = 256 * stor14.length.field_8
+  mem[ceil32(stor14.length.field_1) + 192 len ceil32(stor14.length.field_1)] = mem[128 len ceil32(stor14.length.field_1)]
+  if ceil32(stor14.length.field_1) > stor14.length.field_1:
+      mem[stor14.length.field_1 + ceil32(stor14.length.field_1) + 192] = 0
+  return Array(len=stor14.length % 128, data=mem[128 len ceil32(stor14.length.field_1)], mem[(2 * ceil32(stor14.length.field_1)) + 192 len 2 * ceil32(stor14.length.field_1)]), 
+
+def sendAllTokens(address to): # not payable
+  require calldata.size - 4 >=′ 32
+  require to == to
+  if not roleAdmin[0xaa4e0f6cdcea7b211950e8a75e39146abfef1b33054a194490366571502a5e48][caller].field_0:
+      mem[128 len 42] = call.data[calldata.size len 42]
+      idx = 41
+      s = caller
+      while idx > 1:
+          if s % 16 >= 16:
+              revert with 0, 50
+          if idx >= 42:
+              revert with 0, 50
+          mem[idx + 128 len 8] = Mask(8, -(0, 0) + 256, 0) << (0, 0) - 256
+          if not idx:
+              revert with 0, 17
+          idx = idx - 1
+          s = Mask(252, 0, s) * 0.0625
+          continue 
+      if caller + 10240:
+          revert with 0, 'Strings: hex length insufficient'
+      mem[224 len 66] = call.data[calldata.size len 66]
+      idx = 65
+      s = 0xaa4e0f6cdcea7b211950e8a75e39146abfef1b33054a194490366571502a5e48
+      while idx > 1:
+          if s % 16 >= 16:
+              revert with 0, 50
+          if idx >= 66:
+              revert with 0, 50
+          mem[idx + 224 len 8] = Mask(8, -(0, 0) + 256, 0) << (0, 0) - 256
+          if not idx:
+              revert with 0, 17
+          idx = idx - 1
+          s = Mask(252, 0, s) * 0.0625
+          continue 
+      revert with 0, 32, 148, 'AccessControl: account ', mem[160 len 42], ' is missing role ', mem[288 len 66], 0, 0 >> 928, 0
+  if not price:
+      revert with 0, 18
+  if userData[address(to)].field_216 > !(userData[address(to)].field_0 / price):
+      revert with 0, 17
+  if not price:
+      revert with 0, 18
+  if userData[address(to)].field_216 + (userData[address(to)].field_0 / price) > userData[address(to)].field_0 / price:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'Trying to send more than they purchased.'
+  userData[address(to)].field_216 = uint32(userData[address(to)].field_216 + (userData[address(to)].field_0 / price))
+  if stor0 > !(userData[address(to)].field_0 / price):
+      revert with 0, 17
+  if stor0 + (userData[address(to)].field_0 / price) > 24000:
+      revert with 0, 'Number would exceed max supply'
+  mem[64] = 128
+  mem[96] = 0
+  if not to:
+      revert with MintToZeroAddress()
+  if not userData[address(to)].field_0 / price:
+      revert with MintZeroQuantity()
+  balanceOf[address(to)].field_0 = uint64((userData[address(to)].field_0 / price) + balanceOf[address(to)].field_0)
+  balanceOf[address(to)].field_64 = uint64((userData[address(to)].field_0 / price) + balanceOf[address(to)].field_64)
+  mem[0] = stor0
+  mem[32] = 4
+  stor4[stor0].field_0 = to
+  stor4[stor0].field_160 = uint64(block.timestamp)
+  log Transfer(
+        address from=0,
+        address to=to,
+        uint256 value=stor0)
+  if not ext_code.size(to):
+      idx = stor0
+      while idx + 1 != (userData[address(to)].field_0 / price) + stor0:
+          log Transfer(
+                address from=0,
+                address to=to,
+                uint256 value=idx + 1)
+          idx = idx + 1
+          continue 
+      stor0 = None + 3
+      stop
+  mem[128] = 0x150b7a0200000000000000000000000000000000000000000000000000000000
+  mem[var68001] = caller
+  mem[var68001 + 32] = 0
+  mem[var68001 + 64] = var68003
+  mem[var68001 + 96] = 128
+  mem[var70002] = 0
+  if var52001 < var72003:
+      mem[var52001 + var72002] = mem[var52001 + 128]
+      var52001 = var52001 + 32
+      continue 
+  if var52001 > var72003:
+      mem[var72003 + var72002] = 0
+  require ext_code.size(to)
+  call to.onERC721Received(address , address , uint256 , bytes ) with:
+       gas gas_remaining wei
+      args mem[132 len ceil32(var72005) + var72008 - 100]
+  mem[128] = ext_call.return_data[0]
+  if not ext_call.success:
+      if not return_data.size:
+          revert with TransferToNonERC721ReceiverImplementer()
+      if not return_data.size:
+          revert with TransferToNonERC721ReceiverImplementer()
+      revert with ext_call.return_data[0 len return_data.size]
+  mem[64] = ceil32(return_data.size) + 128
+  require return_data.size >=′ 32
+  require ext_call.return_data[0] == Mask(32, 224, ext_call.return_data[0])
+  if Mask(32, 224, ext_call.return_data[0]) != 0x150b7a0200000000000000000000000000000000000000000000000000000000:
+      revert with TransferToNonERC721ReceiverImplementer()
+  if var72026 == (userData[address(to)].field_0 / price) + stor0:
+      require stor0 == stor0
+      stor0 = var72026
+      stop
+  log Transfer(
+        address from=0,
+        address to=to,
+        uint256 value=var72026)
+  mem[ceil32(return_data.size) + 128] = 0x150b7a0200000000000000000000000000000000000000000000000000000000
+  mem[ceil32(return_data.size) + 132] = caller
+  mem[ceil32(return_data.size) + 164] = 0
+  mem[ceil32(return_data.size) + 196] = var72026
+  mem[ceil32(return_data.size) + 228] = 128
+  mem[ceil32(return_data.size) + 260] = 0
+  var52001 = 0
+  continue 
+
+def tokenURI(uint256 tokenId): # not payable
+  require calldata.size - 4 >=′ 32
+  if tokenId >= stor0:
+      revert with URIQueryForNonexistentToken()
+  if stor4[tokenId].field_224:
+      revert with URIQueryForNonexistentToken()
+  if bool(stor15.length):
+      if bool(stor15.length) == uint255(stor15.length) * 0.5 < 32:
+          revert with 0, 34
+      if bool(stor15.length):
+          if bool(stor15.length) == uint255(stor15.length) * 0.5 < 32:
+              revert with 0, 34
+          if not Mask(256, -1, stor15.length):
+              if not uint255(stor15.length) * 0.5:
+                  return ''
+              if tokenId:
+                  s = 0
+                  idx = tokenId
+                  while idx:
+                      if s == -1:
+                          revert with 0, 17
+                      s = s + 1
+                      idx = idx / 10
+                      continue 
+                  if s > LOCK8605463013():
+                      revert with 0, 65
+          else:
+              if 31 < uint255(stor15.length) * 0.5:
+                  idx = 128
+                  s = 0
+                  while (uint255(stor15.length) * 0.5) + 96 > idx:
+                      mem[idx + 32] = stor15[s].field_256
+                      idx = idx + 32
+                      s = s + 1
+                      continue 
+                  if uint255(stor15.length) * 0.5:
+              else:
+                  if not uint255(stor15.length) * 0.5:
+                      return ''
+                  if tokenId:
+                      s = 0
+                      idx = tokenId
+                      while idx:
+                          if s == -1:
+                              revert with 0, 17
+                          s = s + 1
+                          idx = idx / 10
+                          continue 
+                      if s > LOCK8605463013():
+                          revert with 0, 65
+      else:
+          if bool(stor15.length) == stor15.length.field_1 < 32:
+              revert with 0, 34
+          if not stor15.length.field_1:
+              if not uint255(stor15.length) * 0.5:
+                  return ''
+              if tokenId:
+                  s = 0
+                  idx = tokenId
+                  while idx:
+                      if s == -1:
+                          revert with 0, 17
+                      s = s + 1
+                      idx = idx / 10
+                      continue 
+                  if s > LOCK8605463013():
+                      revert with 0, 65
+          else:
+              if 31 < stor15.length.field_1:
+                  idx = 128
+                  s = 0
+                  while stor15.length.field_1 + 96 > idx:
+                      mem[idx + 32] = stor15[s].field_256
+                      idx = idx + 32
+                      s = s + 1
+                      continue 
+                  if uint255(stor15.length) * 0.5:
+              else:
+                  if not uint255(stor15.length) * 0.5:
+                      return ''
+                  if tokenId:
+                      s = 0
+                      idx = tokenId
+                      while idx:
+                          if s == -1:
+                              revert with 0, 17
+                          s = s + 1
+                          idx = idx / 10
+                          continue 
+                      if s > LOCK8605463013():
+                          revert with 0, 65
+  else:
+      if bool(stor15.length) == stor15.length.field_1 < 32:
+          revert with 0, 34
+      if bool(stor15.length):
+          if bool(stor15.length) == uint255(stor15.length) * 0.5 < 32:
+              revert with 0, 34
+          if not Mask(256, -1, stor15.length):
+              if not stor15.length.field_1:
+                  return ''
+              if tokenId:
+                  s = 0
+                  idx = tokenId
+                  while idx:
+                      if s == -1:
+                          revert with 0, 17
+                      s = s + 1
+                      idx = idx / 10
+                      continue 
+                  if s > LOCK8605463013():
+                      revert with 0, 65
+          else:
+              if 31 < uint255(stor15.length) * 0.5:
+                  idx = 128
+                  s = 0
+                  while (uint255(stor15.length) * 0.5) + 96 > idx:
+                      mem[idx + 32] = stor15[s].field_256
+                      idx = idx + 32
+                      s = s + 1
+                      continue 
+                  if stor15.length.field_1:
+              else:
+                  if not stor15.length.field_1:
+                      return ''
+                  if tokenId:
+                      s = 0
+                      idx = tokenId
+                      while idx:
+                          if s == -1:
+                              revert with 0, 17
+                          s = s + 1
+                          idx = idx / 10
+                          continue 
+                      if s > LOCK8605463013():
+                          revert with 0, 65
+      else:
+          if bool(stor15.length) == stor15.length.field_1 < 32:
+              revert with 0, 34
+          if not stor15.length.field_1:
+              if not stor15.length.field_1:
+                  return ''
+              if tokenId:
+                  s = 0
+                  idx = tokenId
+                  while idx:
+                      if s == -1:
+                          revert with 0, 17
+                      s = s + 1
+                      idx = idx / 10
+                      continue 
+                  if s > LOCK8605463013():
+                      revert with 0, 65
+          else:
+              if 31 < stor15.length.field_1:
+                  idx = 128
+                  s = 0
+                  while stor15.length.field_1 + 96 > idx:
+                      mem[idx + 32] = stor15[s].field_256
+                      idx = idx + 32
+                      s = s + 1
+                      continue 
+                  if stor15.length.field_1:
+              else:
+                  if not stor15.length.field_1:
+                      return ''
+                  if tokenId:
+                      s = 0
+                      idx = tokenId
+                      while idx:
+                          if s == -1:
+                              revert with 0, 17
+                          s = s + 1
+                          idx = idx / 10
+                          continue 
+                      if s > LOCK8605463013():
+                          revert with 0, 65
+  ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+
+def sendTokensBatch(address[] addresses) payable: 
+  mem[64] = 96
+  require not call.value
+  require calldata.size - 4 >=′ 32
+  require addresses <= LOCK8605463013()
+  require addresses + 35 <′ calldata.size
+  require addresses.length <= LOCK8605463013()
+  require addresses + (32 * addresses.length) + 36 <= calldata.size
+  mem[0] = caller
+  mem[32] = sha3(0xaa4e0f6cdcea7b211950e8a75e39146abfef1b33054a194490366571502a5e48, 11)
+  if roleAdmin[0xaa4e0f6cdcea7b211950e8a75e39146abfef1b33054a194490366571502a5e48][caller].field_0:
+      idx = 0
+      while idx < addresses.length:
+          require cd[((32 * idx) + addresses + 36)] == address(cd[((32 * idx) + addresses + 36)])
+          if idx >= addresses.length:
+              revert with 0, 50
+          require cd[((32 * idx) + addresses + 36)] == address(cd[((32 * idx) + addresses + 36)])
+          if not price:
+              revert with 0, 18
+          mem[0] = address(cd[((32 * idx) + addresses + 36)])
+          if userData[address(cd[((32 * idx) + addresses + 36)])].field_216 > !(userData[address(cd[((32 * idx) + addresses + 36)])].field_0 / price):
+              revert with 0, 17
+          if not price:
+              revert with 0, 18
+          if userData[address(cd[((32 * idx) + addresses + 36)])].field_216 + (userData[address(cd[((32 * idx) + addresses + 36)])].field_0 / price) > userData[address(cd[((32 * idx) + addresses + 36)])].field_0 / price:
+              revert with 0, 'Trying to send more than they purchased.'
+          userData[address(cd[((32 * idx) + addresses + 36)])].field_216 = uint32(userData[address(cd[((32 * idx) + addresses + 36)])].field_216 + (userData[address(cd[((32 * idx) + addresses + 36)])].field_0 / price))
+          if stor0 > !(userData[address(cd[((32 * idx) + addresses + 36)])].field_0 / price):
+              revert with 0, 17
+          if stor0 + (userData[address(cd[((32 * idx) + addresses + 36)])].field_0 / price) > 24000:
+              revert with 0, 'Number would exceed max supply'
+          _98 = mem[64]
+          mem[64] = mem[64] + 32
+          mem[_98] = 0
+          if not address(cd[((32 * idx) + addresses + 36)]):
+              revert with MintToZeroAddress()
+          if not userData[address(cd[((32 * idx) + addresses + 36)])].field_0 / price:
+              revert with MintZeroQuantity()
+          balanceOf[address(cd[((32 * idx) + addresses + 36)])].field_0 = uint64((userData[address(cd[((32 * idx) + addresses + 36)])].field_0 / price) + balanceOf[address(cd[((32 * idx) + addresses + 36)])].field_0)
+          balanceOf[address(cd[((32 * idx) + addresses + 36)])].field_64 = uint64((userData[address(cd[((32 * idx) + addresses + 36)])].field_0 / price) + balanceOf[address(cd[((32 * idx) + addresses + 36)])].field_64)
+          mem[0] = stor0
+          mem[32] = 4
+          stor4[stor0].field_0 = address(cd[((32 * idx) + addresses + 36)])
+          stor4[stor0].field_160 = uint64(block.timestamp)
+          log Transfer(
+                address from=0,
+                address to=address(cd[((32 * idx) + addresses + 36)]),
+                uint256 value=stor0)
+          if not ext_code.size(address(cd[((32 * idx) + addresses + 36)])):
+              s = stor0
+              while s + 1 != (userData[address(cd[((32 * idx) + addresses + 36)])].field_0 / price) + stor0:
+                  log Transfer(
+                        address from=0,
+                        address to=address(cd[((32 * idx) + addresses + 36)]),
+                        uint256 value=s + 1)
+                  s = s + 1
+                  continue 
+              stor0 = None + 3
+              if idx == -1:
+                  revert with 0, 17
+              idx = idx + 1
+              continue 
+          mem[mem[64]] = 0x150b7a0200000000000000000000000000000000000000000000000000000000
+          mem[var86001] = caller
+          mem[var86001 + 32] = 0
+          mem[var86001 + 64] = var86003
+          mem[var86001 + 96] = 128
+          mem[var88002] = 0
+          if var70001 < var90003:
+              mem[var70001 + var90002] = mem[var70001 + _98 + 32]
+              var70001 = var70001 + 32
+              continue 
+          if var70001 <= var90003:
+              require ext_code.size(address(cd[((32 * idx) + addresses + 36)]))
+              call address(cd[((32 * idx) + addresses + 36)]).onERC721Received(address , address , uint256 , bytes ) with:
+                   gas gas_remaining wei
+                  args mem[mem[64] + 4 len ceil32(var90005) + var90008 + -mem[64] + 28]
+              mem[mem[64]] = ext_call.return_data[0]
+              if not ext_call.success:
+                  if not return_data.size:
+                      if not mem[96]:
+                          revert with TransferToNonERC721ReceiverImplementer()
+                      revert with memory
+                        from 128
+                         len mem[96]
+                  if not return_data.size:
+                      revert with TransferToNonERC721ReceiverImplementer()
+                  revert with ext_call.return_data[0 len return_data.size]
+              _344 = mem[64]
+              mem[64] = mem[64] + ceil32(return_data.size)
+              require return_data.size >=′ 32
+              require mem[_344] == Mask(32, 224, mem[_344])
+              if Mask(32, 224, mem[_344]) != 0x150b7a0200000000000000000000000000000000000000000000000000000000:
+                  revert with TransferToNonERC721ReceiverImplementer()
+          else:
+              mem[var90003 + var90002] = 0
+              require ext_code.size(address(cd[((32 * idx) + addresses + 36)]))
+              call address(cd[((32 * idx) + addresses + 36)]).onERC721Received(address , address , uint256 , bytes ) with:
+                   gas gas_remaining wei
+                  args mem[mem[64] + 4 len ceil32(var90005) + var90008 + -mem[64] + 28]
+              mem[mem[64]] = ext_call.return_data[0]
+              if not ext_call.success:
+                  if not return_data.size:
+                      if not mem[96]:
+                          revert with TransferToNonERC721ReceiverImplementer()
+                      revert with memory
+                        from 128
+                         len mem[96]
+                  if not return_data.size:
+                      revert with TransferToNonERC721ReceiverImplementer()
+                  revert with ext_call.return_data[0 len return_data.size]
+              _345 = mem[64]
+              mem[64] = mem[64] + ceil32(return_data.size)
+              require return_data.size >=′ 32
+              require mem[_345] == Mask(32, 224, mem[_345])
+              if Mask(32, 224, mem[_345]) != 0x150b7a0200000000000000000000000000000000000000000000000000000000:
+                  revert with TransferToNonERC721ReceiverImplementer()
+          if var90026 == (userData[address(cd[((32 * idx) + addresses + 36)])].field_0 / price) + stor0:
+              require stor0 == stor0
+              stor0 = var90026
+              if idx == -1:
+                  revert with 0, 17
+              idx = idx + 1
+              continue 
+          log Transfer(
+                address from=0,
+                address to=address(cd[((32 * idx) + addresses + 36)]),
+                uint256 value=var90026)
+          mem[mem[64]] = 0x150b7a0200000000000000000000000000000000000000000000000000000000
+          mem[mem[64] + 4] = caller
+          mem[mem[64] + 36] = 0
+          mem[mem[64] + 68] = var90026
+          mem[mem[64] + 100] = 128
+          mem[mem[64] + 132] = 0
+          var70001 = 0
+          continue 
+      stop
+  mem[128 len 42] = call.data[calldata.size len 42]
+  idx = 41
+  s = caller
+  while idx > 1:
+      if s % 16 >= 16:
+          revert with 0, 50
+      if idx >= 42:
+          revert with 0, 50
+      mem[idx + 128 len 8] = Mask(8, -(0, 0) + 256, 0) << (0, 0) - 256
+      if not idx:
+          revert with 0, 17
+      idx = idx - 1
+      s = Mask(252, 0, s) * 0.0625
+      continue 
+  if caller + 10240:
+      revert with 0, 'Strings: hex length insufficient'
+  mem[224 len 66] = call.data[calldata.size len 66]
+  idx = 65
+  s = 0xaa4e0f6cdcea7b211950e8a75e39146abfef1b33054a194490366571502a5e48
+  while idx > 1:
+      if s % 16 >= 16:
+          revert with 0, 50
+      if idx >= 66:
+          revert with 0, 50
+      mem[idx + 224 len 8] = Mask(8, -(0, 0) + 256, 0) << (0, 0) - 256
+      if not idx:
+          revert with 0, 17
+      idx = idx - 1
+      s = Mask(252, 0, s) * 0.0625
+      continue 
+  revert with 0, 32, 148, 'AccessControl: account ', mem[160 len 42], ' is missing role ', mem[288 len 66], 0, 0 >> 928, 0
+
+def sendRefundBatch(address[] addresses) payable: 
+  mem[64] = 96
+  require not call.value
+  require calldata.size - 4 >=′ 32
+  require addresses <= LOCK8605463013()
+  require addresses + 35 <′ calldata.size
+  require addresses.length <= LOCK8605463013()
+  require addresses + (32 * addresses.length) + 36 <= calldata.size
+  mem[0] = caller
+  mem[32] = sha3(0xaa4e0f6cdcea7b211950e8a75e39146abfef1b33054a194490366571502a5e48, 11)
+  if roleAdmin[0xaa4e0f6cdcea7b211950e8a75e39146abfef1b33054a194490366571502a5e48][caller].field_0:
+      idx = 0
+      while idx < addresses.length:
+          require cd[((32 * idx) + addresses + 36)] == address(cd[((32 * idx) + addresses + 36)])
+          mem[0] = caller
+          mem[32] = sha3(0xaa4e0f6cdcea7b211950e8a75e39146abfef1b33054a194490366571502a5e48, 11)
+          if roleAdmin[0xaa4e0f6cdcea7b211950e8a75e39146abfef1b33054a194490366571502a5e48][caller].field_0:
+              if stor10 == 2:
+                  revert with 0, 'ReentrancyGuard: reentrant call'
+              stor10 = 2
+              if not price:
+                  revert with 0, 'Price has not been set'
+              mem[0] = address(cd[((32 * idx) + addresses + 36)])
+              mem[32] = 16
+              if userData[address(cd[((32 * idx) + addresses + 36)])].field_248:
+                  revert with 0, 'Address has already claimed their refund.'
+              userData[address(cd[((32 * idx) + addresses + 36)])].field_248 = 1
+              if not price:
+                  revert with 0, 18
+              call address(cd[((32 * idx) + addresses + 36)]) with:
+                 value userData[address(cd[((32 * idx) + addresses + 36)])].field_0 % price wei
+                   gas gas_remaining wei
+              if return_data.size:
+                  _45 = mem[64]
+                  mem[64] = mem[64] + ceil32(return_data.size) + 1
+                  mem[_45] = return_data.size
+                  mem[_45 + 32 len return_data.size] = ext_call.return_data[0 len return_data.size]
+              if not ext_call.success:
+                  revert with 0, 'Refund failed.'
+              stor10 = 1
+              if idx == -1:
+                  revert with 0, 17
+              idx = idx + 1
+              continue 
+          _42 = mem[64]
+          mem[mem[64]] = 42
+          mem[64] = mem[64] + 96
+          mem[_42 + 32 len 42] = call.data[calldata.size len 42]
+          if 0 >= mem[_42]:
+              revert with 0, 50
+          mem[_42 + 32 len 8] = Mask(8, -(2713877091499598330239944961141122840311015265600950719674787125185463975936, 0) + 256, 0) << (2713877091499598330239944961141122840311015265600950719674787125185463975936, 0) - 256
+          if 1 >= mem[_42]:
+              revert with 0, 50
+          mem[_42 + 33 len 8] = Mask(8, -(('mask_shl', 8, 248, -3, "'x'"), 0) + 256, 0) << (('mask_shl', 8, 248, -3, "'x'"), 0) - 256
+          idx = 41
+          s = caller
+          while idx > 1:
+              if s % 16 >= 16:
+                  revert with 0, 50
+              if idx >= mem[_42]:
+                  revert with 0, 50
+              mem[idx + _42 + 32 len 8] = Mask(8, -(0, 0) + 256, 0) << (0, 0) - 256
+              if not idx:
+                  revert with 0, 17
+              idx = idx - 1
+              s = Mask(252, 0, s) * 0.0625
+              continue 
+          if caller + 10240:
+              revert with 0, 'Strings: hex length insufficient'
+          _65 = mem[64]
+          mem[mem[64]] = 66
+          mem[64] = mem[64] + 128
+          mem[_65 + 32 len 66] = call.data[calldata.size len 66]
+          if 0 >= mem[_65]:
+              revert with 0, 50
+          mem[_65 + 32 len 8] = Mask(8, -(2713877091499598330239944961141122840311015265600950719674787125185463975936, 0) + 256, 0) << (2713877091499598330239944961141122840311015265600950719674787125185463975936, 0) - 256
+          if 1 >= mem[_65]:
+              revert with 0, 50
+          mem[_65 + 33 len 8] = Mask(8, -(('mask_shl', 8, 248, -3, "'x'"), 0) + 256, 0) << (('mask_shl', 8, 248, -3, "'x'"), 0) - 256
+          idx = 65
+          s = 0xaa4e0f6cdcea7b211950e8a75e39146abfef1b33054a194490366571502a5e48
+          while idx > 1:
+              if s % 16 >= 16:
+                  revert with 0, 50
+              if idx >= mem[_65]:
+                  revert with 0, 50
+              mem[idx + _65 + 32 len 8] = Mask(8, -(0, 0) + 256, 0) << (0, 0) - 256
+              if not idx:
+                  revert with 0, 17
+              idx = idx - 1
+              s = Mask(252, 0, s) * 0.0625
+              continue 
+          _94 = mem[64]
+          mem[mem[64] + 32] = 'AccessControl: account '
+          _98 = mem[_42]
+          idx = 0
+          while idx < _98:
+              mem[idx + _94 + 55] = mem[idx + _42 + 32]
+              idx = idx + 32
+              continue 
+          mem[_94 + _98 + 55] = ' is missing role '
+          if ceil32(_98) <= _98:
+              _149 = mem[_65]
+              idx = 0
+              while idx < _149:
+                  mem[idx + _94 + _98 + 72] = mem[idx + _65 + 32]
+                  idx = idx + 32
+                  continue 
+              if ceil32(_149) <= _149:
+                  _199 = mem[64]
+                  mem[mem[64]] = _149 + _94 + _98 + -mem[64] + 40
+                  mem[64] = _149 + _94 + _98 + 72
+                  mem[_149 + _94 + _98 + 72] = 0x8c379a000000000000000000000000000000000000000000000000000000000
+                  mem[_149 + _94 + _98 + 76] = 32
+                  _211 = mem[_199]
+                  mem[_149 + _94 + _98 + 108] = mem[_199]
+                  idx = 0
+                  while idx < _211:
+                      mem[idx + _149 + _94 + _98 + 140] = mem[idx + _199 + 32]
+                      idx = idx + 32
+                      continue 
+                  if ceil32(_211) > _211:
+                      mem[_211 + _149 + _94 + _98 + 140] = 0
+                  revert with 0, 32, mem[_149 + _94 + _98 + 108 len ceil32(_211) + 32]
+              mem[_149 + _94 + _98 + 72] = 0
+              _200 = mem[64]
+              mem[mem[64]] = _149 + _94 + _98 + -mem[64] + 40
+              mem[64] = _149 + _94 + _98 + 72
+              mem[_149 + _94 + _98 + 72] = 0x8c379a000000000000000000000000000000000000000000000000000000000
+              mem[_149 + _94 + _98 + 76] = 32
+              _212 = mem[_200]
+              mem[_149 + _94 + _98 + 108] = mem[_200]
+              idx = 0
+              while idx < _212:
+                  mem[idx + _149 + _94 + _98 + 140] = mem[idx + _200 + 32]
+                  idx = idx + 32
+                  continue 
+              if ceil32(_212) > _212:
+                  mem[_212 + _149 + _94 + _98 + 140] = 0
+              revert with 0, 32, mem[_149 + _94 + _98 + 108 len ceil32(_212) + 32]
+          _150 = mem[_65]
+          idx = 0
+          while idx < _150:
+              mem[idx + _94 + _98 + 72] = mem[idx + _65 + 32]
+              idx = idx + 32
+              continue 
+          if ceil32(_150) <= _150:
+              _201 = mem[64]
+              mem[mem[64]] = _150 + _94 + _98 + -mem[64] + 40
+              mem[64] = _150 + _94 + _98 + 72
+              mem[_150 + _94 + _98 + 72] = 0x8c379a000000000000000000000000000000000000000000000000000000000
+              mem[_150 + _94 + _98 + 76] = 32
+              _213 = mem[_201]
+              mem[_150 + _94 + _98 + 108] = mem[_201]
+              idx = 0
+              while idx < _213:
+                  mem[idx + _150 + _94 + _98 + 140] = mem[idx + _201 + 32]
+                  idx = idx + 32
+                  continue 
+              if ceil32(_213) > _213:
+                  mem[_213 + _150 + _94 + _98 + 140] = 0
+              revert with 0, 32, mem[_150 + _94 + _98 + 108 len ceil32(_213) + 32]
+          mem[_150 + _94 + _98 + 72] = 0
+          _202 = mem[64]
+          mem[mem[64]] = _150 + _94 + _98 + -mem[64] + 40
+          mem[64] = _150 + _94 + _98 + 72
+          mem[_150 + _94 + _98 + 72] = 0x8c379a000000000000000000000000000000000000000000000000000000000
+          mem[_150 + _94 + _98 + 76] = 32
+          _214 = mem[_202]
+          mem[_150 + _94 + _98 + 108] = mem[_202]
+          idx = 0
+          while idx < _214:
+              mem[idx + _150 + _94 + _98 + 140] = mem[idx + _202 + 32]
+              idx = idx + 32
+              continue 
+          if ceil32(_214) > _214:
+              mem[_214 + _150 + _94 + _98 + 140] = 0
+          revert with 0, 32, mem[_150 + _94 + _98 + 108 len ceil32(_214) + 32]
+      stop
+  mem[128 len 42] = call.data[calldata.size len 42]
+  idx = 41
+  s = caller
+  while idx > 1:
+      if s % 16 >= 16:
+          revert with 0, 50
+      if idx >= 42:
+          revert with 0, 50
+      mem[idx + 128 len 8] = Mask(8, -(0, 0) + 256, 0) << (0, 0) - 256
+      if not idx:
+          revert with 0, 17
+      idx = idx - 1
+      s = Mask(252, 0, s) * 0.0625
+      continue 
+  if caller + 10240:
+      revert with 0, 'Strings: hex length insufficient'
+  mem[224 len 66] = call.data[calldata.size len 66]
+  idx = 65
+  s = 0xaa4e0f6cdcea7b211950e8a75e39146abfef1b33054a194490366571502a5e48
+  while idx > 1:
+      if s % 16 >= 16:
+          revert with 0, 50
+      if idx >= 66:
+          revert with 0, 50
+      mem[idx + 224 len 8] = Mask(8, -(0, 0) + 256, 0) << (0, 0) - 256
+      if not idx:
+          revert with 0, 17
+      idx = idx - 1
+      s = Mask(252, 0, s) * 0.0625
+      continue 
+  revert with 0, 32, 148, 'AccessControl: account ', mem[160 len 42], ' is missing role ', mem[288 len 66], 0, 0 >> 928, 0
+
+def sendTokensAndRefund(address to): # not payable
+  require calldata.size - 4 >=′ 32
+  require to == to
+  if not roleAdmin[0xaa4e0f6cdcea7b211950e8a75e39146abfef1b33054a194490366571502a5e48][caller].field_0:
+      mem[128 len 42] = call.data[calldata.size len 42]
+      idx = 41
+      s = caller
+      while idx > 1:
+          if s % 16 >= 16:
+              revert with 0, 50
+          if idx >= 42:
+              revert with 0, 50
+          mem[idx + 128 len 8] = Mask(8, -(0, 0) + 256, 0) << (0, 0) - 256
+          if not idx:
+              revert with 0, 17
+          idx = idx - 1
+          s = Mask(252, 0, s) * 0.0625
+          continue 
+      if caller + 10240:
+          revert with 0, 'Strings: hex length insufficient'
+      mem[224 len 66] = call.data[calldata.size len 66]
+      idx = 65
+      s = 0xaa4e0f6cdcea7b211950e8a75e39146abfef1b33054a194490366571502a5e48
+      while idx > 1:
+          if s % 16 >= 16:
+              revert with 0, 50
+          if idx >= 66:
+              revert with 0, 50
+          mem[idx + 224 len 8] = Mask(8, -(0, 0) + 256, 0) << (0, 0) - 256
+          if not idx:
+              revert with 0, 17
+          idx = idx - 1
+          s = Mask(252, 0, s) * 0.0625
+          continue 
+      revert with 0, 32, 148, 'AccessControl: account ', mem[160 len 42], ' is missing role ', mem[288 len 66], 0, 0 >> 928, 0
+  if stor10 == 2:
+      revert with 0, 'ReentrancyGuard: reentrant call'
+  stor10 = 2
+  if not price:
+      revert with 0, 'Price has not been set'
+  if userData[address(to)].field_248:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'Already sent refunds to this address.'
+  userData[address(to)].field_248 = 1
+  if not price:
+      revert with 0, 18
+  call to with:
+     value userData[address(to)].field_0 % price wei
+       gas gas_remaining wei
+  if not return_data.size:
+      if not ext_call.success:
+          revert with 0, 'Refund failed.'
+      if not price:
+          revert with 0, 18
+      if not userData[address(to)].field_0 / price:
+          stor10 = 1
+          stop
+      if userData[address(to)].field_216:
+          revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'Already sent tokens to this address.'
+      userData[address(to)].field_216 = uint32(userData[address(to)].field_0 / price)
+      if stor0 > !(userData[address(to)].field_0 / price):
+          revert with 0, 17
+      if stor0 + (userData[address(to)].field_0 / price) > 24000:
+          revert with 0, 'Number would exceed max supply'
+      mem[64] = 128
+      mem[96] = 0
+      if not to:
+          revert with MintToZeroAddress()
+      if not userData[address(to)].field_0 / price:
+          revert with MintZeroQuantity()
+      balanceOf[address(to)].field_0 = uint64((userData[address(to)].field_0 / price) + balanceOf[address(to)].field_0)
+      balanceOf[address(to)].field_64 = uint64((userData[address(to)].field_0 / price) + balanceOf[address(to)].field_64)
+      mem[0] = stor0
+      mem[32] = 4
+      stor4[stor0].field_0 = to
+      stor4[stor0].field_160 = uint64(block.timestamp)
+      log Transfer(
+            address from=0,
+            address to=to,
+            uint256 value=stor0)
+      if not ext_code.size(to):
+          idx = stor0
+          while idx + 1 != (userData[address(to)].field_0 / price) + stor0:
+              log Transfer(
+                    address from=0,
+                    address to=to,
+                    uint256 value=idx + 1)
+              idx = idx + 1
+              continue 
+          stor0 = None + 3
+          stor10 = 1
+          stop
+      mem[128] = 0x150b7a0200000000000000000000000000000000000000000000000000000000
+      mem[var70001] = caller
+      mem[var70001 + 32] = 0
+      mem[var70001 + 64] = var70003
+      mem[var70001 + 96] = 128
+      mem[var72002] = 0
+      if var54001 < var74003:
+          mem[var54001 + var74002] = mem[var54001 + 128]
+          var54001 = var54001 + 32
+          continue 
+      if var54001 > var74003:
+          mem[var74003 + var74002] = 0
+      require ext_code.size(to)
+      call to.onERC721Received(address , address , uint256 , bytes ) with:
+           gas gas_remaining wei
+          args mem[132 len ceil32(var74005) + var74008 - 100]
+      mem[128] = ext_call.return_data[0]
+      if not ext_call.success:
+          if not return_data.size:
+              revert with TransferToNonERC721ReceiverImplementer()
+          if not return_data.size:
+              revert with TransferToNonERC721ReceiverImplementer()
+          revert with ext_call.return_data[0 len return_data.size]
+      mem[64] = ceil32(return_data.size) + 128
+      require return_data.size >=′ 32
+      require ext_call.return_data[0] == Mask(32, 224, ext_call.return_data[0])
+      if Mask(32, 224, ext_call.return_data[0]) != 0x150b7a0200000000000000000000000000000000000000000000000000000000:
+          revert with TransferToNonERC721ReceiverImplementer()
+      if var74026 == (userData[address(to)].field_0 / price) + stor0:
+          require stor0 == stor0
+          stor0 = var74026
+          stor10 = 1
+          stop
+      log Transfer(
+            address from=0,
+            address to=to,
+            uint256 value=var74026)
+      mem[ceil32(return_data.size) + 128] = 0x150b7a0200000000000000000000000000000000000000000000000000000000
+      mem[ceil32(return_data.size) + 132] = caller
+      mem[ceil32(return_data.size) + 164] = 0
+      mem[ceil32(return_data.size) + 196] = var74026
+      mem[ceil32(return_data.size) + 228] = 128
+      mem[ceil32(return_data.size) + 260] = 0
+  else:
+      mem[96] = return_data.size
+      mem[128 len return_data.size] = ext_call.return_data[0 len return_data.size]
+      if not ext_call.success:
+          revert with 0, 'Refund failed.'
+      if not price:
+          revert with 0, 18
+      if not userData[address(to)].field_0 / price:
+          stor10 = 1
+          stop
+      if userData[address(to)].field_216:
+          revert with 0, 'Already sent tokens to this address.'
+      userData[address(to)].field_216 = uint32(userData[address(to)].field_0 / price)
+      if stor0 > !(userData[address(to)].field_0 / price):
+          revert with 0, 17
+      if stor0 + (userData[address(to)].field_0 / price) > 24000:
+          revert with 0, 'Number would exceed max supply'
+      mem[64] = ceil32(return_data.size) + 129
+      mem[ceil32(return_data.size) + 97] = 0
+      if not to:
+          revert with MintToZeroAddress()
+      if not userData[address(to)].field_0 / price:
+          revert with MintZeroQuantity()
+      balanceOf[address(to)].field_0 = uint64((userData[address(to)].field_0 / price) + balanceOf[address(to)].field_0)
+      balanceOf[address(to)].field_64 = uint64((userData[address(to)].field_0 / price) + balanceOf[address(to)].field_64)
+      mem[0] = stor0
+      mem[32] = 4
+      stor4[stor0].field_0 = to
+      stor4[stor0].field_160 = uint64(block.timestamp)
+      log Transfer(
+            address from=0,
+            address to=to,
+            uint256 value=stor0)
+      if not ext_code.size(to):
+          idx = stor0
+          while idx + 1 != (userData[address(to)].field_0 / price) + stor0:
+              log Transfer(
+                    address from=0,
+                    address to=to,
+                    uint256 value=idx + 1)
+              idx = idx + 1
+              continue 
+          stor0 = None + 3
+          stor10 = 1
+          stop
+      mem[ceil32(return_data.size) + 129] = 0x150b7a0200000000000000000000000000000000000000000000000000000000
+      mem[var70001] = caller
+      mem[var70001 + 32] = 0
+      mem[var70001 + 64] = var70003
+      mem[var70001 + 96] = 128
+      mem[var72002] = 0
+      if var54001 < var74003:
+          mem[var54001 + var74002] = mem[var54001 + ceil32(return_data.size) + 129]
+          var54001 = var54001 + 32
+          continue 
+      if var54001 > var74003:
+          mem[var74003 + var74002] = 0
+      require ext_code.size(to)
+      call to.onERC721Received(address , address , uint256 , bytes ) with:
+           gas gas_remaining wei
+          args mem[ceil32(return_data.size) + 133 len ceil32(var74005) + var74008 + -ceil32(return_data.size) - 101]
+      mem[ceil32(return_data.size) + 129] = ext_call.return_data[0]
+      if not ext_call.success:
+          if not return_data.size:
+              revert with TransferToNonERC721ReceiverImplementer()
+          revert with ext_call.return_data[0 len return_data.size]
+      mem[64] = ceil32(return_data.size) + ceil32(return_data.size) + 129
+      require return_data.size >=′ 32
+      require ext_call.return_data[0] == Mask(32, 224, ext_call.return_data[0])
+      if Mask(32, 224, ext_call.return_data[0]) != 0x150b7a0200000000000000000000000000000000000000000000000000000000:
+          revert with TransferToNonERC721ReceiverImplementer()
+      if var74026 == (userData[address(to)].field_0 / price) + stor0:
+          require stor0 == stor0
+          stor0 = var74026
+          stor10 = 1
+          stop
+      log Transfer(
+            address from=0,
+            address to=to,
+            uint256 value=var74026)
+      mem[ceil32(return_data.size) + ceil32(return_data.size) + 129] = 0x150b7a0200000000000000000000000000000000000000000000000000000000
+      mem[ceil32(return_data.size) + ceil32(return_data.size) + 133] = caller
+      mem[ceil32(return_data.size) + ceil32(return_data.size) + 165] = 0
+      mem[ceil32(return_data.size) + ceil32(return_data.size) + 197] = var74026
+      mem[ceil32(return_data.size) + ceil32(return_data.size) + 229] = 128
+      mem[ceil32(return_data.size) + ceil32(return_data.size) + 261] = 0
+  var54001 = 0
+  continue 
+
+def safeTransferFrom(address from, address to, uint256 tokenId): # not payable
+  require calldata.size - 4 >=′ 96
+  require from == from
+  require to == to
+  mem[96] = 0
+  mem[128] = 0
+  mem[160] = 0
+  mem[192] = 0
+  if tokenId >= stor0:
+      revert with OwnerQueryForNonexistentToken()
+  mem[224] = stor4[tokenId].field_0
+  mem[256] = stor4[tokenId].field_160
+  mem[288] = bool(stor4[tokenId].field_224)
+  if stor4[tokenId].field_224:
+      revert with OwnerQueryForNonexistentToken()
+  if stor4[tokenId].field_0:
+      if stor4[tokenId].field_0 != from:
+          revert with TransferFromIncorrectOwner()
+      if from != caller:
+          if not stor7[address(from)][caller]:
+              if tokenId >= stor0:
+                  revert with ApprovalQueryForNonexistentToken()
+              if stor4[tokenId].field_224:
+                  revert with ApprovalQueryForNonexistentToken()
+              if approved[tokenId] != caller:
+                  revert with TransferCallerNotOwnerNorApproved()
+      if not to:
+          revert with TransferToZeroAddress()
+      approved[tokenId] = 0
+      log Approval(
+            address owner=from,
+            address spender=0,
+            uint256 value=tokenId)
+      balanceOf[address(from)].field_0 = uint64(balanceOf[address(from)].field_0 - 1)
+      balanceOf[to].field_0 = uint64(balanceOf[to].field_0 + 1)
+      stor4[tokenId].field_0 = to
+      stor4[tokenId].field_160 = uint64(block.timestamp)
+      if not stor4[tokenId + 1].field_0:
+          if tokenId + 1 != stor0:
+              stor4[tokenId + 1].field_0 = from
+              stor4[tokenId + 1].field_160 = stor4[tokenId].field_160
+      log Transfer(
+            address from=from,
+            address to=to,
+            uint256 value=tokenId)
+      if ext_code.size(to):
+          require ext_code.size(to)
+          call to.onERC721Received(address , address , uint256 , bytes ) with:
+               gas gas_remaining wei
+              args caller, address(from), tokenId, 128, 0
+          if not ext_call.success:
+              if not return_data.size:
+                  revert with TransferToNonERC721ReceiverImplementer()
+              if not return_data.size:
+                  revert with TransferToNonERC721ReceiverImplementer()
+              revert with ext_call.return_data[0 len return_data.size]
+          require return_data.size >=′ 32
+          require ext_call.return_data[0] == Mask(32, 224, ext_call.return_data[0])
+          if Mask(32, 224, ext_call.return_data[0]) != 0x150b7a0200000000000000000000000000000000000000000000000000000000:
+              revert with TransferToNonERC721ReceiverImplementer()
+  else:
+      mem[64] = 416
+      mem[320] = stor4[tokenId - 1].field_0
+      mem[352] = stor4[tokenId - 1].field_160
+      mem[384] = bool(stor4[tokenId - 1].field_224)
+      s = 224
+      s = tokenId
+      while not stor4[tokenId - 1].field_0:
+          mem[0] = s - 2
+          mem[32] = 4
+          mem[64] = mem[64] + 96
+          mem[320] = stor4[s - 2].field_0
+          mem[352] = stor4[tokenId - 1].field_160
+          mem[384] = bool(stor4[tokenId - 1].field_224)
+          s = 320
+          s = s - 1
+          continue 
+      if mem[332 len 20] != from:
+          revert with TransferFromIncorrectOwner()
+      if from == caller:
+          if not to:
+              revert with TransferToZeroAddress()
+          approved[tokenId] = 0
+          log Approval(
+                address owner=from,
+                address spender=0,
+                uint256 value=tokenId)
+          balanceOf[address(from)].field_0 = uint64(balanceOf[address(from)].field_0 - 1)
+          balanceOf[to].field_0 = uint64(balanceOf[to].field_0 + 1)
+          mem[32] = 4
+          stor4[tokenId].field_0 = to
+          stor4[tokenId].field_160 = uint64(block.timestamp)
+          mem[0] = tokenId + 1
+          if stor4[tokenId + 1].field_0:
+              log Transfer(
+                    address from=from,
+                    address to=to,
+                    uint256 value=tokenId)
+              if ext_code.size(to):
+                  mem[mem[64] + 4] = caller
+                  mem[mem[64] + 36] = from
+                  mem[mem[64] + 68] = tokenId
+                  mem[mem[64] + 100] = 128
+                  mem[mem[64] + 132] = 0
+                  mem[mem[64] + 164 len 0] = None
+                  require ext_code.size(to)
+                  call to.onERC721Received(address , address , uint256 , bytes ) with:
+                       gas gas_remaining wei
+                      args caller, address(from), tokenId, 128, 0
+                  mem[mem[64]] = ext_call.return_data[0]
+                  if not ext_call.success:
+                      if not return_data.size:
+                          revert with TransferToNonERC721ReceiverImplementer()
+                      if not return_data.size:
+                          revert with TransferToNonERC721ReceiverImplementer()
+                      revert with ext_call.return_data[0 len return_data.size]
+                  _1313 = mem[64]
+                  mem[64] = mem[64] + ceil32(return_data.size)
+                  require return_data.size >=′ 32
+                  require mem[_1313] == Mask(32, 224, mem[_1313])
+                  if Mask(32, 224, mem[_1313]) != 0x150b7a0200000000000000000000000000000000000000000000000000000000:
+                      revert with TransferToNonERC721ReceiverImplementer()
+          else:
+              if tokenId + 1 == stor0:
+                  log Transfer(
+                        address from=from,
+                        address to=to,
+                        uint256 value=tokenId)
+                  if ext_code.size(to):
+                      mem[mem[64] + 4] = caller
+                      mem[mem[64] + 36] = from
+                      mem[mem[64] + 68] = tokenId
+                      mem[mem[64] + 100] = 128
+                      mem[mem[64] + 132] = 0
+                      mem[mem[64] + 164 len 0] = None
+                      require ext_code.size(to)
+                      call to.onERC721Received(address , address , uint256 , bytes ) with:
+                           gas gas_remaining wei
+                          args caller, address(from), tokenId, 128, 0
+                      mem[mem[64]] = ext_call.return_data[0]
+                      if not ext_call.success:
+                          if not return_data.size:
+                              revert with TransferToNonERC721ReceiverImplementer()
+                          if not return_data.size:
+                              revert with TransferToNonERC721ReceiverImplementer()
+                          revert with ext_call.return_data[0 len return_data.size]
+                      _1315 = mem[64]
+                      mem[64] = mem[64] + ceil32(return_data.size)
+                      require return_data.size >=′ 32
+                      require mem[_1315] == Mask(32, 224, mem[_1315])
+                      if Mask(32, 224, mem[_1315]) != 0x150b7a0200000000000000000000000000000000000000000000000000000000:
+                          revert with TransferToNonERC721ReceiverImplementer()
+              else:
+                  stor4[tokenId + 1].field_0 = from
+                  stor4[tokenId + 1].field_160 = mem[376 len 8]
+                  log Transfer(
+                        address from=from,
+                        address to=to,
+                        uint256 value=tokenId)
+                  if ext_code.size(to):
+                      mem[mem[64] + 4] = caller
+                      mem[mem[64] + 36] = from
+                      mem[mem[64] + 68] = tokenId
+                      mem[mem[64] + 100] = 128
+                      mem[mem[64] + 132] = 0
+                      mem[mem[64] + 164 len 0] = None
+                      require ext_code.size(to)
+                      call to.onERC721Received(address , address , uint256 , bytes ) with:
+                           gas gas_remaining wei
+                          args caller, address(from), tokenId, 128, 0
+                      mem[mem[64]] = ext_call.return_data[0]
+                      if not ext_call.success:
+                          if not return_data.size:
+                              revert with TransferToNonERC721ReceiverImplementer()
+                          if not return_data.size:
+                              revert with TransferToNonERC721ReceiverImplementer()
+                          revert with ext_call.return_data[0 len return_data.size]
+                      _1317 = mem[64]
+                      mem[64] = mem[64] + ceil32(return_data.size)
+                      require return_data.size >=′ 32
+                      require mem[_1317] == Mask(32, 224, mem[_1317])
+                      if Mask(32, 224, mem[_1317]) != 0x150b7a0200000000000000000000000000000000000000000000000000000000:
+                          revert with TransferToNonERC721ReceiverImplementer()
+      else:
+          if stor7[address(from)][caller]:
+              if not to:
+                  revert with TransferToZeroAddress()
+              approved[tokenId] = 0
+              log Approval(
+                    address owner=from,
+                    address spender=0,
+                    uint256 value=tokenId)
+              balanceOf[address(from)].field_0 = uint64(balanceOf[address(from)].field_0 - 1)
+              balanceOf[to].field_0 = uint64(balanceOf[to].field_0 + 1)
+              mem[32] = 4
+              stor4[tokenId].field_0 = to
+              stor4[tokenId].field_160 = uint64(block.timestamp)
+              mem[0] = tokenId + 1
+              if stor4[tokenId + 1].field_0:
+                  log Transfer(
+                        address from=from,
+                        address to=to,
+                        uint256 value=tokenId)
+                  if ext_code.size(to):
+                      mem[mem[64] + 4] = caller
+                      mem[mem[64] + 36] = from
+                      mem[mem[64] + 68] = tokenId
+                      mem[mem[64] + 100] = 128
+                      mem[mem[64] + 132] = 0
+                      mem[mem[64] + 164 len 0] = None
+                      require ext_code.size(to)
+                      call to.onERC721Received(address , address , uint256 , bytes ) with:
+                           gas gas_remaining wei
+                          args caller, address(from), tokenId, 128, 0
+                      mem[mem[64]] = ext_call.return_data[0]
+                      if not ext_call.success:
+                          if not return_data.size:
+                              revert with TransferToNonERC721ReceiverImplementer()
+                          if not return_data.size:
+                              revert with TransferToNonERC721ReceiverImplementer()
+                          revert with ext_call.return_data[0 len return_data.size]
+                      _1319 = mem[64]
+                      mem[64] = mem[64] + ceil32(return_data.size)
+                      require return_data.size >=′ 32
+                      require mem[_1319] == Mask(32, 224, mem[_1319])
+                      if Mask(32, 224, mem[_1319]) != 0x150b7a0200000000000000000000000000000000000000000000000000000000:
+                          revert with TransferToNonERC721ReceiverImplementer()
+              else:
+                  if tokenId + 1 == stor0:
+                      log Transfer(
+                            address from=from,
+                            address to=to,
+                            uint256 value=tokenId)
+                      if ext_code.size(to):
+                          mem[mem[64] + 4] = caller
+                          mem[mem[64] + 36] = from
+                          mem[mem[64] + 68] = tokenId
+                          mem[mem[64] + 100] = 128
+                          mem[mem[64] + 132] = 0
+                          mem[mem[64] + 164 len 0] = None
+                          require ext_code.size(to)
+                          call to.onERC721Received(address , address , uint256 , bytes ) with:
+                               gas gas_remaining wei
+                              args caller, address(from), tokenId, 128, 0
+                          mem[mem[64]] = ext_call.return_data[0]
+                          if not ext_call.success:
+                              if not return_data.size:
+                                  revert with TransferToNonERC721ReceiverImplementer()
+                              if not return_data.size:
+                                  revert with TransferToNonERC721ReceiverImplementer()
+                              revert with ext_call.return_data[0 len return_data.size]
+                          _1321 = mem[64]
+                          mem[64] = mem[64] + ceil32(return_data.size)
+                          require return_data.size >=′ 32
+                          require mem[_1321] == Mask(32, 224, mem[_1321])
+                          if Mask(32, 224, mem[_1321]) != 0x150b7a0200000000000000000000000000000000000000000000000000000000:
+                              revert with TransferToNonERC721ReceiverImplementer()
+                  else:
+                      stor4[tokenId + 1].field_0 = from
+                      stor4[tokenId + 1].field_160 = mem[376 len 8]
+                      log Transfer(
+                            address from=from,
+                            address to=to,
+                            uint256 value=tokenId)
+                      if ext_code.size(to):
+                          mem[mem[64] + 4] = caller
+                          mem[mem[64] + 36] = from
+                          mem[mem[64] + 68] = tokenId
+                          mem[mem[64] + 100] = 128
+                          mem[mem[64] + 132] = 0
+                          mem[mem[64] + 164 len 0] = None
+                          require ext_code.size(to)
+                          call to.onERC721Received(address , address , uint256 , bytes ) with:
+                               gas gas_remaining wei
+                              args caller, address(from), tokenId, 128, 0
+                          mem[mem[64]] = ext_call.return_data[0]
+                          if not ext_call.success:
+                              if not return_data.size:
+                                  revert with TransferToNonERC721ReceiverImplementer()
+                              if not return_data.size:
+                                  revert with TransferToNonERC721ReceiverImplementer()
+                              revert with ext_call.return_data[0 len return_data.size]
+                          _1323 = mem[64]
+                          mem[64] = mem[64] + ceil32(return_data.size)
+                          require return_data.size >=′ 32
+                          require mem[_1323] == Mask(32, 224, mem[_1323])
+                          if Mask(32, 224, mem[_1323]) != 0x150b7a0200000000000000000000000000000000000000000000000000000000:
+                              revert with TransferToNonERC721ReceiverImplementer()
+          else:
+              if tokenId >= stor0:
+                  revert with ApprovalQueryForNonexistentToken()
+              if stor4[tokenId].field_224:
+                  revert with ApprovalQueryForNonexistentToken()
+              if approved[tokenId] != caller:
+                  revert with TransferCallerNotOwnerNorApproved()
+              if not to:
+                  revert with TransferToZeroAddress()
+              approved[tokenId] = 0
+              log Approval(
+                    address owner=from,
+                    address spender=0,
+                    uint256 value=tokenId)
+              balanceOf[address(from)].field_0 = uint64(balanceOf[address(from)].field_0 - 1)
+              balanceOf[to].field_0 = uint64(balanceOf[to].field_0 + 1)
+              mem[32] = 4
+              stor4[tokenId].field_0 = to
+              stor4[tokenId].field_160 = uint64(block.timestamp)
+              mem[0] = tokenId + 1
+              if stor4[tokenId + 1].field_0:
+                  log Transfer(
+                        address from=from,
+                        address to=to,
+                        uint256 value=tokenId)
+                  if ext_code.size(to):
+                      mem[mem[64] + 4] = caller
+                      mem[mem[64] + 36] = from
+                      mem[mem[64] + 68] = tokenId
+                      mem[mem[64] + 100] = 128
+                      mem[mem[64] + 132] = 0
+                      mem[mem[64] + 164 len 0] = None
+                      require ext_code.size(to)
+                      call to.onERC721Received(address , address , uint256 , bytes ) with:
+                           gas gas_remaining wei
+                          args caller, address(from), tokenId, 128, 0
+                      mem[mem[64]] = ext_call.return_data[0]
+                      if not ext_call.success:
+                          if not return_data.size:
+                              revert with TransferToNonERC721ReceiverImplementer()
+                          if not return_data.size:
+                              revert with TransferToNonERC721ReceiverImplementer()
+                          revert with ext_call.return_data[0 len return_data.size]
+                      _1325 = mem[64]
+                      mem[64] = mem[64] + ceil32(return_data.size)
+                      require return_data.size >=′ 32
+                      require mem[_1325] == Mask(32, 224, mem[_1325])
+                      if Mask(32, 224, mem[_1325]) != 0x150b7a0200000000000000000000000000000000000000000000000000000000:
+                          revert with TransferToNonERC721ReceiverImplementer()
+              else:
+                  if tokenId + 1 == stor0:
+                      log Transfer(
+                            address from=from,
+                            address to=to,
+                            uint256 value=tokenId)
+                      if ext_code.size(to):
+                          mem[mem[64] + 4] = caller
+                          mem[mem[64] + 36] = from
+                          mem[mem[64] + 68] = tokenId
+                          mem[mem[64] + 100] = 128
+                          mem[mem[64] + 132] = 0
+                          mem[mem[64] + 164 len 0] = None
+                          require ext_code.size(to)
+                          call to.onERC721Received(address , address , uint256 , bytes ) with:
+                               gas gas_remaining wei
+                              args caller, address(from), tokenId, 128, 0
+                          mem[mem[64]] = ext_call.return_data[0]
+                          if not ext_call.success:
+                              if not return_data.size:
+                                  revert with TransferToNonERC721ReceiverImplementer()
+                              if not return_data.size:
+                                  revert with TransferToNonERC721ReceiverImplementer()
+                              revert with ext_call.return_data[0 len return_data.size]
+                          _1327 = mem[64]
+                          mem[64] = mem[64] + ceil32(return_data.size)
+                          require return_data.size >=′ 32
+                          require mem[_1327] == Mask(32, 224, mem[_1327])
+                          if Mask(32, 224, mem[_1327]) != 0x150b7a0200000000000000000000000000000000000000000000000000000000:
+                              revert with TransferToNonERC721ReceiverImplementer()
+                  else:
+                      stor4[tokenId + 1].field_0 = from
+                      stor4[tokenId + 1].field_160 = mem[376 len 8]
+                      log Transfer(
+                            address from=from,
+                            address to=to,
+                            uint256 value=tokenId)
+                      if ext_code.size(to):
+                          mem[mem[64] + 4] = caller
+                          mem[mem[64] + 36] = from
+                          mem[mem[64] + 68] = tokenId
+                          mem[mem[64] + 100] = 128
+                          mem[mem[64] + 132] = 0
+                          mem[mem[64] + 164 len 0] = None
+                          require ext_code.size(to)
+                          call to.onERC721Received(address , address , uint256 , bytes ) with:
+                               gas gas_remaining wei
+                              args caller, address(from), tokenId, 128, 0
+                          mem[mem[64]] = ext_call.return_data[0]
+                          if not ext_call.success:
+                              if not return_data.size:
+                                  revert with TransferToNonERC721ReceiverImplementer()
+                              if not return_data.size:
+                                  revert with TransferToNonERC721ReceiverImplementer()
+                              revert with ext_call.return_data[0 len return_data.size]
+                          _1329 = mem[64]
+                          mem[64] = mem[64] + ceil32(return_data.size)
+                          require return_data.size >=′ 32
+                          require mem[_1329] == Mask(32, 224, mem[_1329])
+                          if Mask(32, 224, mem[_1329]) != 0x150b7a0200000000000000000000000000000000000000000000000000000000:
+                              revert with TransferToNonERC721ReceiverImplementer()
+
+def sendTokensAndRefundBatch(address[] addresses) payable: 
+  mem[64] = 96
+  require not call.value
+  require calldata.size - 4 >=′ 32
+  require addresses <= LOCK8605463013()
+  require addresses + 35 <′ calldata.size
+  require addresses.length <= LOCK8605463013()
+  require addresses + (32 * addresses.length) + 36 <= calldata.size
+  mem[0] = caller
+  mem[32] = sha3(0xaa4e0f6cdcea7b211950e8a75e39146abfef1b33054a194490366571502a5e48, 11)
+  if roleAdmin[0xaa4e0f6cdcea7b211950e8a75e39146abfef1b33054a194490366571502a5e48][caller].field_0:
+      idx = 0
+      while idx < addresses.length:
+          require cd[((32 * idx) + addresses + 36)] == address(cd[((32 * idx) + addresses + 36)])
+          mem[0] = caller
+          mem[32] = sha3(0xaa4e0f6cdcea7b211950e8a75e39146abfef1b33054a194490366571502a5e48, 11)
+          if not roleAdmin[0xaa4e0f6cdcea7b211950e8a75e39146abfef1b33054a194490366571502a5e48][caller].field_0:
+              _66 = mem[64]
+              mem[mem[64]] = 42
+              mem[64] = mem[64] + 96
+              mem[_66 + 32 len 42] = call.data[calldata.size len 42]
+              if 0 >= mem[_66]:
+                  revert with 0, 50
+              mem[_66 + 32 len 8] = Mask(8, -(2713877091499598330239944961141122840311015265600950719674787125185463975936, 0) + 256, 0) << (2713877091499598330239944961141122840311015265600950719674787125185463975936, 0) - 256
+              if 1 >= mem[_66]:
+                  revert with 0, 50
+              mem[_66 + 33 len 8] = Mask(8, -(('mask_shl', 8, 248, -3, "'x'"), 0) + 256, 0) << (('mask_shl', 8, 248, -3, "'x'"), 0) - 256
+              idx = 41
+              s = caller
+              while idx > 1:
+                  if s % 16 >= 16:
+                      revert with 0, 50
+                  if idx >= mem[_66]:
+                      revert with 0, 50
+                  mem[idx + _66 + 32 len 8] = Mask(8, -(0, 0) + 256, 0) << (0, 0) - 256
+                  if not idx:
+                      revert with 0, 17
+                  idx = idx - 1
+                  s = Mask(252, 0, s) * 0.0625
+                  continue 
+              if caller + 10240:
+                  revert with 0, 'Strings: hex length insufficient'
+              _127 = mem[64]
+              mem[mem[64]] = 66
+              mem[64] = mem[64] + 128
+              mem[_127 + 32 len 66] = call.data[calldata.size len 66]
+              if 0 >= mem[_127]:
+                  revert with 0, 50
+              mem[_127 + 32 len 8] = Mask(8, -(2713877091499598330239944961141122840311015265600950719674787125185463975936, 0) + 256, 0) << (2713877091499598330239944961141122840311015265600950719674787125185463975936, 0) - 256
+              if 1 >= mem[_127]:
+                  revert with 0, 50
+              mem[_127 + 33 len 8] = Mask(8, -(('mask_shl', 8, 248, -3, "'x'"), 0) + 256, 0) << (('mask_shl', 8, 248, -3, "'x'"), 0) - 256
+              idx = 65
+              s = 0xaa4e0f6cdcea7b211950e8a75e39146abfef1b33054a194490366571502a5e48
+              while idx > 1:
+                  if s % 16 >= 16:
+                      revert with 0, 50
+                  if idx >= mem[_127]:
+                      revert with 0, 50
+                  mem[idx + _127 + 32 len 8] = Mask(8, -(0, 0) + 256, 0) << (0, 0) - 256
+                  if not idx:
+                      revert with 0, 17
+                  idx = idx - 1
+                  s = Mask(252, 0, s) * 0.0625
+                  continue 
+              _216 = mem[64]
+              mem[mem[64] + 32] = 'AccessControl: account '
+              _220 = mem[_66]
+              idx = 0
+              while idx < _220:
+                  mem[idx + _216 + 55] = mem[idx + _66 + 32]
+                  idx = idx + 32
+                  continue 
+              mem[_216 + _220 + 55] = ' is missing role '
+              if ceil32(_220) <= _220:
+                  _339 = mem[_127]
+                  idx = 0
+                  while idx < _339:
+                      mem[idx + _216 + _220 + 72] = mem[idx + _127 + 32]
+                      idx = idx + 32
+                      continue 
+                  if ceil32(_339) <= _339:
+                      _459 = mem[64]
+                      mem[mem[64]] = _339 + _216 + _220 + -mem[64] + 40
+                      mem[64] = _339 + _216 + _220 + 72
+                      mem[_339 + _216 + _220 + 72] = 0x8c379a000000000000000000000000000000000000000000000000000000000
+                      mem[_339 + _216 + _220 + 76] = 32
+                      _471 = mem[_459]
+                      mem[_339 + _216 + _220 + 108] = mem[_459]
+                      idx = 0
+                      while idx < _471:
+                          mem[idx + _339 + _216 + _220 + 140] = mem[idx + _459 + 32]
+                          idx = idx + 32
+                          continue 
+                      if ceil32(_471) > _471:
+                          mem[_471 + _339 + _216 + _220 + 140] = 0
+                      revert with 0, 32, mem[_339 + _216 + _220 + 108 len ceil32(_471) + 32]
+                  mem[_339 + _216 + _220 + 72] = 0
+                  _460 = mem[64]
+                  mem[mem[64]] = _339 + _216 + _220 + -mem[64] + 40
+                  mem[64] = _339 + _216 + _220 + 72
+                  mem[_339 + _216 + _220 + 72] = 0x8c379a000000000000000000000000000000000000000000000000000000000
+                  mem[_339 + _216 + _220 + 76] = 32
+                  _472 = mem[_460]
+                  mem[_339 + _216 + _220 + 108] = mem[_460]
+                  idx = 0
+                  while idx < _472:
+                      mem[idx + _339 + _216 + _220 + 140] = mem[idx + _460 + 32]
+                      idx = idx + 32
+                      continue 
+                  if ceil32(_472) > _472:
+                      mem[_472 + _339 + _216 + _220 + 140] = 0
+                  revert with 0, 32, mem[_339 + _216 + _220 + 108 len ceil32(_472) + 32]
+              _340 = mem[_127]
+              idx = 0
+              while idx < _340:
+                  mem[idx + _216 + _220 + 72] = mem[idx + _127 + 32]
+                  idx = idx + 32
+                  continue 
+              if ceil32(_340) <= _340:
+                  _461 = mem[64]
+                  mem[mem[64]] = _340 + _216 + _220 + -mem[64] + 40
+                  mem[64] = _340 + _216 + _220 + 72
+                  mem[_340 + _216 + _220 + 72] = 0x8c379a000000000000000000000000000000000000000000000000000000000
+                  mem[_340 + _216 + _220 + 76] = 32
+                  _473 = mem[_461]
+                  mem[_340 + _216 + _220 + 108] = mem[_461]
+                  idx = 0
+                  while idx < _473:
+                      mem[idx + _340 + _216 + _220 + 140] = mem[idx + _461 + 32]
+                      idx = idx + 32
+                      continue 
+                  if ceil32(_473) > _473:
+                      mem[_473 + _340 + _216 + _220 + 140] = 0
+                  revert with 0, 32, mem[_340 + _216 + _220 + 108 len ceil32(_473) + 32]
+              mem[_340 + _216 + _220 + 72] = 0
+              _462 = mem[64]
+              mem[mem[64]] = _340 + _216 + _220 + -mem[64] + 40
+              mem[64] = _340 + _216 + _220 + 72
+              mem[_340 + _216 + _220 + 72] = 0x8c379a000000000000000000000000000000000000000000000000000000000
+              mem[_340 + _216 + _220 + 76] = 32
+              _474 = mem[_462]
+              mem[_340 + _216 + _220 + 108] = mem[_462]
+              idx = 0
+              while idx < _474:
+                  mem[idx + _340 + _216 + _220 + 140] = mem[idx + _462 + 32]
+                  idx = idx + 32
+                  continue 
+              if ceil32(_474) > _474:
+                  mem[_474 + _340 + _216 + _220 + 140] = 0
+              revert with 0, 32, mem[_340 + _216 + _220 + 108 len ceil32(_474) + 32]
+          if stor10 == 2:
+              revert with 0, 'ReentrancyGuard: reentrant call'
+          stor10 = 2
+          if not price:
+              revert with 0, 'Price has not been set'
+          mem[0] = address(cd[((32 * idx) + addresses + 36)])
+          mem[32] = 16
+          if userData[address(cd[((32 * idx) + addresses + 36)])].field_248:
+              revert with 0, 'Already sent refunds to this address.'
+          userData[address(cd[((32 * idx) + addresses + 36)])].field_248 = 1
+          if not price:
+              revert with 0, 18
+          call address(cd[((32 * idx) + addresses + 36)]) with:
+             value userData[address(cd[((32 * idx) + addresses + 36)])].field_0 % price wei
+               gas gas_remaining wei
+          if not return_data.size:
+              if not ext_call.success:
+                  revert with 0, 'Refund failed.'
+              if not price:
+                  revert with 0, 18
+              if not userData[address(cd[((32 * idx) + addresses + 36)])].field_0 / price:
+                  stor10 = 1
+                  if idx == -1:
+                      revert with 0, 17
+                  idx = idx + 1
+                  continue 
+              if userData[address(cd[((32 * idx) + addresses + 36)])].field_216:
+                  revert with 0, 'Already sent tokens to this address.'
+              userData[address(cd[((32 * idx) + addresses + 36)])].field_216 = uint32(userData[address(cd[((32 * idx) + addresses + 36)])].field_0 / price)
+              if stor0 > !(userData[address(cd[((32 * idx) + addresses + 36)])].field_0 / price):
+                  revert with 0, 17
+              if stor0 + (userData[address(cd[((32 * idx) + addresses + 36)])].field_0 / price) > 24000:
+                  revert with 0, 'Number would exceed max supply'
+              _84 = mem[64]
+              mem[64] = mem[64] + 32
+              mem[_84] = 0
+              if not address(cd[((32 * idx) + addresses + 36)]):
+                  revert with MintToZeroAddress()
+              if not userData[address(cd[((32 * idx) + addresses + 36)])].field_0 / price:
+                  revert with MintZeroQuantity()
+              balanceOf[address(cd[((32 * idx) + addresses + 36)])].field_0 = uint64((userData[address(cd[((32 * idx) + addresses + 36)])].field_0 / price) + balanceOf[address(cd[((32 * idx) + addresses + 36)])].field_0)
+              balanceOf[address(cd[((32 * idx) + addresses + 36)])].field_64 = uint64((userData[address(cd[((32 * idx) + addresses + 36)])].field_0 / price) + balanceOf[address(cd[((32 * idx) + addresses + 36)])].field_64)
+              mem[0] = stor0
+              mem[32] = 4
+              stor4[stor0].field_0 = address(cd[((32 * idx) + addresses + 36)])
+              stor4[stor0].field_160 = uint64(block.timestamp)
+              log Transfer(
+                    address from=0,
+                    address to=address(cd[((32 * idx) + addresses + 36)]),
+                    uint256 value=stor0)
+              if not ext_code.size(address(cd[((32 * idx) + addresses + 36)])):
+                  s = stor0
+                  while s + 1 != (userData[address(cd[((32 * idx) + addresses + 36)])].field_0 / price) + stor0:
+                      log Transfer(
+                            address from=0,
+                            address to=address(cd[((32 * idx) + addresses + 36)]),
+                            uint256 value=s + 1)
+                      s = s + 1
+                      continue 
+                  stor0 = None + 3
+                  stor10 = 1
+                  if idx == -1:
+                      revert with 0, 17
+                  idx = idx + 1
+                  continue 
+              mem[mem[64]] = 0x150b7a0200000000000000000000000000000000000000000000000000000000
+              mem[var85001] = caller
+              mem[var85001 + 32] = 0
+              mem[var85001 + 64] = var85003
+              mem[var85001 + 96] = 128
+              mem[var87002] = 0
+              if var69001 < var89003:
+                  mem[var69001 + var89002] = mem[var69001 + _84 + 32]
+                  var69001 = var69001 + 32
+                  continue 
+              if var69001 <= var89003:
+                  require ext_code.size(address(cd[((32 * idx) + addresses + 36)]))
+                  call address(cd[((32 * idx) + addresses + 36)]).onERC721Received(address , address , uint256 , bytes ) with:
+                       gas gas_remaining wei
+                      args mem[mem[64] + 4 len ceil32(var89005) + var89008 + -mem[64] + 28]
+                  mem[mem[64]] = ext_call.return_data[0]
+                  if not ext_call.success:
+                      if not return_data.size:
+                          if not mem[96]:
+                              revert with TransferToNonERC721ReceiverImplementer()
+                          revert with memory
+                            from 128
+                             len mem[96]
+                      if not return_data.size:
+                          revert with TransferToNonERC721ReceiverImplementer()
+                      revert with ext_call.return_data[0 len return_data.size]
+                  _643 = mem[64]
+                  mem[64] = mem[64] + ceil32(return_data.size)
+                  require return_data.size >=′ 32
+                  require mem[_643] == Mask(32, 224, mem[_643])
+                  if Mask(32, 224, mem[_643]) != 0x150b7a0200000000000000000000000000000000000000000000000000000000:
+                      revert with TransferToNonERC721ReceiverImplementer()
+              else:
+                  mem[var89003 + var89002] = 0
+                  require ext_code.size(address(cd[((32 * idx) + addresses + 36)]))
+                  call address(cd[((32 * idx) + addresses + 36)]).onERC721Received(address , address , uint256 , bytes ) with:
+                       gas gas_remaining wei
+                      args mem[mem[64] + 4 len ceil32(var89005) + var89008 + -mem[64] + 28]
+                  mem[mem[64]] = ext_call.return_data[0]
+                  if not ext_call.success:
+                      if not return_data.size:
+                          if not mem[96]:
+                              revert with TransferToNonERC721ReceiverImplementer()
+                          revert with memory
+                            from 128
+                             len mem[96]
+                      if not return_data.size:
+                          revert with TransferToNonERC721ReceiverImplementer()
+                      revert with ext_call.return_data[0 len return_data.size]
+                  _644 = mem[64]
+                  mem[64] = mem[64] + ceil32(return_data.size)
+                  require return_data.size >=′ 32
+                  require mem[_644] == Mask(32, 224, mem[_644])
+                  if Mask(32, 224, mem[_644]) != 0x150b7a0200000000000000000000000000000000000000000000000000000000:
+                      revert with TransferToNonERC721ReceiverImplementer()
+          else:
+              _69 = mem[64]
+              mem[64] = mem[64] + ceil32(return_data.size) + 1
+              mem[_69] = return_data.size
+              mem[_69 + 32 len return_data.size] = ext_call.return_data[0 len return_data.size]
+              if not ext_call.success:
+                  revert with 0, 'Refund failed.'
+              if not price:
+                  revert with 0, 18
+              if not userData[address(cd[((32 * idx) + addresses + 36)])].field_0 / price:
+                  stor10 = 1
+                  if idx == -1:
+                      revert with 0, 17
+                  idx = idx + 1
+                  continue 
+              if userData[address(cd[((32 * idx) + addresses + 36)])].field_216:
+                  revert with 0, 'Already sent tokens to this address.'
+              userData[address(cd[((32 * idx) + addresses + 36)])].field_216 = uint32(userData[address(cd[((32 * idx) + addresses + 36)])].field_0 / price)
+              if stor0 > !(userData[address(cd[((32 * idx) + addresses + 36)])].field_0 / price):
+                  revert with 0, 17
+              if stor0 + (userData[address(cd[((32 * idx) + addresses + 36)])].field_0 / price) > 24000:
+                  revert with 0, 'Number would exceed max supply'
+              _86 = mem[64]
+              mem[64] = mem[64] + 32
+              mem[_86] = 0
+              if not address(cd[((32 * idx) + addresses + 36)]):
+                  revert with MintToZeroAddress()
+              if not userData[address(cd[((32 * idx) + addresses + 36)])].field_0 / price:
+                  revert with MintZeroQuantity()
+              balanceOf[address(cd[((32 * idx) + addresses + 36)])].field_0 = uint64((userData[address(cd[((32 * idx) + addresses + 36)])].field_0 / price) + balanceOf[address(cd[((32 * idx) + addresses + 36)])].field_0)
+              balanceOf[address(cd[((32 * idx) + addresses + 36)])].field_64 = uint64((userData[address(cd[((32 * idx) + addresses + 36)])].field_0 / price) + balanceOf[address(cd[((32 * idx) + addresses + 36)])].field_64)
+              mem[0] = stor0
+              mem[32] = 4
+              stor4[stor0].field_0 = address(cd[((32 * idx) + addresses + 36)])
+              stor4[stor0].field_160 = uint64(block.timestamp)
+              log Transfer(
+                    address from=0,
+                    address to=address(cd[((32 * idx) + addresses + 36)]),
+                    uint256 value=stor0)
+              if not ext_code.size(address(cd[((32 * idx) + addresses + 36)])):
+                  s = stor0
+                  while s + 1 != (userData[address(cd[((32 * idx) + addresses + 36)])].field_0 / price) + stor0:
+                      log Transfer(
+                            address from=0,
+                            address to=address(cd[((32 * idx) + addresses + 36)]),
+                            uint256 value=s + 1)
+                      s = s + 1
+                      continue 
+                  stor0 = None + 3
+                  stor10 = 1
+                  if idx == -1:
+                      revert with 0, 17
+                  idx = idx + 1
+                  continue 
+              mem[mem[64]] = 0x150b7a0200000000000000000000000000000000000000000000000000000000
+              mem[var85001] = caller
+              mem[var85001 + 32] = 0
+              mem[var85001 + 64] = var85003
+              mem[var85001 + 96] = 128
+              mem[var87002] = 0
+              if var69001 < var89003:
+                  mem[var69001 + var89002] = mem[var69001 + _86 + 32]
+                  var69001 = var69001 + 32
+                  continue 
+              if var69001 <= var89003:
+                  require ext_code.size(address(cd[((32 * idx) + addresses + 36)]))
+                  call address(cd[((32 * idx) + addresses + 36)]).onERC721Received(address , address , uint256 , bytes ) with:
+                       gas gas_remaining wei
+                      args mem[mem[64] + 4 len ceil32(var89005) + var89008 + -mem[64] + 28]
+                  mem[mem[64]] = ext_call.return_data[0]
+                  if not ext_call.success:
+                      if not return_data.size:
+                          if not mem[96]:
+                              revert with TransferToNonERC721ReceiverImplementer()
+                          revert with memory
+                            from 128
+                             len mem[96]
+                      if not return_data.size:
+                          revert with TransferToNonERC721ReceiverImplementer()
+                      revert with ext_call.return_data[0 len return_data.size]
+                  _645 = mem[64]
+                  mem[64] = mem[64] + ceil32(return_data.size)
+                  require return_data.size >=′ 32
+                  require mem[_645] == Mask(32, 224, mem[_645])
+                  if Mask(32, 224, mem[_645]) != 0x150b7a0200000000000000000000000000000000000000000000000000000000:
+                      revert with TransferToNonERC721ReceiverImplementer()
+              else:
+                  mem[var89003 + var89002] = 0
+                  require ext_code.size(address(cd[((32 * idx) + addresses + 36)]))
+                  call address(cd[((32 * idx) + addresses + 36)]).onERC721Received(address , address , uint256 , bytes ) with:
+                       gas gas_remaining wei
+                      args mem[mem[64] + 4 len ceil32(var89005) + var89008 + -mem[64] + 28]
+                  mem[mem[64]] = ext_call.return_data[0]
+                  if not ext_call.success:
+                      if not return_data.size:
+                          if not mem[96]:
+                              revert with TransferToNonERC721ReceiverImplementer()
+                          revert with memory
+                            from 128
+                             len mem[96]
+                      if not return_data.size:
+                          revert with TransferToNonERC721ReceiverImplementer()
+                      revert with ext_call.return_data[0 len return_data.size]
+                  _646 = mem[64]
+                  mem[64] = mem[64] + ceil32(return_data.size)
+                  require return_data.size >=′ 32
+                  require mem[_646] == Mask(32, 224, mem[_646])
+                  if Mask(32, 224, mem[_646]) != 0x150b7a0200000000000000000000000000000000000000000000000000000000:
+                      revert with TransferToNonERC721ReceiverImplementer()
+          if var89026 == (userData[address(cd[((32 * idx) + addresses + 36)])].field_0 / price) + stor0:
+              require stor0 == stor0
+              stor0 = var89026
+              stor10 = 1
+              if idx == -1:
+                  revert with 0, 17
+              idx = idx + 1
+              continue 
+          log Transfer(
+                address from=0,
+                address to=address(cd[((32 * idx) + addresses + 36)]),
+                uint256 value=var89026)
+          mem[mem[64]] = 0x150b7a0200000000000000000000000000000000000000000000000000000000
+          mem[mem[64] + 4] = caller
+          mem[mem[64] + 36] = 0
+          mem[mem[64] + 68] = var89026
+          mem[mem[64] + 100] = 128
+          mem[mem[64] + 132] = 0
+          var69001 = 0
+          continue 
+      stop
+  mem[128 len 42] = call.data[calldata.size len 42]
+  idx = 41
+  s = caller
+  while idx > 1:
+      if s % 16 >= 16:
+          revert with 0, 50
+      if idx >= 42:
+          revert with 0, 50
+      mem[idx + 128 len 8] = Mask(8, -(0, 0) + 256, 0) << (0, 0) - 256
+      if not idx:
+          revert with 0, 17
+      idx = idx - 1
+      s = Mask(252, 0, s) * 0.0625
+      continue 
+  if caller + 10240:
+      revert with 0, 'Strings: hex length insufficient'
+  mem[224 len 66] = call.data[calldata.size len 66]
+  idx = 65
+  s = 0xaa4e0f6cdcea7b211950e8a75e39146abfef1b33054a194490366571502a5e48
+  while idx > 1:
+      if s % 16 >= 16:
+          revert with 0, 50
+      if idx >= 66:
+          revert with 0, 50
+      mem[idx + 224 len 8] = Mask(8, -(0, 0) + 256, 0) << (0, 0) - 256
+      if not idx:
+          revert with 0, 17
+      idx = idx - 1
+      s = Mask(252, 0, s) * 0.0625
+      continue 
+  revert with 0, 32, 148, 'AccessControl: account ', mem[160 len 42], ' is missing role ', mem[288 len 66], 0, 0 >> 928, 0
+
+def safeTransferFrom(address from, address to, uint256 tokenId, bytes _data): # not payable
+  require calldata.size - 4 >=′ 128
+  require from == from
+  require to == to
+  require _data <= LOCK8605463013()
+  require calldata.size >′ _data + 35
+  if _data.length > LOCK8605463013():
+      revert with 0, 65
+  if ceil32(ceil32(_data.length)) + 97 < 96 or ceil32(ceil32(_data.length)) + 97 > LOCK8605463013():
+      revert with 0, 65
+  mem[96] = _data.length
+  require _data + _data.length + 36 <= calldata.size
+  mem[128 len _data.length] = _data[all]
+  mem[ceil32(ceil32(_data.length)) + 97] = 0
+  mem[ceil32(ceil32(_data.length)) + 129] = 0
+  mem[ceil32(ceil32(_data.length)) + 161] = 0
+  if tokenId >= stor0:
+      revert with OwnerQueryForNonexistentToken()
+  mem[ceil32(ceil32(_data.length)) + 193] = stor4[tokenId].field_0
+  mem[ceil32(ceil32(_data.length)) + 225] = stor4[tokenId].field_160
+  mem[ceil32(ceil32(_data.length)) + 257] = bool(stor4[tokenId].field_224)
+  if stor4[tokenId].field_224:
+      revert with OwnerQueryForNonexistentToken()
+  if stor4[tokenId].field_0:
+      if stor4[tokenId].field_0 != from:
+          revert with TransferFromIncorrectOwner()
+      if from != caller:
+          if not stor7[address(from)][caller]:
+              if tokenId >= stor0:
+                  revert with ApprovalQueryForNonexistentToken()
+              if stor4[tokenId].field_224:
+                  revert with ApprovalQueryForNonexistentToken()
+              if approved[tokenId] != caller:
+                  revert with TransferCallerNotOwnerNorApproved()
+      if not to:
+          revert with TransferToZeroAddress()
+      approved[tokenId] = 0
+      log Approval(
+            address owner=from,
+            address spender=0,
+            uint256 value=tokenId)
+      balanceOf[address(from)].field_0 = uint64(balanceOf[address(from)].field_0 - 1)
+      balanceOf[to].field_0 = uint64(balanceOf[to].field_0 + 1)
+      stor4[tokenId].field_0 = to
+      stor4[tokenId].field_160 = uint64(block.timestamp)
+      if not stor4[tokenId + 1].field_0:
+          if tokenId + 1 != stor0:
+              stor4[tokenId + 1].field_0 = from
+              stor4[tokenId + 1].field_160 = stor4[tokenId].field_160
+      log Transfer(
+            address from=from,
+            address to=to,
+            uint256 value=tokenId)
+      if ext_code.size(to):
+          require ext_code.size(to)
+          call to.onERC721Received(address , address , uint256 , bytes ) with:
+               gas gas_remaining wei
+              args caller, address(from), tokenId, Array(len=_data.length, data=_data[all])
+          if not ext_call.success:
+              if not return_data.size:
+                  if not _data.length:
+                      revert with TransferToNonERC721ReceiverImplementer()
+                  revert with _data[all]
+              if not return_data.size:
+                  revert with TransferToNonERC721ReceiverImplementer()
+              revert with ext_call.return_data[0 len return_data.size]
+          require return_data.size >=′ 32
+          require ext_call.return_data[0] == Mask(32, 224, ext_call.return_data[0])
+          if Mask(32, 224, ext_call.return_data[0]) != 0x150b7a0200000000000000000000000000000000000000000000000000000000:
+              revert with TransferToNonERC721ReceiverImplementer()
+  else:
+      mem[64] = ceil32(ceil32(_data.length)) + 385
+      mem[ceil32(ceil32(_data.length)) + 289] = stor4[tokenId - 1].field_0
+      mem[ceil32(ceil32(_data.length)) + 321] = stor4[tokenId - 1].field_160
+      mem[ceil32(ceil32(_data.length)) + 353] = bool(stor4[tokenId - 1].field_224)
+      s = ceil32(ceil32(_data.length)) + 193
+      s = tokenId
+      while not stor4[tokenId - 1].field_0:
+          mem[0] = s - 2
+          mem[32] = 4
+          mem[64] = mem[64] + 96
+          mem[ceil32(ceil32(_data.length)) + 289] = stor4[s - 2].field_0
+          mem[ceil32(ceil32(_data.length)) + 321] = stor4[tokenId - 1].field_160
+          mem[ceil32(ceil32(_data.length)) + 353] = bool(stor4[tokenId - 1].field_224)
+          s = ceil32(ceil32(_data.length)) + 289
+          s = s - 1
+          continue 
+      if mem[ceil32(ceil32(_data.length)) + 301 len 20] != from:
+          revert with TransferFromIncorrectOwner()
+      if from == caller:
+          if not to:
+              revert with TransferToZeroAddress()
+          approved[tokenId] = 0
+          log Approval(
+                address owner=from,
+                address spender=0,
+                uint256 value=tokenId)
+          balanceOf[address(from)].field_0 = uint64(balanceOf[address(from)].field_0 - 1)
+          balanceOf[to].field_0 = uint64(balanceOf[to].field_0 + 1)
+          mem[32] = 4
+          stor4[tokenId].field_0 = to
+          stor4[tokenId].field_160 = uint64(block.timestamp)
+          mem[0] = tokenId + 1
+          if stor4[tokenId + 1].field_0:
+              log Transfer(
+                    address from=from,
+                    address to=to,
+                    uint256 value=tokenId)
+              if ext_code.size(to):
+                  mem[mem[64] + 4] = caller
+                  mem[mem[64] + 36] = from
+                  mem[mem[64] + 68] = tokenId
+                  mem[mem[64] + 100] = 128
+                  mem[mem[64] + 132] = _data.length
+                  mem[mem[64] + 164 len ceil32(_data.length)] = _data[all], Mask(8 * ceil32(_data.length) - _data.length, -(8 * ceil32(_data.length) + -ceil32(ceil32(_data.length)) + 31) + 256, 0) >> -(8 * ceil32(_data.length) + -ceil32(ceil32(_data.length)) + 31) + 256
+                  if ceil32(_data.length) <= _data.length:
+                      require ext_code.size(to)
+                      call to.onERC721Received(address , address , uint256 , bytes ) with:
+                           gas gas_remaining wei
+                          args caller, address(from), tokenId, Array(len=_data.length, data=_data[all])
+                      mem[mem[64]] = ext_call.return_data[0]
+                      if not ext_call.success:
+                          if not return_data.size:
+                              if not _data.length:
+                                  revert with TransferToNonERC721ReceiverImplementer()
+                              revert with _data[all]
+                          if not return_data.size:
+                              revert with TransferToNonERC721ReceiverImplementer()
+                          revert with ext_call.return_data[0 len return_data.size]
+                      _1313 = mem[64]
+                      mem[64] = mem[64] + ceil32(return_data.size)
+                      require return_data.size >=′ 32
+                      require mem[_1313] == Mask(32, 224, mem[_1313])
+                      if Mask(32, 224, mem[_1313]) != 0x150b7a0200000000000000000000000000000000000000000000000000000000:
+                          revert with TransferToNonERC721ReceiverImplementer()
+                  else:
+                      mem[_data.length + mem[64] + 164] = 0
+                      require ext_code.size(to)
+                      call to.onERC721Received(address , address , uint256 , bytes ) with:
+                           gas gas_remaining wei
+                          args caller, address(from), tokenId, Array(len=_data.length, data=_data[all])
+                      mem[mem[64]] = ext_call.return_data[0]
+                      if not ext_call.success:
+                          if not return_data.size:
+                              if not _data.length:
+                                  revert with TransferToNonERC721ReceiverImplementer()
+                              revert with _data[all]
+                          if not return_data.size:
+                              revert with TransferToNonERC721ReceiverImplementer()
+                          revert with ext_call.return_data[0 len return_data.size]
+                      _1314 = mem[64]
+                      mem[64] = mem[64] + ceil32(return_data.size)
+                      require return_data.size >=′ 32
+                      require mem[_1314] == Mask(32, 224, mem[_1314])
+                      if Mask(32, 224, mem[_1314]) != 0x150b7a0200000000000000000000000000000000000000000000000000000000:
+                          revert with TransferToNonERC721ReceiverImplementer()
+          else:
+              if tokenId + 1 == stor0:
+                  log Transfer(
+                        address from=from,
+                        address to=to,
+                        uint256 value=tokenId)
+                  if ext_code.size(to):
+                      mem[mem[64] + 4] = caller
+                      mem[mem[64] + 36] = from
+                      mem[mem[64] + 68] = tokenId
+                      mem[mem[64] + 100] = 128
+                      mem[mem[64] + 132] = _data.length
+                      mem[mem[64] + 164 len ceil32(_data.length)] = _data[all], Mask(8 * ceil32(_data.length) - _data.length, -(8 * ceil32(_data.length) + -ceil32(ceil32(_data.length)) + 31) + 256, 0) >> -(8 * ceil32(_data.length) + -ceil32(ceil32(_data.length)) + 31) + 256
+                      if ceil32(_data.length) <= _data.length:
+                          require ext_code.size(to)
+                          call to.onERC721Received(address , address , uint256 , bytes ) with:
+                               gas gas_remaining wei
+                              args caller, address(from), tokenId, Array(len=_data.length, data=_data[all])
+                          mem[mem[64]] = ext_call.return_data[0]
+                          if not ext_call.success:
+                              if not return_data.size:
+                                  if not _data.length:
+                                      revert with TransferToNonERC721ReceiverImplementer()
+                                  revert with _data[all]
+                              if not return_data.size:
+                                  revert with TransferToNonERC721ReceiverImplementer()
+                              revert with ext_call.return_data[0 len return_data.size]
+                          _1315 = mem[64]
+                          mem[64] = mem[64] + ceil32(return_data.size)
+                          require return_data.size >=′ 32
+                          require mem[_1315] == Mask(32, 224, mem[_1315])
+                          if Mask(32, 224, mem[_1315]) != 0x150b7a0200000000000000000000000000000000000000000000000000000000:
+                              revert with TransferToNonERC721ReceiverImplementer()
+                      else:
+                          mem[_data.length + mem[64] + 164] = 0
+                          require ext_code.size(to)
+                          call to.onERC721Received(address , address , uint256 , bytes ) with:
+                               gas gas_remaining wei
+                              args caller, address(from), tokenId, Array(len=_data.length, data=_data[all])
+                          mem[mem[64]] = ext_call.return_data[0]
+                          if not ext_call.success:
+                              if not return_data.size:
+                                  if not _data.length:
+                                      revert with TransferToNonERC721ReceiverImplementer()
+                                  revert with _data[all]
+                              if not return_data.size:
+                                  revert with TransferToNonERC721ReceiverImplementer()
+                              revert with ext_call.return_data[0 len return_data.size]
+                          _1316 = mem[64]
+                          mem[64] = mem[64] + ceil32(return_data.size)
+                          require return_data.size >=′ 32
+                          require mem[_1316] == Mask(32, 224, mem[_1316])
+                          if Mask(32, 224, mem[_1316]) != 0x150b7a0200000000000000000000000000000000000000000000000000000000:
+                              revert with TransferToNonERC721ReceiverImplementer()
+              else:
+                  stor4[tokenId + 1].field_0 = from
+                  stor4[tokenId + 1].field_160 = mem[ceil32(ceil32(_data.length)) + 345 len 8]
+                  log Transfer(
+                        address from=from,
+                        address to=to,
+                        uint256 value=tokenId)
+                  if ext_code.size(to):
+                      mem[mem[64] + 4] = caller
+                      mem[mem[64] + 36] = from
+                      mem[mem[64] + 68] = tokenId
+                      mem[mem[64] + 100] = 128
+                      mem[mem[64] + 132] = _data.length
+                      mem[mem[64] + 164 len ceil32(_data.length)] = _data[all], Mask(8 * ceil32(_data.length) - _data.length, -(8 * ceil32(_data.length) + -ceil32(ceil32(_data.length)) + 31) + 256, 0) >> -(8 * ceil32(_data.length) + -ceil32(ceil32(_data.length)) + 31) + 256
+                      if ceil32(_data.length) <= _data.length:
+                          require ext_code.size(to)
+                          call to.onERC721Received(address , address , uint256 , bytes ) with:
+                               gas gas_remaining wei
+                              args caller, address(from), tokenId, Array(len=_data.length, data=_data[all])
+                          mem[mem[64]] = ext_call.return_data[0]
+                          if not ext_call.success:
+                              if not return_data.size:
+                                  if not _data.length:
+                                      revert with TransferToNonERC721ReceiverImplementer()
+                                  revert with _data[all]
+                              if not return_data.size:
+                                  revert with TransferToNonERC721ReceiverImplementer()
+                              revert with ext_call.return_data[0 len return_data.size]
+                          _1317 = mem[64]
+                          mem[64] = mem[64] + ceil32(return_data.size)
+                          require return_data.size >=′ 32
+                          require mem[_1317] == Mask(32, 224, mem[_1317])
+                          if Mask(32, 224, mem[_1317]) != 0x150b7a0200000000000000000000000000000000000000000000000000000000:
+                              revert with TransferToNonERC721ReceiverImplementer()
+                      else:
+                          mem[_data.length + mem[64] + 164] = 0
+                          require ext_code.size(to)
+                          call to.onERC721Received(address , address , uint256 , bytes ) with:
+                               gas gas_remaining wei
+                              args caller, address(from), tokenId, Array(len=_data.length, data=_data[all])
+                          mem[mem[64]] = ext_call.return_data[0]
+                          if not ext_call.success:
+                              if not return_data.size:
+                                  if not _data.length:
+                                      revert with TransferToNonERC721ReceiverImplementer()
+                                  revert with _data[all]
+                              if not return_data.size:
+                                  revert with TransferToNonERC721ReceiverImplementer()
+                              revert with ext_call.return_data[0 len return_data.size]
+                          _1318 = mem[64]
+                          mem[64] = mem[64] + ceil32(return_data.size)
+                          require return_data.size >=′ 32
+                          require mem[_1318] == Mask(32, 224, mem[_1318])
+                          if Mask(32, 224, mem[_1318]) != 0x150b7a0200000000000000000000000000000000000000000000000000000000:
+                              revert with TransferToNonERC721ReceiverImplementer()
+      else:
+          if stor7[address(from)][caller]:
+              if not to:
+                  revert with TransferToZeroAddress()
+              approved[tokenId] = 0
+              log Approval(
+                    address owner=from,
+                    address spender=0,
+                    uint256 value=tokenId)
+              balanceOf[address(from)].field_0 = uint64(balanceOf[address(from)].field_0 - 1)
+              balanceOf[to].field_0 = uint64(balanceOf[to].field_0 + 1)
+              mem[32] = 4
+              stor4[tokenId].field_0 = to
+              stor4[tokenId].field_160 = uint64(block.timestamp)
+              mem[0] = tokenId + 1
+              if stor4[tokenId + 1].field_0:
+                  log Transfer(
+                        address from=from,
+                        address to=to,
+                        uint256 value=tokenId)
+                  if ext_code.size(to):
+                      mem[mem[64] + 4] = caller
+                      mem[mem[64] + 36] = from
+                      mem[mem[64] + 68] = tokenId
+                      mem[mem[64] + 100] = 128
+                      mem[mem[64] + 132] = _data.length
+                      mem[mem[64] + 164 len ceil32(_data.length)] = _data[all], Mask(8 * ceil32(_data.length) - _data.length, -(8 * ceil32(_data.length) + -ceil32(ceil32(_data.length)) + 31) + 256, 0) >> -(8 * ceil32(_data.length) + -ceil32(ceil32(_data.length)) + 31) + 256
+                      if ceil32(_data.length) <= _data.length:
+                          require ext_code.size(to)
+                          call to.onERC721Received(address , address , uint256 , bytes ) with:
+                               gas gas_remaining wei
+                              args caller, address(from), tokenId, Array(len=_data.length, data=_data[all])
+                          mem[mem[64]] = ext_call.return_data[0]
+                          if not ext_call.success:
+                              if not return_data.size:
+                                  if not _data.length:
+                                      revert with TransferToNonERC721ReceiverImplementer()
+                                  revert with _data[all]
+                              if not return_data.size:
+                                  revert with TransferToNonERC721ReceiverImplementer()
+                              revert with ext_call.return_data[0 len return_data.size]
+                          _1319 = mem[64]
+                          mem[64] = mem[64] + ceil32(return_data.size)
+                          require return_data.size >=′ 32
+                          require mem[_1319] == Mask(32, 224, mem[_1319])
+                          if Mask(32, 224, mem[_1319]) != 0x150b7a0200000000000000000000000000000000000000000000000000000000:
+                              revert with TransferToNonERC721ReceiverImplementer()
+                      else:
+                          mem[_data.length + mem[64] + 164] = 0
+                          require ext_code.size(to)
+                          call to.onERC721Received(address , address , uint256 , bytes ) with:
+                               gas gas_remaining wei
+                              args caller, address(from), tokenId, Array(len=_data.length, data=_data[all])
+                          mem[mem[64]] = ext_call.return_data[0]
+                          if not ext_call.success:
+                              if not return_data.size:
+                                  if not _data.length:
+                                      revert with TransferToNonERC721ReceiverImplementer()
+                                  revert with _data[all]
+                              if not return_data.size:
+                                  revert with TransferToNonERC721ReceiverImplementer()
+                              revert with ext_call.return_data[0 len return_data.size]
+                          _1320 = mem[64]
+                          mem[64] = mem[64] + ceil32(return_data.size)
+                          require return_data.size >=′ 32
+                          require mem[_1320] == Mask(32, 224, mem[_1320])
+                          if Mask(32, 224, mem[_1320]) != 0x150b7a0200000000000000000000000000000000000000000000000000000000:
+                              revert with TransferToNonERC721ReceiverImplementer()
+              else:
+                  if tokenId + 1 == stor0:
+                      log Transfer(
+                            address from=from,
+                            address to=to,
+                            uint256 value=tokenId)
+                      if ext_code.size(to):
+                          mem[mem[64] + 4] = caller
+                          mem[mem[64] + 36] = from
+                          mem[mem[64] + 68] = tokenId
+                          mem[mem[64] + 100] = 128
+                          mem[mem[64] + 132] = _data.length
+                          mem[mem[64] + 164 len ceil32(_data.length)] = _data[all], Mask(8 * ceil32(_data.length) - _data.length, -(8 * ceil32(_data.length) + -ceil32(ceil32(_data.length)) + 31) + 256, 0) >> -(8 * ceil32(_data.length) + -ceil32(ceil32(_data.length)) + 31) + 256
+                          if ceil32(_data.length) <= _data.length:
+                              require ext_code.size(to)
+                              call to.onERC721Received(address , address , uint256 , bytes ) with:
+                                   gas gas_remaining wei
+                                  args caller, address(from), tokenId, Array(len=_data.length, data=_data[all])
+                              mem[mem[64]] = ext_call.return_data[0]
+                              if not ext_call.success:
+                                  if not return_data.size:
+                                      if not _data.length:
+                                          revert with TransferToNonERC721ReceiverImplementer()
+                                      revert with _data[all]
+                                  if not return_data.size:
+                                      revert with TransferToNonERC721ReceiverImplementer()
+                                  revert with ext_call.return_data[0 len return_data.size]
+                              _1321 = mem[64]
+                              mem[64] = mem[64] + ceil32(return_data.size)
+                              require return_data.size >=′ 32
+                              require mem[_1321] == Mask(32, 224, mem[_1321])
+                              if Mask(32, 224, mem[_1321]) != 0x150b7a0200000000000000000000000000000000000000000000000000000000:
+                                  revert with TransferToNonERC721ReceiverImplementer()
+                          else:
+                              mem[_data.length + mem[64] + 164] = 0
+                              require ext_code.size(to)
+                              call to.onERC721Received(address , address , uint256 , bytes ) with:
+                                   gas gas_remaining wei
+                                  args caller, address(from), tokenId, Array(len=_data.length, data=_data[all])
+                              mem[mem[64]] = ext_call.return_data[0]
+                              if not ext_call.success:
+                                  if not return_data.size:
+                                      if not _data.length:
+                                          revert with TransferToNonERC721ReceiverImplementer()
+                                      revert with _data[all]
+                                  if not return_data.size:
+                                      revert with TransferToNonERC721ReceiverImplementer()
+                                  revert with ext_call.return_data[0 len return_data.size]
+                              _1322 = mem[64]
+                              mem[64] = mem[64] + ceil32(return_data.size)
+                              require return_data.size >=′ 32
+                              require mem[_1322] == Mask(32, 224, mem[_1322])
+                              if Mask(32, 224, mem[_1322]) != 0x150b7a0200000000000000000000000000000000000000000000000000000000:
+                                  revert with TransferToNonERC721ReceiverImplementer()
+                  else:
+                      stor4[tokenId + 1].field_0 = from
+                      stor4[tokenId + 1].field_160 = mem[ceil32(ceil32(_data.length)) + 345 len 8]
+                      log Transfer(
+                            address from=from,
+                            address to=to,
+                            uint256 value=tokenId)
+                      if ext_code.size(to):
+                          mem[mem[64] + 4] = caller
+                          mem[mem[64] + 36] = from
+                          mem[mem[64] + 68] = tokenId
+                          mem[mem[64] + 100] = 128
+                          mem[mem[64] + 132] = _data.length
+                          mem[mem[64] + 164 len ceil32(_data.length)] = _data[all], Mask(8 * ceil32(_data.length) - _data.length, -(8 * ceil32(_data.length) + -ceil32(ceil32(_data.length)) + 31) + 256, 0) >> -(8 * ceil32(_data.length) + -ceil32(ceil32(_data.length)) + 31) + 256
+                          if ceil32(_data.length) <= _data.length:
+                              require ext_code.size(to)
+                              call to.onERC721Received(address , address , uint256 , bytes ) with:
+                                   gas gas_remaining wei
+                                  args caller, address(from), tokenId, Array(len=_data.length, data=_data[all])
+                              mem[mem[64]] = ext_call.return_data[0]
+                              if not ext_call.success:
+                                  if not return_data.size:
+                                      if not _data.length:
+                                          revert with TransferToNonERC721ReceiverImplementer()
+                                      revert with _data[all]
+                                  if not return_data.size:
+                                      revert with TransferToNonERC721ReceiverImplementer()
+                                  revert with ext_call.return_data[0 len return_data.size]
+                              _1323 = mem[64]
+                              mem[64] = mem[64] + ceil32(return_data.size)
+                              require return_data.size >=′ 32
+                              require mem[_1323] == Mask(32, 224, mem[_1323])
+                              if Mask(32, 224, mem[_1323]) != 0x150b7a0200000000000000000000000000000000000000000000000000000000:
+                                  revert with TransferToNonERC721ReceiverImplementer()
+                          else:
+                              mem[_data.length + mem[64] + 164] = 0
+                              require ext_code.size(to)
+                              call to.onERC721Received(address , address , uint256 , bytes ) with:
+                                   gas gas_remaining wei
+                                  args caller, address(from), tokenId, Array(len=_data.length, data=_data[all])
+                              mem[mem[64]] = ext_call.return_data[0]
+                              if not ext_call.success:
+                                  if not return_data.size:
+                                      if not _data.length:
+                                          revert with TransferToNonERC721ReceiverImplementer()
+                                      revert with _data[all]
+                                  if not return_data.size:
+                                      revert with TransferToNonERC721ReceiverImplementer()
+                                  revert with ext_call.return_data[0 len return_data.size]
+                              _1324 = mem[64]
+                              mem[64] = mem[64] + ceil32(return_data.size)
+                              require return_data.size >=′ 32
+                              require mem[_1324] == Mask(32, 224, mem[_1324])
+                              if Mask(32, 224, mem[_1324]) != 0x150b7a0200000000000000000000000000000000000000000000000000000000:
+                                  revert with TransferToNonERC721ReceiverImplementer()
+          else:
+              if tokenId >= stor0:
+                  revert with ApprovalQueryForNonexistentToken()
+              if stor4[tokenId].field_224:
+                  revert with ApprovalQueryForNonexistentToken()
+              if approved[tokenId] != caller:
+                  revert with TransferCallerNotOwnerNorApproved()
+              if not to:
+                  revert with TransferToZeroAddress()
+              approved[tokenId] = 0
+              log Approval(
+                    address owner=from,
+                    address spender=0,
+                    uint256 value=tokenId)
+              balanceOf[address(from)].field_0 = uint64(balanceOf[address(from)].field_0 - 1)
+              balanceOf[to].field_0 = uint64(balanceOf[to].field_0 + 1)
+              mem[32] = 4
+              stor4[tokenId].field_0 = to
+              stor4[tokenId].field_160 = uint64(block.timestamp)
+              mem[0] = tokenId + 1
+              if stor4[tokenId + 1].field_0:
+                  log Transfer(
+                        address from=from,
+                        address to=to,
+                        uint256 value=tokenId)
+                  if ext_code.size(to):
+                      mem[mem[64] + 4] = caller
+                      mem[mem[64] + 36] = from
+                      mem[mem[64] + 68] = tokenId
+                      mem[mem[64] + 100] = 128
+                      mem[mem[64] + 132] = _data.length
+                      mem[mem[64] + 164 len ceil32(_data.length)] = _data[all], Mask(8 * ceil32(_data.length) - _data.length, -(8 * ceil32(_data.length) + -ceil32(ceil32(_data.length)) + 31) + 256, 0) >> -(8 * ceil32(_data.length) + -ceil32(ceil32(_data.length)) + 31) + 256
+                      if ceil32(_data.length) <= _data.length:
+                          require ext_code.size(to)
+                          call to.onERC721Received(address , address , uint256 , bytes ) with:
+                               gas gas_remaining wei
+                              args caller, address(from), tokenId, Array(len=_data.length, data=_data[all])
+                          mem[mem[64]] = ext_call.return_data[0]
+                          if not ext_call.success:
+                              if not return_data.size:
+                                  if not _data.length:
+                                      revert with TransferToNonERC721ReceiverImplementer()
+                                  revert with _data[all]
+                              if not return_data.size:
+                                  revert with TransferToNonERC721ReceiverImplementer()
+                              revert with ext_call.return_data[0 len return_data.size]
+                          _1325 = mem[64]
+                          mem[64] = mem[64] + ceil32(return_data.size)
+                          require return_data.size >=′ 32
+                          require mem[_1325] == Mask(32, 224, mem[_1325])
+                          if Mask(32, 224, mem[_1325]) != 0x150b7a0200000000000000000000000000000000000000000000000000000000:
+                              revert with TransferToNonERC721ReceiverImplementer()
+                      else:
+                          mem[_data.length + mem[64] + 164] = 0
+                          require ext_code.size(to)
+                          call to.onERC721Received(address , address , uint256 , bytes ) with:
+                               gas gas_remaining wei
+                              args caller, address(from), tokenId, Array(len=_data.length, data=_data[all])
+                          mem[mem[64]] = ext_call.return_data[0]
+                          if not ext_call.success:
+                              if not return_data.size:
+                                  if not _data.length:
+                                      revert with TransferToNonERC721ReceiverImplementer()
+                                  revert with _data[all]
+                              if not return_data.size:
+                                  revert with TransferToNonERC721ReceiverImplementer()
+                              revert with ext_call.return_data[0 len return_data.size]
+                          _1326 = mem[64]
+                          mem[64] = mem[64] + ceil32(return_data.size)
+                          require return_data.size >=′ 32
+                          require mem[_1326] == Mask(32, 224, mem[_1326])
+                          if Mask(32, 224, mem[_1326]) != 0x150b7a0200000000000000000000000000000000000000000000000000000000:
+                              revert with TransferToNonERC721ReceiverImplementer()
+              else:
+                  if tokenId + 1 == stor0:
+                      log Transfer(
+                            address from=from,
+                            address to=to,
+                            uint256 value=tokenId)
+                      if ext_code.size(to):
+                          mem[mem[64] + 4] = caller
+                          mem[mem[64] + 36] = from
+                          mem[mem[64] + 68] = tokenId
+                          mem[mem[64] + 100] = 128
+                          mem[mem[64] + 132] = _data.length
+                          mem[mem[64] + 164 len ceil32(_data.length)] = _data[all], Mask(8 * ceil32(_data.length) - _data.length, -(8 * ceil32(_data.length) + -ceil32(ceil32(_data.length)) + 31) + 256, 0) >> -(8 * ceil32(_data.length) + -ceil32(ceil32(_data.length)) + 31) + 256
+                          if ceil32(_data.length) <= _data.length:
+                              require ext_code.size(to)
+                              call to.onERC721Received(address , address , uint256 , bytes ) with:
+                                   gas gas_remaining wei
+                                  args caller, address(from), tokenId, Array(len=_data.length, data=_data[all])
+                              mem[mem[64]] = ext_call.return_data[0]
+                              if not ext_call.success:
+                                  if not return_data.size:
+                                      if not _data.length:
+                                          revert with TransferToNonERC721ReceiverImplementer()
+                                      revert with _data[all]
+                                  if not return_data.size:
+                                      revert with TransferToNonERC721ReceiverImplementer()
+                                  revert with ext_call.return_data[0 len return_data.size]
+                              _1327 = mem[64]
+                              mem[64] = mem[64] + ceil32(return_data.size)
+                              require return_data.size >=′ 32
+                              require mem[_1327] == Mask(32, 224, mem[_1327])
+                              if Mask(32, 224, mem[_1327]) != 0x150b7a0200000000000000000000000000000000000000000000000000000000:
+                                  revert with TransferToNonERC721ReceiverImplementer()
+                          else:
+                              mem[_data.length + mem[64] + 164] = 0
+                              require ext_code.size(to)
+                              call to.onERC721Received(address , address , uint256 , bytes ) with:
+                                   gas gas_remaining wei
+                                  args caller, address(from), tokenId, Array(len=_data.length, data=_data[all])
+                              mem[mem[64]] = ext_call.return_data[0]
+                              if not ext_call.success:
+                                  if not return_data.size:
+                                      if not _data.length:
+                                          revert with TransferToNonERC721ReceiverImplementer()
+                                      revert with _data[all]
+                                  if not return_data.size:
+                                      revert with TransferToNonERC721ReceiverImplementer()
+                                  revert with ext_call.return_data[0 len return_data.size]
+                              _1328 = mem[64]
+                              mem[64] = mem[64] + ceil32(return_data.size)
+                              require return_data.size >=′ 32
+                              require mem[_1328] == Mask(32, 224, mem[_1328])
+                              if Mask(32, 224, mem[_1328]) != 0x150b7a0200000000000000000000000000000000000000000000000000000000:
+                                  revert with TransferToNonERC721ReceiverImplementer()
+                  else:
+                      stor4[tokenId + 1].field_0 = from
+                      stor4[tokenId + 1].field_160 = mem[ceil32(ceil32(_data.length)) + 345 len 8]
+                      log Transfer(
+                            address from=from,
+                            address to=to,
+                            uint256 value=tokenId)
+                      if ext_code.size(to):
+                          mem[mem[64] + 4] = caller
+                          mem[mem[64] + 36] = from
+                          mem[mem[64] + 68] = tokenId
+                          mem[mem[64] + 100] = 128
+                          mem[mem[64] + 132] = _data.length
+                          mem[mem[64] + 164 len ceil32(_data.length)] = _data[all], Mask(8 * ceil32(_data.length) - _data.length, -(8 * ceil32(_data.length) + -ceil32(ceil32(_data.length)) + 31) + 256, 0) >> -(8 * ceil32(_data.length) + -ceil32(ceil32(_data.length)) + 31) + 256
+                          if ceil32(_data.length) <= _data.length:
+                              require ext_code.size(to)
+                              call to.onERC721Received(address , address , uint256 , bytes ) with:
+                                   gas gas_remaining wei
+                                  args caller, address(from), tokenId, Array(len=_data.length, data=_data[all])
+                              mem[mem[64]] = ext_call.return_data[0]
+                              if not ext_call.success:
+                                  if not return_data.size:
+                                      if not _data.length:
+                                          revert with TransferToNonERC721ReceiverImplementer()
+                                      revert with _data[all]
+                                  if not return_data.size:
+                                      revert with TransferToNonERC721ReceiverImplementer()
+                                  revert with ext_call.return_data[0 len return_data.size]
+                              _1329 = mem[64]
+                              mem[64] = mem[64] + ceil32(return_data.size)
+                              require return_data.size >=′ 32
+                              require mem[_1329] == Mask(32, 224, mem[_1329])
+                              if Mask(32, 224, mem[_1329]) != 0x150b7a0200000000000000000000000000000000000000000000000000000000:
+                                  revert with TransferToNonERC721ReceiverImplementer()
+                          else:
+                              mem[_data.length + mem[64] + 164] = 0
+                              require ext_code.size(to)
+                              call to.onERC721Received(address , address , uint256 , bytes ) with:
+                                   gas gas_remaining wei
+                                  args caller, address(from), tokenId, Array(len=_data.length, data=_data[all])
+                              mem[mem[64]] = ext_call.return_data[0]
+                              if not ext_call.success:
+                                  if not return_data.size:
+                                      if not _data.length:
+                                          revert with TransferToNonERC721ReceiverImplementer()
+                                      revert with _data[all]
+                                  if not return_data.size:
+                                      revert with TransferToNonERC721ReceiverImplementer()
+                                  revert with ext_call.return_data[0 len return_data.size]
+                              _1330 = mem[64]
+                              mem[64] = mem[64] + ceil32(return_data.size)
+                              require return_data.size >=′ 32
+                              require mem[_1330] == Mask(32, 224, mem[_1330])
+                              if Mask(32, 224, mem[_1330]) != 0x150b7a0200000000000000000000000000000000000000000000000000000000:
+                                  revert with TransferToNonERC721ReceiverImplementer()
+
+

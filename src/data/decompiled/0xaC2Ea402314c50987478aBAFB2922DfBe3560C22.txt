@@ -1,0 +1,108 @@
+# Palkeoramix decompiler. 
+
+def storage:
+  stor3608 is address at storage 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc
+
+def ????????(?) payable: 
+  require 4 <= calldata.size
+  require calldata.size <= calldata.size
+  require calldata.size - 4 >=′ 64
+  require _param1 == address(_param1)
+  require _param2 <= LOCK8605463013()
+  require _param2 + 35 <′ calldata.size
+  if _param2.length > LOCK8605463013():
+      revert with 0, 65
+  if ceil32(ceil32(_param2.length)) + 97 < 96 or ceil32(ceil32(_param2.length)) + 97 > LOCK8605463013():
+      revert with 0, 65
+  mem[96] = _param2.length
+  require _param2 + _param2.length + 36 <= calldata.size
+  mem[128 len _param2.length] = _param2[all]
+  mem[_param2.length + 128] = 0
+  if not -ext_code.size(address(_param1)):
+      revert with 0, address(_param1)
+  stor3608 = address(_param1)
+  log Upgraded(address implementation=address(_param1))
+  if not _param2.length:
+      if call.value:
+          revert with 3013121951
+  else:
+      mem[ceil32(ceil32(_param2.length)) + 97 len ceil32(_param2.length)] = _param2[all], mem[_param2.length + 128 len ceil32(_param2.length) - _param2.length]
+      mem[ceil32(ceil32(_param2.length)) + _param2.length + 97] = 0
+      delegate address(_param1).mem[ceil32(ceil32(_param2.length)) + 97 len 4] with:
+           gas gas_remaining wei
+          args mem[ceil32(ceil32(_param2.length)) + 101 len _param2.length - 4]
+      if not return_data.size:
+          if not delegate.return_code:
+              if _param2.length:
+                  revert with _param2[all]
+              revert with 338029122
+          if not _param2.length:
+              if not ext_code.size(address(_param1)):
+                  revert with 0, address(_param1)
+      else:
+          if not delegate.return_code:
+              if return_data.size:
+                  revert with ext_call.return_data[0 len return_data.size]
+              revert with 338029122
+          if not return_data.size:
+              if not ext_code.size(address(_param1)):
+                  revert with 0, address(_param1)
+
+def _fallback(?) payable: # default function
+  if caller - 0x6940be4e523738c7b9eef2276afcdbbe682ff58e:
+      delegate stor3608 with:
+         funct call.data[0 len 4]
+           gas gas_remaining wei
+          args call.data[4 len calldata.size - 4]
+      if not delegate.return_code:
+          revert with ext_call.return_data[0 len return_data.size]
+      return ext_call.return_data[0 len return_data.size]
+  if call.func_hash != 0x4f1ef28600000000000000000000000000000000000000000000000000000000:
+      revert with 3535107820
+  require 4 <= calldata.size
+  require calldata.size <= calldata.size
+  require calldata.size - 4 >=′ 64
+  require _param1 == address(_param1)
+  require _param2 <= LOCK8605463013()
+  require _param2 + 35 <′ calldata.size
+  if _param2.length > LOCK8605463013():
+      revert with 0, 65
+  if ceil32(ceil32(_param2.length)) + 129 < 128 or ceil32(ceil32(_param2.length)) + 129 > LOCK8605463013():
+      revert with 0, 65
+  mem[128] = _param2.length
+  require _param2 + _param2.length + 36 <= calldata.size
+  mem[160 len _param2.length] = _param2[all]
+  mem[_param2.length + 160] = 0
+  if not -ext_code.size(address(_param1)):
+      revert with 0, address(_param1)
+  stor3608 = address(_param1)
+  log Upgraded(address implementation=address(_param1))
+  if not _param2.length:
+      if call.value:
+          revert with 3013121951
+  else:
+      mem[ceil32(ceil32(_param2.length)) + 129 len ceil32(_param2.length)] = _param2[all], mem[_param2.length + 160 len ceil32(_param2.length) - _param2.length]
+      mem[ceil32(ceil32(_param2.length)) + _param2.length + 129] = 0
+      delegate address(_param1).mem[ceil32(ceil32(_param2.length)) + 129 len 4] with:
+           gas gas_remaining wei
+          args mem[ceil32(ceil32(_param2.length)) + 133 len _param2.length - 4]
+      if not return_data.size:
+          if not delegate.return_code:
+              if mem[96]:
+                  revert with memory
+                    from 128
+                     len mem[96]
+              revert with 338029122
+          if not mem[96]:
+              if not ext_code.size(address(_param1)):
+                  revert with 0, address(_param1)
+      else:
+          if not delegate.return_code:
+              if return_data.size:
+                  revert with ext_call.return_data[0 len return_data.size]
+              revert with 338029122
+          if not return_data.size:
+              if not ext_code.size(address(_param1)):
+                  revert with 0, address(_param1)
+
+

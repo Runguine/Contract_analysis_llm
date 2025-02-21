@@ -1,0 +1,389 @@
+# Palkeoramix decompiler. 
+
+const DEFAULT_ADMIN_ROLE = 0
+const MINTER_ROLE = sha3(Mask(88, 168, 'MINTER_ROLE') >> 168)
+const PAUSER_ROLE = sha3(Mask(88, 168, 'PAUSER_ROLE') >> 168)
+
+def storage:
+  roleAdmin is array of struct at storage 0
+  balanceOf is mapping of uint256 at storage 1
+  allowance is mapping of uint256 at storage 2
+  totalSupply is uint256 at storage 3
+  name is array of uint256 at storage 4
+  symbol is array of uint256 at storage 5
+  decimals is uint8 at storage 6
+  paused is uint8 at storage 6 offset 8
+
+def name() payable: 
+  return name[0 len name.length]
+
+def totalSupply() payable: 
+  return totalSupply
+
+def getRoleAdmin(bytes32 role) payable: 
+  require calldata.size - 4 >= 32
+  return roleAdmin[role].field_512
+
+def decimals() payable: 
+  return decimals
+
+def paused() payable: 
+  return bool(paused)
+
+def balanceOf(address account) payable: 
+  require calldata.size - 4 >= 32
+  return balanceOf[address(account)]
+
+def getRoleMember(bytes32 role, uint256 index) payable: 
+  require calldata.size - 4 >= 64
+  if index >= roleAdmin[role].field_0:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  34,
+                  0xfe456e756d657261626c655365743a20696e646578206f7574206f6620626f756e64,
+                  mem[198 len 30]
+  return roleAdmin[role][index].field_0
+
+def hasRole(bytes32 role, address account) payable: 
+  require calldata.size - 4 >= 64
+  return bool(roleAdmin[role][1][address(account)].field_0)
+
+def symbol() payable: 
+  return symbol[0 len symbol.length]
+
+def getRoleMemberCount(bytes32 role) payable: 
+  require calldata.size - 4 >= 32
+  return roleAdmin[role].field_0
+
+def allowance(address owner, address spender) payable: 
+  require calldata.size - 4 >= 64
+  return allowance[address(owner)][address(spender)]
+
+#
+#  Regular functions
+#
+
+def _fallback(?) payable: # default function
+  revert
+
+def pause() payable: 
+  if not roleAdmin['PAUSER_ROLE'][1][caller].field_0:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  45,
+                  0x657369676e6572206d75737420686176652070617573657220726f6c6520746f2070617573652f756e70617573,
+                  mem[209 len 19]
+  if paused:
+      revert with 0, 'Pausable: paused'
+  paused = 1
+  log Paused(address account=caller)
+
+def unpause() payable: 
+  if not roleAdmin['PAUSER_ROLE'][1][caller].field_0:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  45,
+                  0x657369676e6572206d75737420686176652070617573657220726f6c6520746f2070617573652f756e70617573,
+                  mem[209 len 19]
+  if not paused:
+      revert with 0, 'Pausable: not paused'
+  paused = 0
+  log Unpaused(address account=caller)
+
+def approve(address spender, uint256 amount) payable: 
+  require calldata.size - 4 >= 64
+  if not caller:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  36,
+                  0x7345524332303a20617070726f76652066726f6d20746865207a65726f20616464726573,
+                  mem[200 len 28]
+  if not spender:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  34,
+                  0x6545524332303a20617070726f766520746f20746865207a65726f20616464726573,
+                  mem[198 len 30]
+  allowance[caller][address(spender)] = amount
+  log Approval(
+        address owner=amount,
+        address spender=caller,
+        uint256 value=spender)
+  return 1
+
+def decreaseAllowance(address spender, uint256 subtractedValue) payable: 
+  require calldata.size - 4 >= 64
+  if subtractedValue > allowance[caller][address(spender)]:
+      revert with 0, 
+                  32,
+                  37,
+                  0x7345524332303a2064656372656173656420616c6c6f77616e63652062656c6f77207a6572,
+                  mem[165 len 27],
+                  mem[219 len 5]
+  if not caller:
+      revert with 0, 32, 36, 0x7345524332303a20617070726f76652066726f6d20746865207a65726f20616464726573, mem[296 len 28]
+  if not spender:
+      revert with 0, 32, 34, 0x6545524332303a20617070726f766520746f20746865207a65726f20616464726573, mem[294 len 30]
+  allowance[caller][address(spender)] -= subtractedValue
+  log Approval(
+        address owner=(allowance[caller][address(spender)] - subtractedValue),
+        address spender=caller,
+        uint256 value=spender)
+  return 1
+
+def burn(uint256 _value) payable: 
+  require calldata.size - 4 >= 32
+  if not caller:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  33,
+                  0x6545524332303a206275726e2066726f6d20746865207a65726f20616464726573,
+                  mem[197 len 31]
+  if paused:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  42,
+                  0x6645524332305061757361626c653a20746f6b656e207472616e73666572207768696c65207061757365,
+                  mem[206 len 22]
+  if _value > balanceOf[caller]:
+      revert with 0, 32, 34, 0x7445524332303a206275726e20616d6f756e7420657863656564732062616c616e63, mem[162 len 30], mem[222 len 2]
+  balanceOf[caller] -= _value
+  if _value > totalSupply:
+      revert with 0, 'SafeMath: subtraction overflow'
+  totalSupply -= _value
+  log Transfer(
+        address from=_value,
+        address to=caller,
+        uint256 value=0)
+
+def increaseAllowance(address spender, uint256 addedValue) payable: 
+  require calldata.size - 4 >= 64
+  if addedValue + allowance[caller][address(spender)] < allowance[caller][address(spender)]:
+      revert with 0, 'SafeMath: addition overflow'
+  if not caller:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  36,
+                  0x7345524332303a20617070726f76652066726f6d20746865207a65726f20616464726573,
+                  mem[200 len 28]
+  if not spender:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  34,
+                  0x6545524332303a20617070726f766520746f20746865207a65726f20616464726573,
+                  mem[198 len 30]
+  allowance[caller][address(spender)] += addedValue
+  log Approval(
+        address owner=(addedValue + allowance[caller][address(spender)]),
+        address spender=caller,
+        uint256 value=spender)
+  return 1
+
+def mint(address _to, uint256 _amount) payable: 
+  require calldata.size - 4 >= 64
+  if not roleAdmin['MINTER_ROLE'][1][caller].field_0:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  36,
+                  0x657369676e6572206d7573742068617665206d696e74657220726f6c6520746f206d696e,
+                  mem[200 len 28]
+  if not _to:
+      revert with 0, 'ERC20: mint to the zero address'
+  if paused:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  42,
+                  0x6645524332305061757361626c653a20746f6b656e207472616e73666572207768696c65207061757365,
+                  mem[206 len 22]
+  if _amount + totalSupply < totalSupply:
+      revert with 0, 'SafeMath: addition overflow'
+  totalSupply += _amount
+  if _amount + balanceOf[address(_to)] < balanceOf[address(_to)]:
+      revert with 0, 'SafeMath: addition overflow'
+  balanceOf[address(_to)] += _amount
+  log Transfer(
+        address from=_amount,
+        address to=0,
+        uint256 value=_to)
+
+def grantRole(bytes32 role, address account) payable: 
+  require calldata.size - 4 >= 64
+  if not roleAdmin[roleAdmin[role].field_512][1][caller].field_0:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  47,
+                  0x73416363657373436f6e74726f6c3a2073656e646572206d75737420626520616e2061646d696e20746f206772616e,
+                  mem[211 len 17]
+  if not roleAdmin[role][1][address(account)].field_0:
+      roleAdmin[role].field_0++
+      roleAdmin[role][roleAdmin[role].field_0].field_0 = account
+      roleAdmin[role][roleAdmin[role].field_0].field_160 = 0
+      roleAdmin[role][1][address(account)].field_0 = roleAdmin[role].field_0
+      log RoleGranted(
+            bytes32 role=role,
+            address account=account,
+            address sender=caller)
+
+def transfer(address recipient, uint256 amount) payable: 
+  require calldata.size - 4 >= 64
+  if not caller:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  37,
+                  0x7345524332303a207472616e736665722066726f6d20746865207a65726f20616464726573,
+                  mem[201 len 27]
+  if not recipient:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  35,
+                  0x7345524332303a207472616e7366657220746f20746865207a65726f20616464726573,
+                  mem[199 len 29]
+  if paused:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  42,
+                  0x6645524332305061757361626c653a20746f6b656e207472616e73666572207768696c65207061757365,
+                  mem[206 len 22]
+  if amount > balanceOf[caller]:
+      revert with 0, 
+                  32,
+                  38,
+                  0x7345524332303a207472616e7366657220616d6f756e7420657863656564732062616c616e63,
+                  mem[166 len 26],
+                  mem[218 len 6]
+  balanceOf[caller] -= amount
+  if amount + balanceOf[recipient] < balanceOf[recipient]:
+      revert with 0, 'SafeMath: addition overflow'
+  balanceOf[address(recipient)] = amount + balanceOf[recipient]
+  log Transfer(
+        address from=amount,
+        address to=caller,
+        uint256 value=recipient)
+  return 1
+
+def burnFrom(address _from, uint256 _value) payable: 
+  require calldata.size - 4 >= 64
+  if _value > allowance[address(_from)][caller]:
+      revert with 0, 32, 36, 0x6545524332303a206275726e20616d6f756e74206578636565647320616c6c6f77616e63, mem[164 len 28], mem[220 len 4]
+  if not _from:
+      revert with 0, 32, 36, 0x7345524332303a20617070726f76652066726f6d20746865207a65726f20616464726573, mem[296 len 28]
+  if not caller:
+      revert with 0, 32, 34, 0x6545524332303a20617070726f766520746f20746865207a65726f20616464726573, mem[294 len 30]
+  allowance[address(_from)][caller] -= _value
+  log Approval(
+        address owner=(allowance[address(_from)][caller] - _value),
+        address spender=_from,
+        uint256 value=caller)
+  if not _from:
+      revert with 0, 32, 33, 0x6545524332303a206275726e2066726f6d20746865207a65726f20616464726573, mem[293 len 31]
+  if paused:
+      revert with 0, 32, 42, 0x6645524332305061757361626c653a20746f6b656e207472616e73666572207768696c65207061757365, mem[302 len 22]
+  if _value > balanceOf[address(_from)]:
+      revert with 0, 32, 34, 0x7445524332303a206275726e20616d6f756e7420657863656564732062616c616e63, mem[258 len 30], mem[318 len 2]
+  balanceOf[address(_from)] -= _value
+  if _value > totalSupply:
+      revert with 0, 'SafeMath: subtraction overflow'
+  totalSupply -= _value
+  log Transfer(
+        address from=_value,
+        address to=_from,
+        uint256 value=0)
+
+def renounceRole(bytes32 role, address account) payable: 
+  require calldata.size - 4 >= 64
+  if account != caller:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  47,
+                  0x6f416363657373436f6e74726f6c3a2063616e206f6e6c792072656e6f756e636520726f6c657320666f722073656c,
+                  mem[211 len 17]
+  if roleAdmin[role][1][address(account)].field_0:
+      require roleAdmin[role].field_0 - 1 < roleAdmin[role].field_0
+      require roleAdmin[role][1][address(account)].field_0 - 1 < roleAdmin[role].field_0
+      roleAdmin[role][roleAdmin[role][1][address(account)].field_0].field_0 = roleAdmin[role][roleAdmin[role].field_0].field_0
+      roleAdmin[role][1][roleAdmin[role][roleAdmin[role].field_0].field_0].field_0 = roleAdmin[role][1][address(account)].field_0
+      require roleAdmin[role].field_0
+      roleAdmin[role][roleAdmin[role].field_0].field_0 = 0
+      roleAdmin[role].field_0--
+      roleAdmin[role][1][address(account)].field_0 = 0
+      log RoleRevoked(
+            bytes32 role=role,
+            address account=account,
+            address sender=caller)
+
+def revokeRole(bytes32 role, address account) payable: 
+  require calldata.size - 4 >= 64
+  if not roleAdmin[roleAdmin[role].field_512][1][caller].field_0:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  48,
+                  0x65416363657373436f6e74726f6c3a2073656e646572206d75737420626520616e2061646d696e20746f207265766f6b,
+                  mem[212 len 16]
+  if roleAdmin[role][1][address(account)].field_0:
+      require roleAdmin[role].field_0 - 1 < roleAdmin[role].field_0
+      require roleAdmin[role][1][address(account)].field_0 - 1 < roleAdmin[role].field_0
+      roleAdmin[role][roleAdmin[role][1][address(account)].field_0].field_0 = roleAdmin[role][roleAdmin[role].field_0].field_0
+      roleAdmin[role][1][roleAdmin[role][roleAdmin[role].field_0].field_0].field_0 = roleAdmin[role][1][address(account)].field_0
+      require roleAdmin[role].field_0
+      roleAdmin[role][roleAdmin[role].field_0].field_0 = 0
+      roleAdmin[role].field_0--
+      roleAdmin[role][1][address(account)].field_0 = 0
+      log RoleRevoked(
+            bytes32 role=role,
+            address account=account,
+            address sender=caller)
+
+def transferFrom(address sender, address recipient, uint256 amount) payable: 
+  require calldata.size - 4 >= 96
+  if not sender:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  37,
+                  0x7345524332303a207472616e736665722066726f6d20746865207a65726f20616464726573,
+                  mem[201 len 27]
+  if not recipient:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  35,
+                  0x7345524332303a207472616e7366657220746f20746865207a65726f20616464726573,
+                  mem[199 len 29]
+  if paused:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  42,
+                  0x6645524332305061757361626c653a20746f6b656e207472616e73666572207768696c65207061757365,
+                  mem[206 len 22]
+  if amount > balanceOf[address(sender)]:
+      revert with 0, 
+                  32,
+                  38,
+                  0x7345524332303a207472616e7366657220616d6f756e7420657863656564732062616c616e63,
+                  mem[166 len 26],
+                  mem[218 len 6]
+  balanceOf[address(sender)] -= amount
+  if amount + balanceOf[recipient] < balanceOf[recipient]:
+      revert with 0, 'SafeMath: addition overflow'
+  balanceOf[address(recipient)] = amount + balanceOf[recipient]
+  log Transfer(
+        address from=amount,
+        address to=sender,
+        uint256 value=recipient)
+  if amount > allowance[address(sender)][caller]:
+      revert with 0, 
+                  32,
+                  40,
+                  0x7445524332303a207472616e7366657220616d6f756e74206578636565647320616c6c6f77616e63,
+                  mem[264 len 24],
+                  mem[312 len 8]
+  if not sender:
+      revert with 0, 32, 36, 0x7345524332303a20617070726f76652066726f6d20746865207a65726f20616464726573, mem[392 len 28]
+  if not caller:
+      revert with 0, 32, 34, 0x6545524332303a20617070726f766520746f20746865207a65726f20616464726573, mem[390 len 30]
+  allowance[address(sender)][caller] -= amount
+  log Approval(
+        address owner=(allowance[address(sender)][caller] - amount),
+        address spender=sender,
+        uint256 value=caller)
+  return 1
+
+

@@ -1,0 +1,6 @@
+# Palkeoramix decompiler. 
+
+def _fallback(?) payable: # default function
+  require not calldata.size
+
+

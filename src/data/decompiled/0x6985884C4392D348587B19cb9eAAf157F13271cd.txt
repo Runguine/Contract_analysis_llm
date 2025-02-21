@@ -1,0 +1,1278 @@
+# Palkeoramix decompiler. 
+
+const unknown134d4f25 = 2
+const unknown156a0d0f = 0x2e49c2c00000000000000000000000000000000000000000000000000000000, 1
+const unknown17442b70 = 1, 2
+const unknown1f5e1334 = 1
+const decimals = 18
+const unknown52ae2879 = address(this.address)
+const endpoint = 0x1a44076050125825900e736c501f859c50fe728c
+const sharedDecimals = 6
+const unknown963efcaa = 10^12
+const unknown9f68b964 = 0
+const token = address(this.address)
+
+def storage:
+  owner is address at storage 0
+  unknownbb0b6a53 is mapping of uint256 at storage 1
+  unknownb731ea0aAddress is address at storage 2
+  stor3 is mapping of struct at storage 3
+  unknown111ecdadAddress is address at storage 4
+  balanceOf is mapping of uint256 at storage 5
+  allowance is mapping of uint256 at storage 6
+  totalSupply is uint256 at storage 7
+  stor8 is array of struct at storage 8
+  stor9 is array of struct at storage 9
+
+def unknown111ecdad(): # not payable
+  return unknown111ecdadAddress
+
+def totalSupply(): # not payable
+  return totalSupply
+
+def balanceOf(address account): # not payable
+  require calldata.size - 4 >=′ 32
+  require account == account
+  return balanceOf[address(account)]
+
+def owner(): # not payable
+  return owner
+
+def unknownb731ea0a(): # not payable
+  return unknownb731ea0aAddress
+
+def unknownbb0b6a53(uint256 _param1): # not payable
+  require calldata.size - 4 >=′ 32
+  require _param1 == uint32(_param1)
+  return unknownbb0b6a53[_param1]
+
+def allowance(address owner, address spender): # not payable
+  require calldata.size - 4 >=′ 64
+  require owner == owner
+  require spender == spender
+  return allowance[address(owner)][address(spender)]
+
+#
+#  Regular functions
+#
+
+def _fallback(?) payable: # default function
+  revert
+
+def unknown7d25a05e(uint256 _param1): # not payable
+  require calldata.size - 4 >=′ 64
+  require _param1 == uint32(_param1)
+  return 0
+
+def renounceOwnership(): # not payable
+  if owner != caller:
+      revert with 0, caller
+  owner = 0
+  log OwnershipTransferred(
+        address previousOwner=owner,
+        address newOwner=0)
+
+def unknown5a0dfe4d(uint256 _param1, uint256 _param2): # not payable
+  require calldata.size - 4 >=′ 64
+  require _param1 == uint32(_param1)
+  return (unknownbb0b6a53[_param1 << 224] == _param2)
+
+def unknownff7bd03d(uint256 _param1, uint256 _param2): # not payable
+  require calldata.size - 4 >=′ 96
+  require _param1 == uint32(_param1)
+  return (unknownbb0b6a53[_param1 << 224] == _param2)
+
+def unknown6fc1b31e(uint256 _param1): # not payable
+  require calldata.size - 4 >=′ 32
+  require _param1 == address(_param1)
+  if owner != caller:
+      revert with 0, caller
+  unknown111ecdadAddress = address(_param1)
+  log 0xf0be4f1e: address(_param1)
+
+def unknownd4243885(uint256 _param1): # not payable
+  require calldata.size - 4 >=′ 32
+  require _param1 == address(_param1)
+  if owner != caller:
+      revert with 0, caller
+  unknownb731ea0aAddress = address(_param1)
+  log 0xd48d879c: address(_param1)
+
+def transferOwnership(address newOwner): # not payable
+  require calldata.size - 4 >=′ 32
+  require newOwner == newOwner
+  if owner != caller:
+      revert with 0, caller
+  require newOwner
+  owner = newOwner
+  log OwnershipTransferred(
+        address previousOwner=owner,
+        address newOwner=newOwner)
+
+def unknown3400288b(uint256 _param1, uint256 _param2): # not payable
+  require calldata.size - 4 >=′ 64
+  require _param1 == uint32(_param1)
+  if owner != caller:
+      revert with 0, caller
+  unknownbb0b6a53[_param1 << 224] = _param2
+  log 0x238399d4: _param1 << 224, _param2
+
+def approve(address spender, uint256 amount): # not payable
+  require calldata.size - 4 >=′ 64
+  require spender == spender
+  require caller
+  require spender
+  allowance[caller][address(spender)] = amount
+  log Approval(
+        address owner=amount,
+        address spender=caller,
+        uint256 value=spender)
+  return 1
+
+def setDelegate(address _delegate): # not payable
+  require calldata.size - 4 >=′ 32
+  require _delegate == _delegate
+  if owner != caller:
+      revert with 0, caller
+  require ext_code.size(0x1a44076050125825900e736c501f859c50fe728c)
+  call 0x1a44076050125825900e736c501f859c50fe728c.setDelegate(address _delegate) with:
+       gas gas_remaining wei
+      args _delegate
+  if not ext_call.success:
+      revert with ext_call.return_data[0 len return_data.size]
+
+def unknown82413eac(array _param1, uint256 _param2): # not payable
+  require calldata.size - 4 >=′ 160
+  require calldata.size - 4 >=′ 96
+  require _param1 <= LOCK8605463013()
+  require _param1 + 35 <′ calldata.size
+  require _param1.length <= LOCK8605463013()
+  require _param1 + _param1.length + 36 <= calldata.size
+  require _param2 == address(_param2)
+  return (this.address == address(_param2))
+
+def transfer(address recipient, uint256 amount): # not payable
+  require calldata.size - 4 >=′ 64
+  require recipient == recipient
+  require caller
+  require recipient
+  if caller:
+      if balanceOf[caller] < amount:
+          revert with 0, caller, balanceOf[caller], amount
+      balanceOf[caller] -= amount
+  else:
+      if totalSupply > amount + totalSupply:
+          revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+      totalSupply += amount
+  if recipient:
+      balanceOf[address(recipient)] += amount
+  else:
+      totalSupply -= amount
+  log Transfer(
+        address from=amount,
+        address to=caller,
+        uint256 value=recipient)
+  return 1
+
+def transferFrom(address sender, address recipient, uint256 amount): # not payable
+  require calldata.size - 4 >=′ 96
+  require sender == sender
+  require recipient == recipient
+  if allowance[address(sender)][caller] != -1:
+      if allowance[address(sender)][caller] < amount:
+          revert with 0, caller, allowance[address(sender)][caller], amount
+      require sender
+      require caller
+      allowance[address(sender)][caller] -= amount
+  require sender
+  require recipient
+  if sender:
+      if balanceOf[address(sender)] < amount:
+          revert with 0, address(sender), balanceOf[address(sender)], amount
+      balanceOf[address(sender)] -= amount
+  else:
+      if totalSupply > amount + totalSupply:
+          revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+      totalSupply += amount
+  if recipient:
+      balanceOf[address(recipient)] += amount
+  else:
+      totalSupply -= amount
+  log Transfer(
+        address from=amount,
+        address to=sender,
+        uint256 value=recipient)
+  return 1
+
+def unknownb98bd070(): # not payable
+  require calldata.size - 4 >=′ 32
+  require cd[4] <= LOCK8605463013()
+  require cd[4] + 35 <′ calldata.size
+  require ('cd', 4).length <= LOCK8605463013()
+  require cd[4] + (32 * ('cd', 4).length) + 36 <= calldata.size
+  if owner != caller:
+      revert with 0, caller
+  if 0 >= ('cd', 4).length:
+      log 0xbe4864a8: Array(len=('cd', 4).length, data=mem[160 len 32 * ('cd', 4).length])
+      stop
+  require ('cd', 4)[0] <′ calldata.size + -cd[4] - 131
+  require cd[(('cd', 4)[0] + cd[4] + 100)] <′ calldata.size + -('cd', 4)[0] + -cd[4] - 67
+  require cd[(('cd', 4)[0] + cd[4] + cd[(('cd', 4)[0] + cd[4] + 100)] + 36)] <= LOCK8605463013()
+  require ('cd', 4)[0] + cd[4] + cd[(('cd', 4)[0] + cd[4] + 100)] + 68 <=′ calldata.size - cd[(('cd', 4)[0] + cd[4] + cd[(('cd', 4)[0] + cd[4] + 100)] + 36)]
+  require 2 <= cd[(('cd', 4)[0] + cd[4] + cd[(('cd', 4)[0] + cd[4] + 100)] + 36)]
+  mem[164 len cd[(('cd', 4)[0] + cd[4] + cd[(('cd', 4)[0] + cd[4] + 100)] + 36)]] = call.data[('cd', 4)[0] + cd[4] + cd[(('cd', 4)[0] + cd[4] + 100)] + 68 len cd[(('cd', 4)[0] + cd[4] + cd[(('cd', 4)[0] + cd[4] + 100)] + 36)]]
+  mem[cd[(('cd', 4)[0] + cd[4] + cd[(('cd', 4)[0] + cd[4] + 100)] + 36)] + 164] = 0
+  revert with 0, 
+              32,
+              cd[(('cd', 4)[0] + cd[4] + cd[(('cd', 4)[0] + cd[4] + 100)] + 36)],
+              call.data[('cd', 4)[0] + cd[4] + cd[(('cd', 4)[0] + cd[4] + 100)] + 68 len cd[(('cd', 4)[0] + cd[4] + cd[(('cd', 4)[0] + cd[4] + 100)] + 36)]],
+              mem[cd[(('cd', 4)[0] + cd[4] + cd[(('cd', 4)[0] + cd[4] + 100)] + 36)] + 164 len ceil32(cd[(('cd', 4)[0] + cd[4] + cd[(('cd', 4)[0] + cd[4] + 100)] + 36)]) - cd[(('cd', 4)[0] + cd[4] + cd[(('cd', 4)[0] + cd[4] + 100)] + 36)]]
+
+def unknown0d35b415(): # not payable
+  require calldata.size - 4 >=′ 32
+  require cd[4] <= LOCK8605463013()
+  require calldata.size + -cd[4] - 4 >=′ 224
+  mem[96] = 0
+  mem[128] = 0
+  mem[160] = 0
+  mem[192] = 0
+  mem[224] = 0
+  mem[256] = LOCK8605463013()
+  mem[288] = 0
+  require ('cd', 4).length == uint32(('cd', 4).length)
+  if 10^12 * ('cd', 4)[1] / 10^12 / ('cd', 4)[1] / 10^12 != 10^12 and ('cd', 4)[1] / 10^12:
+      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+  if 10^12 * ('cd', 4)[1] / 10^12 < ('cd', 4)[2]:
+      revert with 0, 10^12 * ('cd', 4)[1] / 10^12, ('cd', 4)[2]
+  mem[64] = 384
+  mem[320] = 10^12 * ('cd', 4)[1] / 10^12
+  mem[352] = 10^12 * ('cd', 4)[1] / 10^12
+  mem[384] = 0
+  mem[416] = LOCK8605463013()
+  mem[448] = 160
+  mem[544] = 0
+  idx = 0
+  s = 320
+  t = 576
+  u = (32 * mem[288]) + 576
+  while idx < 0:
+      mem[t] = u - 576
+      _22 = mem[s]
+      mem[u] = mem[mem[s]]
+      _24 = mem[_22 + 32]
+      mem[u + 32] = 64
+      _25 = mem[_24]
+      mem[u + 64] = mem[_24]
+      v = 0
+      while v < _25:
+          mem[v + u + 96] = mem[v + _24 + 32]
+          v = v + 32
+          continue 
+      mem[_25 + u + 96] = 0
+      idx = idx + 1
+      s = s + 32
+      t = t + 32
+      u = ceil32(_25) + u + 96
+      continue 
+  mem[480] = mem[320]
+  mem[512] = mem[352]
+  return memory
+    from mem[64]
+     len u - mem[64]
+
+def unknownd045a0dc() payable: 
+  require calldata.size - 4 >=′ 224
+  require calldata.size - 4 >=′ 96
+  require cd[132] <= LOCK8605463013()
+  require cd[132] + 35 <′ calldata.size
+  require ('cd', 132).length <= LOCK8605463013()
+  require cd[132] + ('cd', 132).length + 36 <= calldata.size
+  require cd[164] == address(cd[164])
+  require cd[196] <= LOCK8605463013()
+  require cd[196] + 35 <′ calldata.size
+  require ('cd', 196).length <= LOCK8605463013()
+  require cd[196] + ('cd', 196).length + 36 <= calldata.size
+  if caller != this.address:
+      revert with 349480168
+  require 32 <= ('cd', 132).length
+  require 40 <= ('cd', 132).length
+  require cd[4] == uint32(cd[4])
+  require address(('cd', 132)[0])
+  if totalSupply > totalSupply:
+      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+  log Transfer(
+        address from=0,
+        address to=0,
+        uint256 value=address(('cd', 132)[0]))
+  if ('cd', 132).length > 40:
+      require cd[68] == uint64(cd[68])
+      require cd[4] == uint32(cd[4])
+      require 40 <= ('cd', 132).length
+      require ('cd', 132).length <= ('cd', 132).length
+      mem[64] = floor32(('cd', 132).length - 9) + 128
+      mem[96] = ('cd', 132).length - 40
+      mem[128 len ('cd', 132).length - 40] = call.data[cd[132] + 76 len ('cd', 132).length - 40]
+      mem[('cd', 132).length + 88] = 0
+      mem[floor32(('cd', 132).length - 9) + 160] = cd[68] << 192
+      mem[floor32(('cd', 132).length - 9) + 168] = cd[4] << 224
+      mem[floor32(('cd', 132).length - 9) + 172] = 0
+      mem[floor32(('cd', 132).length - 9) + 204 len floor32(('cd', 132).length - 9)] = mem[128 len floor32(('cd', 132).length - 9)]
+      mem[('cd', 132).length + floor32(('cd', 132).length - 9) + 164] = 0x7cb5901200000000000000000000000000000000000000000000000000000000
+      mem[('cd', 132).length + floor32(('cd', 132).length - 9) + 168] = address(('cd', 132)[0])
+      mem[('cd', 132).length + floor32(('cd', 132).length - 9) + 200] = cd[100]
+      mem[('cd', 132).length + floor32(('cd', 132).length - 9) + 232] = 0
+      mem[('cd', 132).length + floor32(('cd', 132).length - 9) + 264] = 128
+      mem[('cd', 132).length + floor32(('cd', 132).length - 9) + 296] = mem[floor32(('cd', 132).length - 9) + 128]
+      require ext_code.size(0x1a44076050125825900e736c501f859c50fe728c)
+      call 0x1a44076050125825900e736c501f859c50fe728c.0x7cb59012 with:
+           gas gas_remaining wei
+          args address(('cd', 132)[0]), cd[100], 0, 128, mem[floor32(('cd', 132).length - 9) + 128], mem[floor32(('cd', 132).length - 9) + 160 len ceil32(mem[floor32(('cd', 132).length - 9) + 128])]
+      if not ext_call.success:
+          revert with ext_call.return_data[0 len return_data.size]
+  require cd[4] == uint32(cd[4])
+  log 0xefed6d35: cd[4] << 224, 0, cd[100], address(('cd', 132)[0])
+
+def unknown13137d65() payable: 
+  require calldata.size - 4 >=′ 224
+  require calldata.size - 4 >=′ 96
+  require cd[132] <= LOCK8605463013()
+  require cd[132] + 35 <′ calldata.size
+  require ('cd', 132).length <= LOCK8605463013()
+  require cd[132] + ('cd', 132).length + 36 <= calldata.size
+  require cd[164] == address(cd[164])
+  require cd[196] <= LOCK8605463013()
+  require cd[196] + 35 <′ calldata.size
+  require ('cd', 196).length <= LOCK8605463013()
+  require cd[196] + ('cd', 196).length + 36 <= calldata.size
+  if 0x1a44076050125825900e736c501f859c50fe728c != caller:
+      revert with 0, caller
+  require cd[4] == uint32(cd[4])
+  if not unknownbb0b6a53[cd[4] << 224]:
+      revert with 0, uint32(cd[4])
+  if unknownbb0b6a53[cd[4] << 224] != cd[36]:
+      require cd[4] == uint32(cd[4])
+      revert with 0, cd[4] << 224, cd[36]
+  require 32 <= ('cd', 132).length
+  require 40 <= ('cd', 132).length
+  require cd[4] == uint32(cd[4])
+  require address(('cd', 132)[0])
+  if totalSupply > totalSupply:
+      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+  log Transfer(
+        address from=0,
+        address to=0,
+        uint256 value=address(('cd', 132)[0]))
+  if ('cd', 132).length > 40:
+      require cd[68] == uint64(cd[68])
+      require cd[4] == uint32(cd[4])
+      require 40 <= ('cd', 132).length
+      require ('cd', 132).length <= ('cd', 132).length
+      mem[64] = floor32(('cd', 132).length - 9) + 128
+      mem[96] = ('cd', 132).length - 40
+      mem[128 len ('cd', 132).length - 40] = call.data[cd[132] + 76 len ('cd', 132).length - 40]
+      mem[('cd', 132).length + 88] = 0
+      mem[floor32(('cd', 132).length - 9) + 160] = cd[68] << 192
+      mem[floor32(('cd', 132).length - 9) + 168] = cd[4] << 224
+      mem[floor32(('cd', 132).length - 9) + 172] = 0
+      mem[floor32(('cd', 132).length - 9) + 204 len floor32(('cd', 132).length - 9)] = mem[128 len floor32(('cd', 132).length - 9)]
+      mem[('cd', 132).length + floor32(('cd', 132).length - 9) + 164] = 0x7cb5901200000000000000000000000000000000000000000000000000000000
+      mem[('cd', 132).length + floor32(('cd', 132).length - 9) + 168] = address(('cd', 132)[0])
+      mem[('cd', 132).length + floor32(('cd', 132).length - 9) + 200] = cd[100]
+      mem[('cd', 132).length + floor32(('cd', 132).length - 9) + 232] = 0
+      mem[('cd', 132).length + floor32(('cd', 132).length - 9) + 264] = 128
+      mem[('cd', 132).length + floor32(('cd', 132).length - 9) + 296] = mem[floor32(('cd', 132).length - 9) + 128]
+      require ext_code.size(0x1a44076050125825900e736c501f859c50fe728c)
+      call 0x1a44076050125825900e736c501f859c50fe728c.0x7cb59012 with:
+           gas gas_remaining wei
+          args address(('cd', 132)[0]), cd[100], 0, 128, mem[floor32(('cd', 132).length - 9) + 128], mem[floor32(('cd', 132).length - 9) + 160 len ceil32(mem[floor32(('cd', 132).length - 9) + 128])]
+      if not ext_call.success:
+          revert with ext_call.return_data[0 len return_data.size]
+  require cd[4] == uint32(cd[4])
+  log 0xefed6d35: cd[4] << 224, 0, cd[100], address(('cd', 132)[0])
+
+def name(): # not payable
+  if bool(stor8.length):
+      if not bool(stor8.length) - (uint255(stor8.length) * 0.5 < 32):
+          revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+      if bool(stor8.length):
+          if not bool(stor8.length) - (uint255(stor8.length) * 0.5 < 32):
+              revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+          if Mask(256, -1, stor8.length):
+              if 31 < uint255(stor8.length) * 0.5:
+                  mem[128] = uint256(stor8.field_0)
+                  idx = 128
+                  s = 0
+                  while (uint255(stor8.length) * 0.5) + 96 > idx:
+                      mem[idx + 32] = stor8[s].field_256
+                      idx = idx + 32
+                      s = s + 1
+                      continue 
+                  return Array(len=2 * Mask(256, -1, stor8.length), data=mem[128 len ceil32(uint255(stor8.length) * 0.5)])
+              mem[128] = 256 * stor8.length.field_8
+      else:
+          if not bool(stor8.length) - (stor8.length.field_1 < 32):
+              revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+          if stor8.length.field_1:
+              if 31 < stor8.length.field_1:
+                  mem[128] = uint256(stor8.field_0)
+                  idx = 128
+                  s = 0
+                  while stor8.length.field_1 + 96 > idx:
+                      mem[idx + 32] = stor8[s].field_256
+                      idx = idx + 32
+                      s = s + 1
+                      continue 
+                  return Array(len=2 * Mask(256, -1, stor8.length), data=mem[128 len ceil32(uint255(stor8.length) * 0.5)])
+              mem[128] = 256 * stor8.length.field_8
+      mem[ceil32(uint255(stor8.length) * 0.5) + 192 len ceil32(uint255(stor8.length) * 0.5)] = mem[128 len ceil32(uint255(stor8.length) * 0.5)]
+      mem[(uint255(stor8.length) * 0.5) + ceil32(uint255(stor8.length) * 0.5) + 192] = 0
+      return Array(len=2 * Mask(256, -1, stor8.length), data=mem[128 len ceil32(uint255(stor8.length) * 0.5)], mem[(2 * ceil32(uint255(stor8.length) * 0.5)) + 192 len 2 * ceil32(uint255(stor8.length) * 0.5)]), 
+  if not bool(stor8.length) - (stor8.length.field_1 < 32):
+      revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+  if bool(stor8.length):
+      if not bool(stor8.length) - (uint255(stor8.length) * 0.5 < 32):
+          revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+      if Mask(256, -1, stor8.length):
+          if 31 < uint255(stor8.length) * 0.5:
+              mem[128] = uint256(stor8.field_0)
+              idx = 128
+              s = 0
+              while (uint255(stor8.length) * 0.5) + 96 > idx:
+                  mem[idx + 32] = stor8[s].field_256
+                  idx = idx + 32
+                  s = s + 1
+                  continue 
+              return Array(len=stor8.length % 128, data=mem[128 len ceil32(stor8.length.field_1)])
+          mem[128] = 256 * stor8.length.field_8
+  else:
+      if not bool(stor8.length) - (stor8.length.field_1 < 32):
+          revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+      if stor8.length.field_1:
+          if 31 < stor8.length.field_1:
+              mem[128] = uint256(stor8.field_0)
+              idx = 128
+              s = 0
+              while stor8.length.field_1 + 96 > idx:
+                  mem[idx + 32] = stor8[s].field_256
+                  idx = idx + 32
+                  s = s + 1
+                  continue 
+              return Array(len=stor8.length % 128, data=mem[128 len ceil32(stor8.length.field_1)])
+          mem[128] = 256 * stor8.length.field_8
+  mem[ceil32(stor8.length.field_1) + 192 len ceil32(stor8.length.field_1)] = mem[128 len ceil32(stor8.length.field_1)]
+  mem[stor8.length.field_1 + ceil32(stor8.length.field_1) + 192] = 0
+  return Array(len=stor8.length % 128, data=mem[128 len ceil32(stor8.length.field_1)], mem[(2 * ceil32(stor8.length.field_1)) + 192 len 2 * ceil32(stor8.length.field_1)]), 
+
+def symbol(): # not payable
+  if bool(stor9.length):
+      if not bool(stor9.length) - (uint255(stor9.length) * 0.5 < 32):
+          revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+      if bool(stor9.length):
+          if not bool(stor9.length) - (uint255(stor9.length) * 0.5 < 32):
+              revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+          if Mask(256, -1, stor9.length):
+              if 31 < uint255(stor9.length) * 0.5:
+                  mem[128] = uint256(stor9.field_0)
+                  idx = 128
+                  s = 0
+                  while (uint255(stor9.length) * 0.5) + 96 > idx:
+                      mem[idx + 32] = stor9[s].field_256
+                      idx = idx + 32
+                      s = s + 1
+                      continue 
+                  return Array(len=2 * Mask(256, -1, stor9.length), data=mem[128 len ceil32(uint255(stor9.length) * 0.5)])
+              mem[128] = 256 * stor9.length.field_8
+      else:
+          if not bool(stor9.length) - (stor9.length.field_1 < 32):
+              revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+          if stor9.length.field_1:
+              if 31 < stor9.length.field_1:
+                  mem[128] = uint256(stor9.field_0)
+                  idx = 128
+                  s = 0
+                  while stor9.length.field_1 + 96 > idx:
+                      mem[idx + 32] = stor9[s].field_256
+                      idx = idx + 32
+                      s = s + 1
+                      continue 
+                  return Array(len=2 * Mask(256, -1, stor9.length), data=mem[128 len ceil32(uint255(stor9.length) * 0.5)])
+              mem[128] = 256 * stor9.length.field_8
+      mem[ceil32(uint255(stor9.length) * 0.5) + 192 len ceil32(uint255(stor9.length) * 0.5)] = mem[128 len ceil32(uint255(stor9.length) * 0.5)]
+      mem[(uint255(stor9.length) * 0.5) + ceil32(uint255(stor9.length) * 0.5) + 192] = 0
+      return Array(len=2 * Mask(256, -1, stor9.length), data=mem[128 len ceil32(uint255(stor9.length) * 0.5)], mem[(2 * ceil32(uint255(stor9.length) * 0.5)) + 192 len 2 * ceil32(uint255(stor9.length) * 0.5)]), 
+  if not bool(stor9.length) - (stor9.length.field_1 < 32):
+      revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+  if bool(stor9.length):
+      if not bool(stor9.length) - (uint255(stor9.length) * 0.5 < 32):
+          revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+      if Mask(256, -1, stor9.length):
+          if 31 < uint255(stor9.length) * 0.5:
+              mem[128] = uint256(stor9.field_0)
+              idx = 128
+              s = 0
+              while (uint255(stor9.length) * 0.5) + 96 > idx:
+                  mem[idx + 32] = stor9[s].field_256
+                  idx = idx + 32
+                  s = s + 1
+                  continue 
+              return Array(len=stor9.length % 128, data=mem[128 len ceil32(stor9.length.field_1)])
+          mem[128] = 256 * stor9.length.field_8
+  else:
+      if not bool(stor9.length) - (stor9.length.field_1 < 32):
+          revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+      if stor9.length.field_1:
+          if 31 < stor9.length.field_1:
+              mem[128] = uint256(stor9.field_0)
+              idx = 128
+              s = 0
+              while stor9.length.field_1 + 96 > idx:
+                  mem[idx + 32] = stor9[s].field_256
+                  idx = idx + 32
+                  s = s + 1
+                  continue 
+              return Array(len=stor9.length % 128, data=mem[128 len ceil32(stor9.length.field_1)])
+          mem[128] = 256 * stor9.length.field_8
+  mem[ceil32(stor9.length.field_1) + 192 len ceil32(stor9.length.field_1)] = mem[128 len ceil32(stor9.length.field_1)]
+  mem[stor9.length.field_1 + ceil32(stor9.length.field_1) + 192] = 0
+  return Array(len=stor9.length % 128, data=mem[128 len ceil32(stor9.length.field_1)], mem[(2 * ceil32(stor9.length.field_1)) + 192 len 2 * ceil32(stor9.length.field_1)]), 
+
+def unknownbd815db0() payable: 
+  require calldata.size - 4 >=′ 32
+  require cd[4] <= LOCK8605463013()
+  require cd[4] + 35 <′ calldata.size
+  require ('cd', 4).length <= LOCK8605463013()
+  require cd[4] + (32 * ('cd', 4).length) + 36 <= calldata.size
+  idx = 0
+  while idx < ('cd', 4).length:
+      require cd[(cd[4] + (32 * idx) + 36)] <′ calldata.size + -cd[4] - 355
+      require cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 36)] == uint32(cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 36)])
+      mem[0] = uint32(cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 36)])
+      mem[32] = 1
+      if unknownbb0b6a53[cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 36)] << 224] == cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 68)]:
+          require cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 292)] <′ calldata.size + -cd[(cd[4] + (32 * idx) + 36)] + -cd[4] - 67
+          require cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 292)] + 36)] <= LOCK8605463013()
+          require cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 292)] + 68 <=′ calldata.size - cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 292)] + 36)]
+          require cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 260)] == address(cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 260)])
+          require cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 324)] <′ calldata.size + -cd[(cd[4] + (32 * idx) + 36)] + -cd[4] - 67
+          require cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 324)] + 36)] <= LOCK8605463013()
+          require cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 324)] + 68 <=′ calldata.size - cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 324)] + 36)]
+          mem[96] = 0xd045a0dc00000000000000000000000000000000000000000000000000000000
+          require cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 36)] == uint32(cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 36)])
+          mem[100] = uint32(cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 36)])
+          mem[132] = cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 68)]
+          require cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 100)] == uint64(cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 100)])
+          mem[164] = uint64(cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 100)])
+          mem[196] = cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 196)]
+          mem[228] = 224
+          mem[324] = cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 292)] + 36)]
+          mem[356 len cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 292)] + 36)]] = call.data[cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 292)] + 68 len cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 292)] + 36)]]
+          mem[cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 292)] + 36)] + 356] = 0
+          mem[260] = address(cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 260)])
+          mem[292] = ceil32(cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 292)] + 36)]) + 256
+          mem[ceil32(cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 292)] + 36)]) + 356] = cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 324)] + 36)]
+          mem[ceil32(cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 292)] + 36)]) + 388 len cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 324)] + 36)]] = call.data[cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 324)] + 68 len cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 324)] + 36)]]
+          mem[ceil32(cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 292)] + 36)]) + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 324)] + 36)] + 388] = 0
+          require ext_code.size(this.address)
+          call this.address.0xd045a0dc with:
+             value cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 228)] wei
+               gas gas_remaining wei
+              args cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 36)] << 224, cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 68)], cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 100)] << 192, cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 196)], 224, address(cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 260)]), ceil32(cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 292)] + 36)]) + 256, cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 292)] + 36)], call.data[cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 292)] + 68 len cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 292)] + 36)]], 0, mem[cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 292)] + 36)] + 388 len ceil32(cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 292)] + 36)]) + ceil32(cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 324)] + 36)]) - cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + cd[(cd[(cd[4] + (32 * idx) + 36)] + cd[4] + 292)] + 36)]]
+          if not ext_call.success:
+              revert with ext_call.return_data[0 len return_data.size]
+      idx = idx + 1
+      continue 
+  mem[96] = 0x8e9e709900000000000000000000000000000000000000000000000000000000
+  static call caller.0x8e9e7099 with:
+          gas gas_remaining wei
+  if not ext_call.success:
+      revert with ext_call.return_data[0 len return_data.size]
+  mem[96 len return_data.size] = ext_call.return_data[0 len return_data.size]
+  mem[64] = ceil32(return_data.size) + 96
+  require return_data.size >=′ 32
+  _18 = mem[96]
+  require mem[96] <= LOCK8605463013()
+  require mem[96] + 127 <′ return_data.size + 96
+  _19 = mem[mem[96] + 96]
+  if mem[mem[96] + 96] > LOCK8605463013():
+      revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+  if ceil32(ceil32(mem[mem[96] + 96])) + 1 < 0 or ceil32(return_data.size) + ceil32(ceil32(mem[mem[96] + 96])) + 97 > LOCK8605463013():
+      revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+  mem[64] = ceil32(return_data.size) + ceil32(ceil32(mem[mem[96] + 96])) + 97
+  mem[ceil32(return_data.size) + 96] = _19
+  require _18 + _19 + 32 <= return_data.size
+  mem[ceil32(return_data.size) + 128 len ceil32(_19)] = mem[_18 + 128 len ceil32(_19)]
+  mem[_19 + ceil32(return_data.size) + 128] = 0
+  mem[mem[64]] = 0x8351eea700000000000000000000000000000000000000000000000000000000
+  mem[mem[64] + 4] = 32
+  mem[mem[64] + 36] = _19
+  mem[mem[64] + 68 len ceil32(_19)] = mem[ceil32(return_data.size) + 128 len ceil32(_19)]
+  mem[_19 + mem[64] + 68] = 0
+  revert with 0, 32, _19, mem[mem[64] + 68 len ceil32(_19)]
+
+def unknown3b6f743b(): # not payable
+  require calldata.size - 4 >=′ 64
+  require cd[4] <= LOCK8605463013()
+  require calldata.size + -cd[4] - 4 >=′ 224
+  require cd[36] == bool(cd[36])
+  require ('cd', 4).length == uint32(('cd', 4).length)
+  if 10^12 * ('cd', 4)[1] / 10^12 / ('cd', 4)[1] / 10^12 != 10^12 and ('cd', 4)[1] / 10^12:
+      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+  if 10^12 * ('cd', 4)[1] / 10^12 < ('cd', 4)[2]:
+      revert with 0, 10^12 * ('cd', 4)[1] / 10^12, ('cd', 4)[2]
+  require ('cd', 4)[4] <′ calldata.size + -cd[4] - 35
+  require cd[(cd[4] + ('cd', 4)[4] + 4)] <= LOCK8605463013()
+  require cd[4] + ('cd', 4)[4] + 36 <=′ calldata.size - cd[(cd[4] + ('cd', 4)[4] + 4)]
+  if cd[(cd[4] + ('cd', 4)[4] + 4)]:
+      ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+  require ('cd', 4).length == uint32(('cd', 4).length)
+  require ('cd', 4)[3] <′ calldata.size + -cd[4] - 35
+  require cd[(cd[4] + ('cd', 4)[3] + 4)] <= LOCK8605463013()
+  require cd[4] + ('cd', 4)[3] + 36 <=′ calldata.size - cd[(cd[4] + ('cd', 4)[3] + 4)]
+  if stor3[('cd', 4).length << 224][1].field_0:
+      if not stor3[('cd', 4).length << 224][1].field_0 - (uint255(stor3[('cd', 4).length << 224][1].field_0) * 0.5 < 32):
+          revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+      if stor3[('cd', 4).length << 224][1].field_0:
+          if not stor3[('cd', 4).length << 224][1].field_0 - (uint255(stor3[('cd', 4).length << 224][1].field_0) * 0.5 < 32):
+              revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+          if Mask(256, -1, stor3[('cd', 4).length << 224][1].field_0):
+              if 31 < uint255(stor3[('cd', 4).length << 224][1].field_0) * 0.5:
+                  ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+      else:
+          if not stor3[('cd', 4).length << 224][1].field_0 - (stor3[('cd', 4).length << 224][1].field_1 < 32):
+              revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+          if stor3[('cd', 4).length << 224][1].field_1:
+              if 31 < stor3[('cd', 4).length << 224][1].field_1:
+                  ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+      if not -uint255(stor3[('cd', 4).length << 224][1].field_0) * 0.5:
+          if not unknown111ecdadAddress:
+              require ('cd', 4).length == uint32(('cd', 4).length)
+              if not unknownbb0b6a53[('cd', 4).length << 224]:
+                  revert with 0, uint32(('cd', 4).length)
+          ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+      if not -cd[(cd[4] + ('cd', 4)[3] + 4)]:
+          if not unknown111ecdadAddress:
+              require ('cd', 4).length == uint32(('cd', 4).length)
+              if not unknownbb0b6a53[('cd', 4).length << 224]:
+                  revert with 0, uint32(('cd', 4).length)
+          ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+      if cd[(cd[4] + ('cd', 4)[3] + 4)] >= 2:
+          require 2 <= cd[(cd[4] + ('cd', 4)[3] + 4)]
+      mem[ceil32(cd[(cd[4] + ('cd', 4)[4] + 4)]) + ceil32(uint255(stor3[('cd', 4).length << 224][1].field_0) * 0.5) + 364 len cd[(cd[4] + ('cd', 4)[3] + 4)]] = call.data[cd[4] + ('cd', 4)[3] + 36 len cd[(cd[4] + ('cd', 4)[3] + 4)]]
+      mem[ceil32(cd[(cd[4] + ('cd', 4)[4] + 4)]) + ceil32(uint255(stor3[('cd', 4).length << 224][1].field_0) * 0.5) + cd[(cd[4] + ('cd', 4)[3] + 4)] + 364] = 0
+      revert with 0, 
+                  32,
+                  cd[(cd[4] + ('cd', 4)[3] + 4)],
+                  call.data[cd[4] + ('cd', 4)[3] + 36 len cd[(cd[4] + ('cd', 4)[3] + 4)]],
+                  mem[ceil32(cd[(cd[4] + ('cd', 4)[4] + 4)]) + ceil32(uint255(stor3[('cd', 4).length << 224][1].field_0) * 0.5) + cd[(cd[4] + ('cd', 4)[3] + 4)] + 364 len ceil32(cd[(cd[4] + ('cd', 4)[3] + 4)]) - cd[(cd[4] + ('cd', 4)[3] + 4)]]
+  if not stor3[('cd', 4).length << 224][1].field_0 - (stor3[('cd', 4).length << 224][1].field_1 < 32):
+      revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+  if stor3[('cd', 4).length << 224][1].field_0:
+      if not stor3[('cd', 4).length << 224][1].field_0 - (uint255(stor3[('cd', 4).length << 224][1].field_0) * 0.5 < 32):
+          revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+      if Mask(256, -1, stor3[('cd', 4).length << 224][1].field_0):
+          if 31 < uint255(stor3[('cd', 4).length << 224][1].field_0) * 0.5:
+              ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+  else:
+      if not stor3[('cd', 4).length << 224][1].field_0 - (stor3[('cd', 4).length << 224][1].field_1 < 32):
+          revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+      if stor3[('cd', 4).length << 224][1].field_1:
+          if 31 < stor3[('cd', 4).length << 224][1].field_1:
+              ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+  if not -stor3[('cd', 4).length << 224][1].field_1:
+      if not unknown111ecdadAddress:
+          require ('cd', 4).length == uint32(('cd', 4).length)
+          if not unknownbb0b6a53[('cd', 4).length << 224]:
+              revert with 0, uint32(('cd', 4).length)
+      ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+  if not -cd[(cd[4] + ('cd', 4)[3] + 4)]:
+      if not unknown111ecdadAddress:
+          require ('cd', 4).length == uint32(('cd', 4).length)
+          if not unknownbb0b6a53[('cd', 4).length << 224]:
+              revert with 0, uint32(('cd', 4).length)
+      ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+  if cd[(cd[4] + ('cd', 4)[3] + 4)] >= 2:
+      require 2 <= cd[(cd[4] + ('cd', 4)[3] + 4)]
+  mem[ceil32(cd[(cd[4] + ('cd', 4)[4] + 4)]) + ceil32(stor3[('cd', 4).length << 224][1].field_1) + 364 len cd[(cd[4] + ('cd', 4)[3] + 4)]] = call.data[cd[4] + ('cd', 4)[3] + 36 len cd[(cd[4] + ('cd', 4)[3] + 4)]]
+  mem[ceil32(cd[(cd[4] + ('cd', 4)[4] + 4)]) + ceil32(stor3[('cd', 4).length << 224][1].field_1) + cd[(cd[4] + ('cd', 4)[3] + 4)] + 364] = 0
+  revert with 0, 
+              32,
+              cd[(cd[4] + ('cd', 4)[3] + 4)],
+              call.data[cd[4] + ('cd', 4)[3] + 36 len cd[(cd[4] + ('cd', 4)[3] + 4)]],
+              mem[ceil32(cd[(cd[4] + ('cd', 4)[4] + 4)]) + ceil32(stor3[('cd', 4).length << 224][1].field_1) + cd[(cd[4] + ('cd', 4)[3] + 4)] + 364 len ceil32(cd[(cd[4] + ('cd', 4)[3] + 4)]) - cd[(cd[4] + ('cd', 4)[3] + 4)]]
+
+def unknown5535d461(uint256 _param1, uint256 _param2): # not payable
+  require calldata.size - 4 >=′ 64
+  require _param1 == uint32(_param1)
+  require _param2 == uint16(_param2)
+  if stor3[_param1][_param2].field_0:
+      if not stor3[_param1][_param2].field_0 - (uint255(stor3[_param1][_param2].field_0) * 0.5 < 32):
+          revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+      if stor3[_param1][_param2].field_0:
+          if not stor3[_param1][_param2].field_0 - (uint255(stor3[_param1][_param2].field_0) * 0.5 < 32):
+              revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+          if Mask(256, -1, stor3[_param1][_param2].field_0):
+              if 31 < uint255(stor3[_param1][_param2].field_0) * 0.5:
+                  mem[128] = stor3[_param1][_param2].field_0
+                  idx = 128
+                  s = 0
+                  while (uint255(stor3[_param1][_param2].field_0) * 0.5) + 96 > idx:
+                      mem[idx + 32] = stor3[_param1][_param2][s].field_256
+                      idx = idx + 32
+                      s = s + 1
+                      continue 
+                  return Array(len=2 * Mask(256, -1, stor3[_param1][_param2].field_0), data=mem[128 len ceil32(uint255(stor3[_param1][_param2].field_0) * 0.5)]), 
+              mem[128] = 256 * stor3[_param1][_param2].field_8
+      else:
+          if not stor3[_param1][_param2].field_0 - (stor3[_param1][_param2].field_1 < 32):
+              revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+          if stor3[_param1][_param2].field_1:
+              if 31 < stor3[_param1][_param2].field_1:
+                  mem[128] = stor3[_param1][_param2].field_0
+                  idx = 128
+                  s = 0
+                  while stor3[_param1][_param2].field_1 + 96 > idx:
+                      mem[idx + 32] = stor3[_param1][_param2][s].field_256
+                      idx = idx + 32
+                      s = s + 1
+                      continue 
+                  return Array(len=2 * Mask(256, -1, stor3[_param1][_param2].field_0), data=mem[128 len ceil32(uint255(stor3[_param1][_param2].field_0) * 0.5)]), 
+              mem[128] = 256 * stor3[_param1][_param2].field_8
+      mem[ceil32(uint255(stor3[_param1][_param2].field_0) * 0.5) + 192 len ceil32(uint255(stor3[_param1][_param2].field_0) * 0.5)] = mem[128 len ceil32(uint255(stor3[_param1][_param2].field_0) * 0.5)]
+      mem[(uint255(stor3[_param1][_param2].field_0) * 0.5) + ceil32(uint255(stor3[_param1][_param2].field_0) * 0.5) + 192] = 0
+      return Array(len=2 * Mask(256, -1, stor3[_param1][_param2].field_0), data=mem[128 len ceil32(uint255(stor3[_param1][_param2].field_0) * 0.5)], mem[(2 * ceil32(uint255(stor3[_param1][_param2].field_0) * 0.5)) + 192 len 2 * ceil32(uint255(stor3[_param1][_param2].field_0) * 0.5)]), 
+  if not stor3[_param1][_param2].field_0 - (stor3[_param1][_param2].field_1 < 32):
+      revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+  if stor3[_param1][_param2].field_0:
+      if not stor3[_param1][_param2].field_0 - (uint255(stor3[_param1][_param2].field_0) * 0.5 < 32):
+          revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+      if Mask(256, -1, stor3[_param1][_param2].field_0):
+          if 31 < uint255(stor3[_param1][_param2].field_0) * 0.5:
+              mem[128] = stor3[_param1][_param2].field_0
+              idx = 128
+              s = 0
+              while (uint255(stor3[_param1][_param2].field_0) * 0.5) + 96 > idx:
+                  mem[idx + 32] = stor3[_param1][_param2][s].field_256
+                  idx = idx + 32
+                  s = s + 1
+                  continue 
+              return Array(len=stor3[_param1][_param2].field_0, data=mem[128 len ceil32(stor3[_param1][_param2].field_1)])
+          mem[128] = 256 * stor3[_param1][_param2].field_8
+  else:
+      if not stor3[_param1][_param2].field_0 - (stor3[_param1][_param2].field_1 < 32):
+          revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+      if stor3[_param1][_param2].field_1:
+          if 31 < stor3[_param1][_param2].field_1:
+              mem[128] = stor3[_param1][_param2].field_0
+              idx = 128
+              s = 0
+              while stor3[_param1][_param2].field_1 + 96 > idx:
+                  mem[idx + 32] = stor3[_param1][_param2][s].field_256
+                  idx = idx + 32
+                  s = s + 1
+                  continue 
+              return Array(len=stor3[_param1][_param2].field_0, data=mem[128 len ceil32(stor3[_param1][_param2].field_1)])
+          mem[128] = 256 * stor3[_param1][_param2].field_8
+  mem[ceil32(stor3[_param1][_param2].field_1) + 192 len ceil32(stor3[_param1][_param2].field_1)] = mem[128 len ceil32(stor3[_param1][_param2].field_1)]
+  mem[stor3[_param1][_param2].field_1 + ceil32(stor3[_param1][_param2].field_1) + 192] = 0
+  return Array(len=stor3[_param1][_param2].field_0, data=mem[128 len ceil32(stor3[_param1][_param2].field_1)], mem[(2 * ceil32(stor3[_param1][_param2].field_1)) + 192 len 2 * ceil32(stor3[_param1][_param2].field_1)]), 
+
+def unknownc7c7f5b3() payable: 
+  require calldata.size - 4 >=′ 128
+  require cd[4] <= LOCK8605463013()
+  require calldata.size + -cd[4] - 4 >=′ 224
+  require calldata.size - 36 >=′ 64
+  require cd[100] == address(cd[100])
+  require ('cd', 4).length == uint32(('cd', 4).length)
+  if 10^12 * ('cd', 4)[1] / 10^12 / ('cd', 4)[1] / 10^12 != 10^12 and ('cd', 4)[1] / 10^12:
+      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+  if 10^12 * ('cd', 4)[1] / 10^12 < ('cd', 4)[2]:
+      revert with 0, 10^12 * ('cd', 4)[1] / 10^12, ('cd', 4)[2]
+  require caller
+  if balanceOf[caller] < 10^12 * ('cd', 4)[1] / 10^12:
+      revert with 0, caller, balanceOf[caller], 10^12 * ('cd', 4)[1] / 10^12
+  balanceOf[caller] += -1 * 10^12 * ('cd', 4)[1] / 10^12
+  totalSupply += -1 * 10^12 * ('cd', 4)[1] / 10^12
+  log Transfer(
+        address from=(10^12 * ('cd', 4)[1] / 10^12),
+        address to=caller,
+        uint256 value=0)
+  require ('cd', 4)[4] <′ calldata.size + -cd[4] - 35
+  require cd[(cd[4] + ('cd', 4)[4] + 4)] <= LOCK8605463013()
+  require cd[4] + ('cd', 4)[4] + 36 <=′ calldata.size - cd[(cd[4] + ('cd', 4)[4] + 4)]
+  if not cd[(cd[4] + ('cd', 4)[4] + 4)]:
+      require ('cd', 4).length == uint32(('cd', 4).length)
+      require ('cd', 4)[3] <′ calldata.size + -cd[4] - 35
+      require cd[(cd[4] + ('cd', 4)[3] + 4)] <= LOCK8605463013()
+      require cd[4] + ('cd', 4)[3] + 36 <=′ calldata.size - cd[(cd[4] + ('cd', 4)[3] + 4)]
+      if stor3[('cd', 4).length << 224][1].field_0:
+          if not stor3[('cd', 4).length << 224][1].field_0 - (uint255(stor3[('cd', 4).length << 224][1].field_0) * 0.5 < 32):
+              revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+          if stor3[('cd', 4).length << 224][1].field_0:
+              if not stor3[('cd', 4).length << 224][1].field_0 - (uint255(stor3[('cd', 4).length << 224][1].field_0) * 0.5 < 32):
+                  revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+              if not Mask(256, -1, stor3[('cd', 4).length << 224][1].field_0):
+                  if -uint255(stor3[('cd', 4).length << 224][1].field_0) * 0.5:
+                      if -cd[(cd[4] + ('cd', 4)[3] + 4)]:
+                          if cd[(cd[4] + ('cd', 4)[3] + 4)] >= 2:
+                              require 2 <= cd[(cd[4] + ('cd', 4)[3] + 4)]
+                          mem[ceil32(cd[(cd[4] + ('cd', 4)[4] + 4)]) + ceil32(uint255(stor3[('cd', 4).length << 224][1].field_0) * 0.5) + 524 len cd[(cd[4] + ('cd', 4)[3] + 4)]] = call.data[cd[4] + ('cd', 4)[3] + 36 len cd[(cd[4] + ('cd', 4)[3] + 4)]]
+                          mem[ceil32(cd[(cd[4] + ('cd', 4)[4] + 4)]) + ceil32(uint255(stor3[('cd', 4).length << 224][1].field_0) * 0.5) + cd[(cd[4] + ('cd', 4)[3] + 4)] + 524] = 0
+                          revert with 0, 
+                                      32,
+                                      cd[(cd[4] + ('cd', 4)[3] + 4)],
+                                      call.data[cd[4] + ('cd', 4)[3] + 36 len cd[(cd[4] + ('cd', 4)[3] + 4)]],
+                                      mem[ceil32(cd[(cd[4] + ('cd', 4)[4] + 4)]) + ceil32(uint255(stor3[('cd', 4).length << 224][1].field_0) * 0.5) + cd[(cd[4] + ('cd', 4)[3] + 4)] + 524 len ceil32(cd[(cd[4] + ('cd', 4)[3] + 4)]) - cd[(cd[4] + ('cd', 4)[3] + 4)]]
+                      if not unknown111ecdadAddress:
+                          require ('cd', 4).length == uint32(('cd', 4).length)
+                          require calldata.size - 36 >=′ 64
+                          if not bool(ceil32(cd[(cd[4] + ('cd', 4)[4] + 4)]) + ceil32(uint255(stor3[('cd', 4).length << 224][1].field_0) * 0.5) + 520 <= LOCK8605463013()):
+                              revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+                          if cd[36] != call.value:
+                              revert with 0, call.value
+                          if cd[68]:
+                              static call 0x1a44076050125825900e736c501f859c50fe728c.0xe4fe1d94 with:
+                                      gas gas_remaining wei
+                              if not ext_call.success:
+                                  revert with ext_call.return_data[0 len return_data.size]
+                  else:
+                      if not unknown111ecdadAddress:
+                          require ('cd', 4).length == uint32(('cd', 4).length)
+                          require calldata.size - 36 >=′ 64
+                          if not bool(ceil32(cd[(cd[4] + ('cd', 4)[4] + 4)]) + ceil32(uint255(stor3[('cd', 4).length << 224][1].field_0) * 0.5) + ceil32(cd[(cd[4] + ('cd', 4)[3] + 4)]) + 552 <= LOCK8605463013()):
+                              revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+                          if cd[36] != call.value:
+                              revert with 0, call.value
+                          if not cd[68]:
+                              if not unknownbb0b6a53[('cd', 4).length << 224]:
+                                  revert with 0, uint32(('cd', 4).length)
+                          else:
+                              static call 0x1a44076050125825900e736c501f859c50fe728c.0xe4fe1d94 with:
+                                      gas gas_remaining wei
+                              if not ext_call.success:
+                                  revert with ext_call.return_data[0 len return_data.size]
+              else:
+                  if 31 >= uint255(stor3[('cd', 4).length << 224][1].field_0) * 0.5:
+                      if -uint255(stor3[('cd', 4).length << 224][1].field_0) * 0.5:
+                          if -cd[(cd[4] + ('cd', 4)[3] + 4)]:
+                              if cd[(cd[4] + ('cd', 4)[3] + 4)] >= 2:
+                                  require 2 <= cd[(cd[4] + ('cd', 4)[3] + 4)]
+                              mem[ceil32(cd[(cd[4] + ('cd', 4)[4] + 4)]) + ceil32(uint255(stor3[('cd', 4).length << 224][1].field_0) * 0.5) + 524 len cd[(cd[4] + ('cd', 4)[3] + 4)]] = call.data[cd[4] + ('cd', 4)[3] + 36 len cd[(cd[4] + ('cd', 4)[3] + 4)]]
+                              mem[ceil32(cd[(cd[4] + ('cd', 4)[4] + 4)]) + ceil32(uint255(stor3[('cd', 4).length << 224][1].field_0) * 0.5) + cd[(cd[4] + ('cd', 4)[3] + 4)] + 524] = 0
+                              revert with 0, 
+                                          32,
+                                          cd[(cd[4] + ('cd', 4)[3] + 4)],
+                                          call.data[cd[4] + ('cd', 4)[3] + 36 len cd[(cd[4] + ('cd', 4)[3] + 4)]],
+                                          mem[ceil32(cd[(cd[4] + ('cd', 4)[4] + 4)]) + ceil32(uint255(stor3[('cd', 4).length << 224][1].field_0) * 0.5) + cd[(cd[4] + ('cd', 4)[3] + 4)] + 524 len ceil32(cd[(cd[4] + ('cd', 4)[3] + 4)]) - cd[(cd[4] + ('cd', 4)[3] + 4)]]
+                          if not unknown111ecdadAddress:
+                              require ('cd', 4).length == uint32(('cd', 4).length)
+                              require calldata.size - 36 >=′ 64
+                              if not bool(ceil32(cd[(cd[4] + ('cd', 4)[4] + 4)]) + ceil32(uint255(stor3[('cd', 4).length << 224][1].field_0) * 0.5) + 520 <= LOCK8605463013()):
+                                  revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+                              if cd[36] != call.value:
+                                  revert with 0, call.value
+                      else:
+                          if not unknown111ecdadAddress:
+                              require ('cd', 4).length == uint32(('cd', 4).length)
+                              require calldata.size - 36 >=′ 64
+                              if not bool(ceil32(cd[(cd[4] + ('cd', 4)[4] + 4)]) + ceil32(uint255(stor3[('cd', 4).length << 224][1].field_0) * 0.5) + ceil32(cd[(cd[4] + ('cd', 4)[3] + 4)]) + 552 <= LOCK8605463013()):
+                                  revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+                              if cd[36] != call.value:
+                                  revert with 0, call.value
+                              if cd[68]:
+                                  static call 0x1a44076050125825900e736c501f859c50fe728c.0xe4fe1d94 with:
+                                          gas gas_remaining wei
+          else:
+              if not stor3[('cd', 4).length << 224][1].field_0 - (stor3[('cd', 4).length << 224][1].field_1 < 32):
+                  revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+              if stor3[('cd', 4).length << 224][1].field_1:
+                  if 31 >= stor3[('cd', 4).length << 224][1].field_1:
+                      if not -uint255(stor3[('cd', 4).length << 224][1].field_0) * 0.5:
+                          if not unknown111ecdadAddress:
+                              require ('cd', 4).length == uint32(('cd', 4).length)
+                              require calldata.size - 36 >=′ 64
+                              if not bool(ceil32(cd[(cd[4] + ('cd', 4)[4] + 4)]) + ceil32(uint255(stor3[('cd', 4).length << 224][1].field_0) * 0.5) + ceil32(cd[(cd[4] + ('cd', 4)[3] + 4)]) + 552 <= LOCK8605463013()):
+                                  revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+                              if cd[36] != call.value:
+                                  revert with 0, call.value
+                      else:
+                          if -cd[(cd[4] + ('cd', 4)[3] + 4)]:
+                              if cd[(cd[4] + ('cd', 4)[3] + 4)] >= 2:
+                                  require 2 <= cd[(cd[4] + ('cd', 4)[3] + 4)]
+                              mem[ceil32(cd[(cd[4] + ('cd', 4)[4] + 4)]) + ceil32(uint255(stor3[('cd', 4).length << 224][1].field_0) * 0.5) + 524 len cd[(cd[4] + ('cd', 4)[3] + 4)]] = call.data[cd[4] + ('cd', 4)[3] + 36 len cd[(cd[4] + ('cd', 4)[3] + 4)]]
+                              mem[ceil32(cd[(cd[4] + ('cd', 4)[4] + 4)]) + ceil32(uint255(stor3[('cd', 4).length << 224][1].field_0) * 0.5) + cd[(cd[4] + ('cd', 4)[3] + 4)] + 524] = 0
+                              revert with 0, 
+                                          32,
+                                          cd[(cd[4] + ('cd', 4)[3] + 4)],
+                                          call.data[cd[4] + ('cd', 4)[3] + 36 len cd[(cd[4] + ('cd', 4)[3] + 4)]],
+                                          mem[ceil32(cd[(cd[4] + ('cd', 4)[4] + 4)]) + ceil32(uint255(stor3[('cd', 4).length << 224][1].field_0) * 0.5) + cd[(cd[4] + ('cd', 4)[3] + 4)] + 524 len ceil32(cd[(cd[4] + ('cd', 4)[3] + 4)]) - cd[(cd[4] + ('cd', 4)[3] + 4)]]
+                          if not unknown111ecdadAddress:
+                              require ('cd', 4).length == uint32(('cd', 4).length)
+                              require calldata.size - 36 >=′ 64
+                              if not bool(ceil32(cd[(cd[4] + ('cd', 4)[4] + 4)]) + ceil32(uint255(stor3[('cd', 4).length << 224][1].field_0) * 0.5) + 520 <= LOCK8605463013()):
+                                  revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+                              if cd[36] != call.value:
+                                  revert with 0, call.value
+              else:
+                  if not -uint255(stor3[('cd', 4).length << 224][1].field_0) * 0.5:
+                      if not unknown111ecdadAddress:
+                          require ('cd', 4).length == uint32(('cd', 4).length)
+                          require calldata.size - 36 >=′ 64
+                          if not bool(ceil32(cd[(cd[4] + ('cd', 4)[4] + 4)]) + ceil32(uint255(stor3[('cd', 4).length << 224][1].field_0) * 0.5) + ceil32(cd[(cd[4] + ('cd', 4)[3] + 4)]) + 552 <= LOCK8605463013()):
+                              revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+                          if cd[36] != call.value:
+                              revert with 0, call.value
+                          if cd[68]:
+                              static call 0x1a44076050125825900e736c501f859c50fe728c.0xe4fe1d94 with:
+                                      gas gas_remaining wei
+                              if not ext_call.success:
+                                  revert with ext_call.return_data[0 len return_data.size]
+                  else:
+                      if -cd[(cd[4] + ('cd', 4)[3] + 4)]:
+                          if cd[(cd[4] + ('cd', 4)[3] + 4)] >= 2:
+                              require 2 <= cd[(cd[4] + ('cd', 4)[3] + 4)]
+                          mem[ceil32(cd[(cd[4] + ('cd', 4)[4] + 4)]) + ceil32(uint255(stor3[('cd', 4).length << 224][1].field_0) * 0.5) + 524 len cd[(cd[4] + ('cd', 4)[3] + 4)]] = call.data[cd[4] + ('cd', 4)[3] + 36 len cd[(cd[4] + ('cd', 4)[3] + 4)]]
+                          mem[ceil32(cd[(cd[4] + ('cd', 4)[4] + 4)]) + ceil32(uint255(stor3[('cd', 4).length << 224][1].field_0) * 0.5) + cd[(cd[4] + ('cd', 4)[3] + 4)] + 524] = 0
+                          revert with 0, 
+                                      32,
+                                      cd[(cd[4] + ('cd', 4)[3] + 4)],
+                                      call.data[cd[4] + ('cd', 4)[3] + 36 len cd[(cd[4] + ('cd', 4)[3] + 4)]],
+                                      mem[ceil32(cd[(cd[4] + ('cd', 4)[4] + 4)]) + ceil32(uint255(stor3[('cd', 4).length << 224][1].field_0) * 0.5) + cd[(cd[4] + ('cd', 4)[3] + 4)] + 524 len ceil32(cd[(cd[4] + ('cd', 4)[3] + 4)]) - cd[(cd[4] + ('cd', 4)[3] + 4)]]
+                      if not unknown111ecdadAddress:
+                          require ('cd', 4).length == uint32(('cd', 4).length)
+                          require calldata.size - 36 >=′ 64
+                          if not bool(ceil32(cd[(cd[4] + ('cd', 4)[4] + 4)]) + ceil32(uint255(stor3[('cd', 4).length << 224][1].field_0) * 0.5) + 520 <= LOCK8605463013()):
+                              revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+                          if cd[36] != call.value:
+                              revert with 0, call.value
+                          if cd[68]:
+                              static call 0x1a44076050125825900e736c501f859c50fe728c.0xe4fe1d94 with:
+                                      gas gas_remaining wei
+      else:
+          if not stor3[('cd', 4).length << 224][1].field_0 - (stor3[('cd', 4).length << 224][1].field_1 < 32):
+              revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+          if not stor3[('cd', 4).length << 224][1].field_0:
+              if not stor3[('cd', 4).length << 224][1].field_0 - (stor3[('cd', 4).length << 224][1].field_1 < 32):
+                  revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+              if stor3[('cd', 4).length << 224][1].field_1:
+                  if 31 >= stor3[('cd', 4).length << 224][1].field_1:
+                      if -stor3[('cd', 4).length << 224][1].field_1:
+                          if -cd[(cd[4] + ('cd', 4)[3] + 4)]:
+                              if cd[(cd[4] + ('cd', 4)[3] + 4)] >= 2:
+                                  require 2 <= cd[(cd[4] + ('cd', 4)[3] + 4)]
+                              mem[ceil32(cd[(cd[4] + ('cd', 4)[4] + 4)]) + ceil32(stor3[('cd', 4).length << 224][1].field_1) + 524 len cd[(cd[4] + ('cd', 4)[3] + 4)]] = call.data[cd[4] + ('cd', 4)[3] + 36 len cd[(cd[4] + ('cd', 4)[3] + 4)]]
+                              mem[ceil32(cd[(cd[4] + ('cd', 4)[4] + 4)]) + ceil32(stor3[('cd', 4).length << 224][1].field_1) + cd[(cd[4] + ('cd', 4)[3] + 4)] + 524] = 0
+                              revert with 0, 
+                                          32,
+                                          cd[(cd[4] + ('cd', 4)[3] + 4)],
+                                          call.data[cd[4] + ('cd', 4)[3] + 36 len cd[(cd[4] + ('cd', 4)[3] + 4)]],
+                                          mem[ceil32(cd[(cd[4] + ('cd', 4)[4] + 4)]) + ceil32(stor3[('cd', 4).length << 224][1].field_1) + cd[(cd[4] + ('cd', 4)[3] + 4)] + 524 len ceil32(cd[(cd[4] + ('cd', 4)[3] + 4)]) - cd[(cd[4] + ('cd', 4)[3] + 4)]]
+                          if not unknown111ecdadAddress:
+                              require ('cd', 4).length == uint32(('cd', 4).length)
+                              require calldata.size - 36 >=′ 64
+                              if not bool(ceil32(cd[(cd[4] + ('cd', 4)[4] + 4)]) + ceil32(stor3[('cd', 4).length << 224][1].field_1) + 520 <= LOCK8605463013()):
+                                  revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+                      else:
+                          if not unknown111ecdadAddress:
+                              require ('cd', 4).length == uint32(('cd', 4).length)
+                              require calldata.size - 36 >=′ 64
+                              if not bool(ceil32(cd[(cd[4] + ('cd', 4)[4] + 4)]) + ceil32(stor3[('cd', 4).length << 224][1].field_1) + ceil32(cd[(cd[4] + ('cd', 4)[3] + 4)]) + 552 <= LOCK8605463013()):
+                                  revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+                              if cd[36] != call.value:
+                                  revert with 0, call.value
+              else:
+                  if -stor3[('cd', 4).length << 224][1].field_1:
+                      if -cd[(cd[4] + ('cd', 4)[3] + 4)]:
+                          if cd[(cd[4] + ('cd', 4)[3] + 4)] >= 2:
+                              require 2 <= cd[(cd[4] + ('cd', 4)[3] + 4)]
+                          mem[ceil32(cd[(cd[4] + ('cd', 4)[4] + 4)]) + ceil32(stor3[('cd', 4).length << 224][1].field_1) + 524 len cd[(cd[4] + ('cd', 4)[3] + 4)]] = call.data[cd[4] + ('cd', 4)[3] + 36 len cd[(cd[4] + ('cd', 4)[3] + 4)]]
+                          mem[ceil32(cd[(cd[4] + ('cd', 4)[4] + 4)]) + ceil32(stor3[('cd', 4).length << 224][1].field_1) + cd[(cd[4] + ('cd', 4)[3] + 4)] + 524] = 0
+                          revert with 0, 
+                                      32,
+                                      cd[(cd[4] + ('cd', 4)[3] + 4)],
+                                      call.data[cd[4] + ('cd', 4)[3] + 36 len cd[(cd[4] + ('cd', 4)[3] + 4)]],
+                                      mem[ceil32(cd[(cd[4] + ('cd', 4)[4] + 4)]) + ceil32(stor3[('cd', 4).length << 224][1].field_1) + cd[(cd[4] + ('cd', 4)[3] + 4)] + 524 len ceil32(cd[(cd[4] + ('cd', 4)[3] + 4)]) - cd[(cd[4] + ('cd', 4)[3] + 4)]]
+                      if not unknown111ecdadAddress:
+                          require ('cd', 4).length == uint32(('cd', 4).length)
+                          require calldata.size - 36 >=′ 64
+                          if not bool(ceil32(cd[(cd[4] + ('cd', 4)[4] + 4)]) + ceil32(stor3[('cd', 4).length << 224][1].field_1) + 520 <= LOCK8605463013()):
+                              revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+                          if cd[36] != call.value:
+                              revert with 0, call.value
+                  else:
+                      if not unknown111ecdadAddress:
+                          require ('cd', 4).length == uint32(('cd', 4).length)
+                          require calldata.size - 36 >=′ 64
+                          if not bool(ceil32(cd[(cd[4] + ('cd', 4)[4] + 4)]) + ceil32(stor3[('cd', 4).length << 224][1].field_1) + ceil32(cd[(cd[4] + ('cd', 4)[3] + 4)]) + 552 <= LOCK8605463013()):
+                              revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+                          if cd[36] != call.value:
+                              revert with 0, call.value
+                          if cd[68]:
+                              static call 0x1a44076050125825900e736c501f859c50fe728c.0xe4fe1d94 with:
+                                      gas gas_remaining wei
+          else:
+              if not stor3[('cd', 4).length << 224][1].field_0 - (uint255(stor3[('cd', 4).length << 224][1].field_0) * 0.5 < 32):
+                  revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+              if Mask(256, -1, stor3[('cd', 4).length << 224][1].field_0):
+                  if 31 >= uint255(stor3[('cd', 4).length << 224][1].field_0) * 0.5:
+                      if not -stor3[('cd', 4).length << 224][1].field_1:
+                          if not unknown111ecdadAddress:
+                              require ('cd', 4).length == uint32(('cd', 4).length)
+                              require calldata.size - 36 >=′ 64
+                              if not bool(ceil32(cd[(cd[4] + ('cd', 4)[4] + 4)]) + ceil32(stor3[('cd', 4).length << 224][1].field_1) + ceil32(cd[(cd[4] + ('cd', 4)[3] + 4)]) + 552 <= LOCK8605463013()):
+                                  revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+                              if cd[36] != call.value:
+                                  revert with 0, call.value
+                      else:
+                          if -cd[(cd[4] + ('cd', 4)[3] + 4)]:
+                              if cd[(cd[4] + ('cd', 4)[3] + 4)] >= 2:
+                                  require 2 <= cd[(cd[4] + ('cd', 4)[3] + 4)]
+                              mem[ceil32(cd[(cd[4] + ('cd', 4)[4] + 4)]) + ceil32(stor3[('cd', 4).length << 224][1].field_1) + 524 len cd[(cd[4] + ('cd', 4)[3] + 4)]] = call.data[cd[4] + ('cd', 4)[3] + 36 len cd[(cd[4] + ('cd', 4)[3] + 4)]]
+                              mem[ceil32(cd[(cd[4] + ('cd', 4)[4] + 4)]) + ceil32(stor3[('cd', 4).length << 224][1].field_1) + cd[(cd[4] + ('cd', 4)[3] + 4)] + 524] = 0
+                              revert with 0, 
+                                          32,
+                                          cd[(cd[4] + ('cd', 4)[3] + 4)],
+                                          call.data[cd[4] + ('cd', 4)[3] + 36 len cd[(cd[4] + ('cd', 4)[3] + 4)]],
+                                          mem[ceil32(cd[(cd[4] + ('cd', 4)[4] + 4)]) + ceil32(stor3[('cd', 4).length << 224][1].field_1) + cd[(cd[4] + ('cd', 4)[3] + 4)] + 524 len ceil32(cd[(cd[4] + ('cd', 4)[3] + 4)]) - cd[(cd[4] + ('cd', 4)[3] + 4)]]
+                          if not unknown111ecdadAddress:
+                              require ('cd', 4).length == uint32(('cd', 4).length)
+                              require calldata.size - 36 >=′ 64
+                              if not bool(ceil32(cd[(cd[4] + ('cd', 4)[4] + 4)]) + ceil32(stor3[('cd', 4).length << 224][1].field_1) + 520 <= LOCK8605463013()):
+                                  revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+                              if cd[36] != call.value:
+                                  revert with 0, call.value
+              else:
+                  if not -stor3[('cd', 4).length << 224][1].field_1:
+                      if not unknown111ecdadAddress:
+                          require ('cd', 4).length == uint32(('cd', 4).length)
+                          require calldata.size - 36 >=′ 64
+                          if not bool(ceil32(cd[(cd[4] + ('cd', 4)[4] + 4)]) + ceil32(stor3[('cd', 4).length << 224][1].field_1) + ceil32(cd[(cd[4] + ('cd', 4)[3] + 4)]) + 552 <= LOCK8605463013()):
+                              revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+                          if cd[36] != call.value:
+                              revert with 0, call.value
+                          if cd[68]:
+                              static call 0x1a44076050125825900e736c501f859c50fe728c.0xe4fe1d94 with:
+                                      gas gas_remaining wei
+                              if not ext_call.success:
+                                  revert with ext_call.return_data[0 len return_data.size]
+                  else:
+                      if -cd[(cd[4] + ('cd', 4)[3] + 4)]:
+                          if cd[(cd[4] + ('cd', 4)[3] + 4)] >= 2:
+                              require 2 <= cd[(cd[4] + ('cd', 4)[3] + 4)]
+                          mem[ceil32(cd[(cd[4] + ('cd', 4)[4] + 4)]) + ceil32(stor3[('cd', 4).length << 224][1].field_1) + 524 len cd[(cd[4] + ('cd', 4)[3] + 4)]] = call.data[cd[4] + ('cd', 4)[3] + 36 len cd[(cd[4] + ('cd', 4)[3] + 4)]]
+                          mem[ceil32(cd[(cd[4] + ('cd', 4)[4] + 4)]) + ceil32(stor3[('cd', 4).length << 224][1].field_1) + cd[(cd[4] + ('cd', 4)[3] + 4)] + 524] = 0
+                          revert with 0, 
+                                      32,
+                                      cd[(cd[4] + ('cd', 4)[3] + 4)],
+                                      call.data[cd[4] + ('cd', 4)[3] + 36 len cd[(cd[4] + ('cd', 4)[3] + 4)]],
+                                      mem[ceil32(cd[(cd[4] + ('cd', 4)[4] + 4)]) + ceil32(stor3[('cd', 4).length << 224][1].field_1) + cd[(cd[4] + ('cd', 4)[3] + 4)] + 524 len ceil32(cd[(cd[4] + ('cd', 4)[3] + 4)]) - cd[(cd[4] + ('cd', 4)[3] + 4)]]
+                      if not unknown111ecdadAddress:
+                          require ('cd', 4).length == uint32(('cd', 4).length)
+                          require calldata.size - 36 >=′ 64
+                          if not bool(ceil32(cd[(cd[4] + ('cd', 4)[4] + 4)]) + ceil32(stor3[('cd', 4).length << 224][1].field_1) + 520 <= LOCK8605463013()):
+                              revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+                          if cd[36] != call.value:
+                              revert with 0, call.value
+                          if cd[68]:
+                              static call 0x1a44076050125825900e736c501f859c50fe728c.0xe4fe1d94 with:
+                                      gas gas_remaining wei
+  ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+
+def unknownbc70b354(uint256 _param1, uint256 _param2, array _param3): # not payable
+  require calldata.size - 4 >=′ 96
+  require _param1 == uint32(_param1)
+  require _param2 == uint16(_param2)
+  require _param3 <= LOCK8605463013()
+  require _param3 + 35 <′ calldata.size
+  require _param3.length <= LOCK8605463013()
+  require _param3 + _param3.length + 36 <= calldata.size
+  if stor3[_param1 << 224][_param2 << 240].field_0:
+      if not stor3[_param1 << 224][_param2 << 240].field_0 - (uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5 < 32):
+          revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+      if stor3[_param1 << 224][_param2 << 240].field_0:
+          if not stor3[_param1 << 224][_param2 << 240].field_0 - (uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5 < 32):
+              revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+          if not Mask(256, -1, stor3[_param1 << 224][_param2 << 240].field_0):
+              if not -uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5:
+                  mem[ceil32(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5) + ceil32(_param3.length) + 160] = 32
+                  mem[ceil32(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5) + ceil32(_param3.length) + 192] = _param3.length
+                  return Mask(8 * -ceil32(_param3.length) + _param3.length + 32, 0, 0), 
+                         mem[ceil32(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5) + _param3.length + 192 len (4 * ceil32(_param3.length)) + -_param3.length + 32]
+              if not -_param3.length:
+                  mem[ceil32(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5) + 192 len ceil32(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5)] = mem[128 len ceil32(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5)]
+                  mem[(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5) + ceil32(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5) + 192] = 0
+                  return Array(len=2 * Mask(256, -1, stor3[_param1 << 224][_param2 << 240].field_0), data=mem[128 len ceil32(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5)], mem[(2 * ceil32(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5)) + 192 len 2 * ceil32(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5)]), 
+          else:
+              if 31 >= uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5:
+                  mem[128] = 256 * stor3[_param1 << 224][_param2 << 240].field_8
+                  if not -uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5:
+                      mem[ceil32(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5) + ceil32(_param3.length) + 160] = 32
+                      mem[ceil32(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5) + ceil32(_param3.length) + 192] = _param3.length
+                      return Mask(8 * -ceil32(_param3.length) + _param3.length + 32, 0, 0), 
+                             mem[ceil32(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5) + _param3.length + 192 len (4 * ceil32(_param3.length)) + -_param3.length + 32]
+                  if not -_param3.length:
+                      mem[ceil32(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5) + 192 len ceil32(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5)] = mem[128 len ceil32(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5)]
+                      mem[(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5) + ceil32(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5) + 192] = 0
+                      return Array(len=2 * Mask(256, -1, stor3[_param1 << 224][_param2 << 240].field_0), data=mem[128 len ceil32(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5)], mem[(2 * ceil32(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5)) + 192 len 2 * ceil32(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5)]), 
+              else:
+                  mem[128] = stor3[_param1 << 224][_param2 << 240].field_0
+                  idx = 128
+                  s = 0
+                  while (uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5) + 96 > idx:
+                      mem[idx + 32] = stor3[_param1 << 224][_param2 << 240][s].field_256
+                      idx = idx + 32
+                      s = s + 1
+                      continue 
+                  if not -uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5:
+                      mem[ceil32(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5) + ceil32(_param3.length) + 160] = 32
+                      mem[ceil32(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5) + ceil32(_param3.length) + 192] = _param3.length
+                      return Mask(8 * -ceil32(_param3.length) + _param3.length + 32, 0, 0), 
+                             mem[ceil32(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5) + _param3.length + 192 len (2 * ceil32(_param3.length)) + -_param3.length + 32]
+                  if not -_param3.length:
+                      return Array(len=2 * Mask(256, -1, stor3[_param1 << 224][_param2 << 240].field_0), data=mem[128 len ceil32(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5)]), 
+      else:
+          if not stor3[_param1 << 224][_param2 << 240].field_0 - (stor3[_param1 << 224][_param2 << 240].field_1 < 32):
+              revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+          if not stor3[_param1 << 224][_param2 << 240].field_1:
+              if not -uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5:
+                  mem[ceil32(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5) + ceil32(_param3.length) + 160] = 32
+                  mem[ceil32(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5) + ceil32(_param3.length) + 192] = _param3.length
+                  return Mask(8 * -ceil32(_param3.length) + _param3.length + 32, 0, 0), 
+                         mem[ceil32(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5) + _param3.length + 192 len (4 * ceil32(_param3.length)) + -_param3.length + 32]
+              if not -_param3.length:
+                  mem[ceil32(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5) + 192 len ceil32(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5)] = mem[128 len ceil32(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5)]
+                  mem[(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5) + ceil32(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5) + 192] = 0
+                  return Array(len=2 * Mask(256, -1, stor3[_param1 << 224][_param2 << 240].field_0), data=mem[128 len ceil32(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5)], mem[(2 * ceil32(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5)) + 192 len 2 * ceil32(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5)]), 
+          else:
+              if 31 >= stor3[_param1 << 224][_param2 << 240].field_1:
+                  mem[128] = 256 * stor3[_param1 << 224][_param2 << 240].field_8
+                  if not -uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5:
+                      mem[ceil32(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5) + ceil32(_param3.length) + 160] = 32
+                      mem[ceil32(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5) + ceil32(_param3.length) + 192] = _param3.length
+                      return Mask(8 * -ceil32(_param3.length) + _param3.length + 32, 0, 0), 
+                             mem[ceil32(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5) + _param3.length + 192 len (4 * ceil32(_param3.length)) + -_param3.length + 32]
+                  if not -_param3.length:
+                      mem[ceil32(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5) + 192 len ceil32(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5)] = mem[128 len ceil32(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5)]
+                      mem[(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5) + ceil32(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5) + 192] = 0
+                      return Array(len=2 * Mask(256, -1, stor3[_param1 << 224][_param2 << 240].field_0), data=mem[128 len ceil32(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5)], mem[(2 * ceil32(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5)) + 192 len 2 * ceil32(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5)]), 
+              else:
+                  mem[128] = stor3[_param1 << 224][_param2 << 240].field_0
+                  idx = 128
+                  s = 0
+                  while stor3[_param1 << 224][_param2 << 240].field_1 + 96 > idx:
+                      mem[idx + 32] = stor3[_param1 << 224][_param2 << 240][s].field_256
+                      idx = idx + 32
+                      s = s + 1
+                      continue 
+                  if not -uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5:
+                      mem[ceil32(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5) + ceil32(_param3.length) + 160] = 32
+                      mem[ceil32(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5) + ceil32(_param3.length) + 192] = _param3.length
+                      return Mask(8 * -ceil32(_param3.length) + _param3.length + 32, 0, 0), 
+                             mem[ceil32(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5) + _param3.length + 192 len (2 * ceil32(_param3.length)) + -_param3.length + 32]
+                  if not -_param3.length:
+                      return Array(len=2 * Mask(256, -1, stor3[_param1 << 224][_param2 << 240].field_0), data=mem[128 len ceil32(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5)]), 
+      ('mul', -1, ('cd', ('add', 4, ('param', '_param3'))))
+      if _param3.length >= 2:
+          require 2 <= _param3.length
+      mem[ceil32(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5) + 196 len _param3.length] = _param3[all]
+      mem[ceil32(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5) + _param3.length + 196] = 0
+      revert with 0, 
+                  32,
+                  _param3.length,
+                  _param3[all],
+                  mem[ceil32(uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5) + _param3.length + 196 len ceil32(_param3.length) - _param3.length]
+  if not stor3[_param1 << 224][_param2 << 240].field_0 - (stor3[_param1 << 224][_param2 << 240].field_1 < 32):
+      revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+  if stor3[_param1 << 224][_param2 << 240].field_0:
+      if not stor3[_param1 << 224][_param2 << 240].field_0 - (uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5 < 32):
+          revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+      if not Mask(256, -1, stor3[_param1 << 224][_param2 << 240].field_0):
+          if not -stor3[_param1 << 224][_param2 << 240].field_1:
+              mem[ceil32(stor3[_param1 << 224][_param2 << 240].field_1) + ceil32(_param3.length) + 160] = 32
+              mem[ceil32(stor3[_param1 << 224][_param2 << 240].field_1) + ceil32(_param3.length) + 192] = _param3.length
+              return Mask(8 * -ceil32(_param3.length) + _param3.length + 32, 0, 0), 
+                     mem[ceil32(stor3[_param1 << 224][_param2 << 240].field_1) + _param3.length + 192 len (4 * ceil32(_param3.length)) + -_param3.length + 32]
+          if not -_param3.length:
+              mem[ceil32(stor3[_param1 << 224][_param2 << 240].field_1) + 192 len ceil32(stor3[_param1 << 224][_param2 << 240].field_1)] = mem[128 len ceil32(stor3[_param1 << 224][_param2 << 240].field_1)]
+              mem[stor3[_param1 << 224][_param2 << 240].field_1 + ceil32(stor3[_param1 << 224][_param2 << 240].field_1) + 192] = 0
+              return Array(len=stor3[_param1 << 224][_param2 << 240].field_0, data=mem[128 len ceil32(stor3[_param1 << 224][_param2 << 240].field_1)], mem[(2 * ceil32(stor3[_param1 << 224][_param2 << 240].field_1)) + 192 len 2 * ceil32(stor3[_param1 << 224][_param2 << 240].field_1)]), 
+      else:
+          if 31 >= uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5:
+              mem[128] = 256 * stor3[_param1 << 224][_param2 << 240].field_8
+              if not -stor3[_param1 << 224][_param2 << 240].field_1:
+                  mem[ceil32(stor3[_param1 << 224][_param2 << 240].field_1) + ceil32(_param3.length) + 160] = 32
+                  mem[ceil32(stor3[_param1 << 224][_param2 << 240].field_1) + ceil32(_param3.length) + 192] = _param3.length
+                  return Mask(8 * -ceil32(_param3.length) + _param3.length + 32, 0, 0), 
+                         mem[ceil32(stor3[_param1 << 224][_param2 << 240].field_1) + _param3.length + 192 len (4 * ceil32(_param3.length)) + -_param3.length + 32]
+              if not -_param3.length:
+                  mem[ceil32(stor3[_param1 << 224][_param2 << 240].field_1) + 192 len ceil32(stor3[_param1 << 224][_param2 << 240].field_1)] = mem[128 len ceil32(stor3[_param1 << 224][_param2 << 240].field_1)]
+                  mem[stor3[_param1 << 224][_param2 << 240].field_1 + ceil32(stor3[_param1 << 224][_param2 << 240].field_1) + 192] = 0
+                  return Array(len=stor3[_param1 << 224][_param2 << 240].field_0, data=mem[128 len ceil32(stor3[_param1 << 224][_param2 << 240].field_1)], mem[(2 * ceil32(stor3[_param1 << 224][_param2 << 240].field_1)) + 192 len 2 * ceil32(stor3[_param1 << 224][_param2 << 240].field_1)]), 
+          else:
+              mem[128] = stor3[_param1 << 224][_param2 << 240].field_0
+              idx = 128
+              s = 0
+              while (uint255(stor3[_param1 << 224][_param2 << 240].field_0) * 0.5) + 96 > idx:
+                  mem[idx + 32] = stor3[_param1 << 224][_param2 << 240][s].field_256
+                  idx = idx + 32
+                  s = s + 1
+                  continue 
+              if not -stor3[_param1 << 224][_param2 << 240].field_1:
+                  mem[ceil32(stor3[_param1 << 224][_param2 << 240].field_1) + ceil32(_param3.length) + 160] = 32
+                  mem[ceil32(stor3[_param1 << 224][_param2 << 240].field_1) + ceil32(_param3.length) + 192] = _param3.length
+                  return Mask(8 * -ceil32(_param3.length) + _param3.length + 32, 0, 0), 
+                         mem[ceil32(stor3[_param1 << 224][_param2 << 240].field_1) + _param3.length + 192 len (2 * ceil32(_param3.length)) + -_param3.length + 32]
+              if not -_param3.length:
+                  return Array(len=stor3[_param1 << 224][_param2 << 240].field_0, data=mem[128 len ceil32(stor3[_param1 << 224][_param2 << 240].field_1)]), 
+  else:
+      if not stor3[_param1 << 224][_param2 << 240].field_0 - (stor3[_param1 << 224][_param2 << 240].field_1 < 32):
+          revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+      if not stor3[_param1 << 224][_param2 << 240].field_1:
+          if not -stor3[_param1 << 224][_param2 << 240].field_1:
+              mem[ceil32(stor3[_param1 << 224][_param2 << 240].field_1) + ceil32(_param3.length) + 160] = 32
+              mem[ceil32(stor3[_param1 << 224][_param2 << 240].field_1) + ceil32(_param3.length) + 192] = _param3.length
+              return Mask(8 * -ceil32(_param3.length) + _param3.length + 32, 0, 0), 
+                     mem[ceil32(stor3[_param1 << 224][_param2 << 240].field_1) + _param3.length + 192 len (4 * ceil32(_param3.length)) + -_param3.length + 32]
+          if not -_param3.length:
+              mem[ceil32(stor3[_param1 << 224][_param2 << 240].field_1) + 192 len ceil32(stor3[_param1 << 224][_param2 << 240].field_1)] = mem[128 len ceil32(stor3[_param1 << 224][_param2 << 240].field_1)]
+              mem[stor3[_param1 << 224][_param2 << 240].field_1 + ceil32(stor3[_param1 << 224][_param2 << 240].field_1) + 192] = 0
+              return Array(len=stor3[_param1 << 224][_param2 << 240].field_0, data=mem[128 len ceil32(stor3[_param1 << 224][_param2 << 240].field_1)], mem[(2 * ceil32(stor3[_param1 << 224][_param2 << 240].field_1)) + 192 len 2 * ceil32(stor3[_param1 << 224][_param2 << 240].field_1)]), 
+      else:
+          if 31 >= stor3[_param1 << 224][_param2 << 240].field_1:
+              mem[128] = 256 * stor3[_param1 << 224][_param2 << 240].field_8
+              if not -stor3[_param1 << 224][_param2 << 240].field_1:
+                  mem[ceil32(stor3[_param1 << 224][_param2 << 240].field_1) + ceil32(_param3.length) + 160] = 32
+                  mem[ceil32(stor3[_param1 << 224][_param2 << 240].field_1) + ceil32(_param3.length) + 192] = _param3.length
+                  return Mask(8 * -ceil32(_param3.length) + _param3.length + 32, 0, 0), 
+                         mem[ceil32(stor3[_param1 << 224][_param2 << 240].field_1) + _param3.length + 192 len (4 * ceil32(_param3.length)) + -_param3.length + 32]
+              if not -_param3.length:
+                  mem[ceil32(stor3[_param1 << 224][_param2 << 240].field_1) + 192 len ceil32(stor3[_param1 << 224][_param2 << 240].field_1)] = mem[128 len ceil32(stor3[_param1 << 224][_param2 << 240].field_1)]
+                  mem[stor3[_param1 << 224][_param2 << 240].field_1 + ceil32(stor3[_param1 << 224][_param2 << 240].field_1) + 192] = 0
+                  return Array(len=stor3[_param1 << 224][_param2 << 240].field_0, data=mem[128 len ceil32(stor3[_param1 << 224][_param2 << 240].field_1)], mem[(2 * ceil32(stor3[_param1 << 224][_param2 << 240].field_1)) + 192 len 2 * ceil32(stor3[_param1 << 224][_param2 << 240].field_1)]), 
+          else:
+              mem[128] = stor3[_param1 << 224][_param2 << 240].field_0
+              idx = 128
+              s = 0
+              while stor3[_param1 << 224][_param2 << 240].field_1 + 96 > idx:
+                  mem[idx + 32] = stor3[_param1 << 224][_param2 << 240][s].field_256
+                  idx = idx + 32
+                  s = s + 1
+                  continue 
+              if not -stor3[_param1 << 224][_param2 << 240].field_1:
+                  mem[ceil32(stor3[_param1 << 224][_param2 << 240].field_1) + ceil32(_param3.length) + 160] = 32
+                  mem[ceil32(stor3[_param1 << 224][_param2 << 240].field_1) + ceil32(_param3.length) + 192] = _param3.length
+                  return Mask(8 * -ceil32(_param3.length) + _param3.length + 32, 0, 0), 
+                         mem[ceil32(stor3[_param1 << 224][_param2 << 240].field_1) + _param3.length + 192 len (2 * ceil32(_param3.length)) + -_param3.length + 32]
+              if not -_param3.length:
+                  return Array(len=stor3[_param1 << 224][_param2 << 240].field_0, data=mem[128 len ceil32(stor3[_param1 << 224][_param2 << 240].field_1)]), 
+  ('mul', -1, ('cd', ('add', 4, ('param', '_param3'))))
+  if _param3.length >= 2:
+      require 2 <= _param3.length
+  mem[ceil32(stor3[_param1 << 224][_param2 << 240].field_1) + 196 len _param3.length] = _param3[all]
+  mem[ceil32(stor3[_param1 << 224][_param2 << 240].field_1) + _param3.length + 196] = 0
+  revert with 0, 
+              32,
+              _param3.length,
+              _param3[all],
+              mem[ceil32(stor3[_param1 << 224][_param2 << 240].field_1) + _param3.length + 196 len ceil32(_param3.length) - _param3.length]
+
+

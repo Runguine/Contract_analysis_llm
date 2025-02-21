@@ -1,0 +1,219 @@
+# Palkeoramix decompiler. 
+
+def storage:
+  balanceOf is mapping of uint256 at storage 0
+  allowance is mapping of uint256 at storage 1
+  totalSupply is uint256 at storage 2
+  name is array of uint256 at storage 3
+  symbol is array of uint256 at storage 4
+  decimals is uint8 at storage 5
+  stor6 is mapping of uint8 at storage 6
+  stor7 is mapping of uint8 at storage 7
+  paused is uint8 at storage 8
+
+def name() payable: 
+  return name[0 len name.length]
+
+def totalSupply() payable: 
+  return totalSupply
+
+def decimals() payable: 
+  return decimals
+
+def isPauser(address account) payable: 
+  require calldata.size - 4 >= 32
+  require account
+  return bool(stor7[address(account)])
+
+def paused() payable: 
+  return bool(paused)
+
+def balanceOf(address account) payable: 
+  require calldata.size - 4 >= 32
+  return balanceOf[address(account)]
+
+def symbol() payable: 
+  return symbol[0 len symbol.length]
+
+def isMinter(address account) payable: 
+  require calldata.size - 4 >= 32
+  require account
+  return bool(stor6[address(account)])
+
+def allowance(address owner, address spender) payable: 
+  require calldata.size - 4 >= 64
+  return allowance[address(owner)][address(spender)]
+
+#
+#  Regular functions
+#
+
+def _fallback(?) payable: # default function
+  revert
+
+def unpause() payable: 
+  require caller
+  require stor7[caller]
+  require paused
+  paused = 0
+  log Unpaused(address account=caller)
+
+def pause() payable: 
+  require caller
+  require stor7[caller]
+  require not paused
+  paused = 1
+  log Paused(address account=caller)
+
+def renouncePauser() payable: 
+  require caller
+  require stor7[caller]
+  stor7[caller] = 0
+  log PauserRemoved(address account=caller)
+
+def renounceMinter() payable: 
+  require caller
+  require stor6[caller]
+  stor6[caller] = 0
+  log MinterRemoved(address account=caller)
+
+def addPauser(address account) payable: 
+  require calldata.size - 4 >= 32
+  require caller
+  require stor7[caller]
+  require account
+  require not stor7[address(account)]
+  stor7[address(account)] = 1
+  log PauserAdded(address account=account)
+
+def addMinter(address account) payable: 
+  require calldata.size - 4 >= 32
+  require caller
+  require stor6[caller]
+  require account
+  require not stor6[address(account)]
+  stor6[address(account)] = 1
+  log MinterAdded(address account=account)
+
+def approve(address spender, uint256 amount) payable: 
+  require calldata.size - 4 >= 64
+  require not paused
+  require spender
+  require caller
+  allowance[caller][address(spender)] = amount
+  log Approval(
+        address owner=amount,
+        address spender=caller,
+        uint256 value=spender)
+  return 1
+
+def burn(uint256 _value) payable: 
+  require calldata.size - 4 >= 32
+  require caller
+  require _value <= totalSupply
+  totalSupply -= _value
+  require _value <= balanceOf[caller]
+  balanceOf[caller] -= _value
+  log Transfer(
+        address from=_value,
+        address to=caller,
+        uint256 value=0)
+
+def mint(address _to, uint256 _amount) payable: 
+  require calldata.size - 4 >= 64
+  require caller
+  require stor6[caller]
+  require _to
+  require _amount + totalSupply >= totalSupply
+  totalSupply += _amount
+  require _amount + balanceOf[address(_to)] >= balanceOf[address(_to)]
+  balanceOf[address(_to)] += _amount
+  log Transfer(
+        address from=_amount,
+        address to=0,
+        uint256 value=_to)
+  return 1
+
+def transfer(address recipient, uint256 amount) payable: 
+  require calldata.size - 4 >= 64
+  require not paused
+  require recipient
+  require amount <= balanceOf[caller]
+  balanceOf[caller] -= amount
+  require amount + balanceOf[recipient] >= balanceOf[recipient]
+  balanceOf[address(recipient)] = amount + balanceOf[recipient]
+  log Transfer(
+        address from=amount,
+        address to=caller,
+        uint256 value=recipient)
+  return 1
+
+def decreaseAllowance(address spender, uint256 subtractedValue) payable: 
+  require calldata.size - 4 >= 64
+  require not paused
+  require subtractedValue <= allowance[caller][address(spender)]
+  require spender
+  require caller
+  allowance[caller][address(spender)] = allowance[caller][address(spender)] - subtractedValue
+  log Approval(
+        address owner=(allowance[caller][address(spender)] - subtractedValue),
+        address spender=caller,
+        uint256 value=spender)
+  return 1
+
+def increaseAllowance(address spender, uint256 addedValue) payable: 
+  require calldata.size - 4 >= 64
+  require not paused
+  require addedValue + allowance[caller][address(spender)] >= allowance[caller][address(spender)]
+  require spender
+  require caller
+  allowance[caller][address(spender)] = addedValue + allowance[caller][address(spender)]
+  log Approval(
+        address owner=(addedValue + allowance[caller][address(spender)]),
+        address spender=caller,
+        uint256 value=spender)
+  return 1
+
+def burnFrom(address _from, uint256 _value) payable: 
+  require calldata.size - 4 >= 64
+  require _from
+  require _value <= totalSupply
+  totalSupply -= _value
+  require _value <= balanceOf[address(_from)]
+  balanceOf[address(_from)] -= _value
+  log Transfer(
+        address from=_value,
+        address to=_from,
+        uint256 value=0)
+  require _value <= allowance[address(_from)][caller]
+  require caller
+  require _from
+  allowance[address(_from)][caller] = allowance[address(_from)][caller] - _value
+  log Approval(
+        address owner=(allowance[address(_from)][caller] - _value),
+        address spender=_from,
+        uint256 value=caller)
+
+def transferFrom(address sender, address recipient, uint256 amount) payable: 
+  require calldata.size - 4 >= 96
+  require not paused
+  require recipient
+  require amount <= balanceOf[address(sender)]
+  balanceOf[address(sender)] -= amount
+  require amount + balanceOf[recipient] >= balanceOf[recipient]
+  balanceOf[address(recipient)] = amount + balanceOf[recipient]
+  log Transfer(
+        address from=amount,
+        address to=sender,
+        uint256 value=recipient)
+  require amount <= allowance[address(sender)][caller]
+  require caller
+  require sender
+  allowance[address(sender)][caller] = allowance[address(sender)][caller] - amount
+  log Approval(
+        address owner=(allowance[address(sender)][caller] - amount),
+        address spender=sender,
+        uint256 value=caller)
+  return 1
+
+

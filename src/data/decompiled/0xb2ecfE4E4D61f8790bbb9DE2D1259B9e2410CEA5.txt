@@ -1,0 +1,15 @@
+# Palkeoramix decompiler. 
+
+def storage:
+  stor3608 is address at storage 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc
+
+def _fallback(?) payable: # default function
+  delegate stor3608 with:
+     funct call.data[0 len 4]
+       gas gas_remaining wei
+      args call.data[4 len calldata.size - 4]
+  if not delegate.return_code:
+      revert with ext_call.return_data[0 len return_data.size]
+  return ext_call.return_data[0 len return_data.size]
+
+

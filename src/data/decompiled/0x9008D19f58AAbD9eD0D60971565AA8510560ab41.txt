@@ -1,0 +1,952 @@
+# Palkeoramix decompiler. 
+
+const authenticator = 0x2c4c28ddbdac9c5e7055b4c863b72ea0149d8afe
+const vaultRelayer = 0xc92e8bdf79f0507f65a392b0ab4667716bfe0110
+const domainSeparator = 0xc078f884a2676e1345748b1feace7b0abee5d00ecadb6e574dcdd109a63e8943
+const vault = 0xba12222222228d8ba445958a75a0704d566bf2c8
+
+def storage:
+  stor0 is mapping of uint256 at storage 0
+  stor1 is uint256 at storage 1
+  stor2 is mapping of uint256 at storage 2
+
+#
+#  Regular functions
+#
+
+def _fallback(?) payable: # default function
+  revert
+
+def getStorageAt(uint256 offset, uint256 length): # not payable
+  require calldata.size - 4 >=′ 64
+  require 32 * length <= LOCK8605463013()
+  if Mask(251, 0, length):
+      mem[128 len 32 * length] = call.data[calldata.size len 32 * length]
+  idx = 0
+  while idx < length:
+      mem[(32 * idx) + 128] = stor[idx + offset]
+      idx = idx + 1
+      continue 
+  return Array(len=32 * length, data=mem[128 len floor32(length)])
+
+def invalidateOrder(bytes orderUid): # not payable
+  require calldata.size - 4 >=′ 32
+  require orderUid <= LOCK8605463013()
+  require orderUid + 35 <′ calldata.size
+  require orderUid.length <= LOCK8605463013()
+  require orderUid + orderUid.length + 36 <= calldata.size
+  if orderUid.length != 56:
+      revert with 0, 'GPv2: invalid uid'
+  if Mask(64, 96, cd[(orderUid + 68)]) >> 96 != caller:
+      revert with 0, 'GPv2: caller does not own order'
+  stor2[orderUid[all]] = -1
+  log OrderInvalidated(
+        address owner=Array(len=orderUid.length, data=orderUid[all]),
+        bytes orderUid=Mask(64, 96, cd[(orderUid + 68)]) >> 96)
+
+def filledAmount(bytes _param1): # not payable
+  require calldata.size - 4 >=′ 32
+  require _param1 <= LOCK8605463013()
+  require _param1 + 35 <′ calldata.size
+  require _param1.length <= LOCK8605463013()
+  require ceil32(_param1.length) + 128 >= 96 and ceil32(_param1.length) + 128 <= LOCK8605463013()
+  require _param1 + _param1.length + 36 <= calldata.size
+  mem[ceil32(_param1.length) + 128] = stor2[_param1[all]]
+  return Mask(8 * -ceil32(_param1.length) + _param1.length + 32, 0, 0), 
+         mem[_param1.length + 160 len -_param1.length + ceil32(_param1.length)]
+
+def preSignature(bytes _param1): # not payable
+  require calldata.size - 4 >=′ 32
+  require _param1 <= LOCK8605463013()
+  require _param1 + 35 <′ calldata.size
+  require _param1.length <= LOCK8605463013()
+  require ceil32(_param1.length) + 128 >= 96 and ceil32(_param1.length) + 128 <= LOCK8605463013()
+  require _param1 + _param1.length + 36 <= calldata.size
+  mem[ceil32(_param1.length) + 128] = stor0[_param1[all]]
+  return Mask(8 * -ceil32(_param1.length) + _param1.length + 32, 0, 0), 
+         mem[_param1.length + 160 len -_param1.length + ceil32(_param1.length)]
+
+def setPreSignature(bytes orderUid, bool signed): # not payable
+  require calldata.size - 4 >=′ 64
+  require orderUid <= LOCK8605463013()
+  require orderUid + 35 <′ calldata.size
+  require orderUid.length <= LOCK8605463013()
+  require orderUid + orderUid.length + 36 <= calldata.size
+  require signed == signed
+  if orderUid.length != 56:
+      revert with 0, 'GPv2: invalid uid'
+  if Mask(64, 96, cd[(orderUid + 68)]) >> 96 != caller:
+      revert with 0, 'GPv2: cannot presign order'
+  if not signed:
+      stor0[orderUid[all]] = 0
+  else:
+      stor0[orderUid[all]] = 0xf59c009283ff87aa78203fc4d9c2df025ee851130fb69cc3e068941f6b5e2d6f
+  log PreSignature(
+        address owner=Array(len=orderUid.length, data=orderUid[all]),
+        bytes orderUid=signed,
+        bool signed=Mask(64, 96, cd[(orderUid + 68)]) >> 96)
+
+def freePreSignatureStorage(bytes[] orderUids) payable: 
+  mem[64] = 96
+  require not call.value
+  require calldata.size - 4 >=′ 32
+  require orderUids <= LOCK8605463013()
+  require orderUids + 35 <′ calldata.size
+  require orderUids.length <= LOCK8605463013()
+  require orderUids + (32 * orderUids.length) + 36 <= calldata.size
+  if this.address != caller:
+      revert with 0, 'GPv2: not an interaction'
+  idx = 0
+  while idx < orderUids.length:
+      require cd[(orderUids + (32 * idx) + 36)] <′ calldata.size + -orderUids - 67
+      require cd[(orderUids + cd[(orderUids + (32 * idx) + 36)] + 36)] <= LOCK8605463013()
+      require orderUids + cd[(orderUids + (32 * idx) + 36)] + 68 <=′ calldata.size - cd[(orderUids + cd[(orderUids + (32 * idx) + 36)] + 36)]
+      if cd[(orderUids + cd[(orderUids + (32 * idx) + 36)] + 36)] != 56:
+          revert with 0, 'GPv2: invalid uid'
+      if 0 >= block.timestamp:
+          revert with 0, 'GPv2: order still valid'
+      mem[mem[64] len cd[(orderUids + cd[(orderUids + (32 * idx) + 36)] + 36)]] = call.data[orderUids + cd[(orderUids + (32 * idx) + 36)] + 68 len cd[(orderUids + cd[(orderUids + (32 * idx) + 36)] + 36)]]
+      mem[cd[(orderUids + cd[(orderUids + (32 * idx) + 36)] + 36)] + mem[64]] = 0
+      stor0[call.data[orderUids + cd[(orderUids + (32 * idx) + 36)] + 68 len cd[(orderUids + cd[(orderUids + (32 * idx) + 36)] + 36)]]] = 0
+      idx = idx + 1
+      continue 
+
+def freeFilledAmountStorage(bytes[] orderUids) payable: 
+  mem[64] = 96
+  require not call.value
+  require calldata.size - 4 >=′ 32
+  require orderUids <= LOCK8605463013()
+  require orderUids + 35 <′ calldata.size
+  require orderUids.length <= LOCK8605463013()
+  require orderUids + (32 * orderUids.length) + 36 <= calldata.size
+  if this.address != caller:
+      revert with 0, 'GPv2: not an interaction'
+  idx = 0
+  while idx < orderUids.length:
+      require cd[(orderUids + (32 * idx) + 36)] <′ calldata.size + -orderUids - 67
+      require cd[(orderUids + cd[(orderUids + (32 * idx) + 36)] + 36)] <= LOCK8605463013()
+      require orderUids + cd[(orderUids + (32 * idx) + 36)] + 68 <=′ calldata.size - cd[(orderUids + cd[(orderUids + (32 * idx) + 36)] + 36)]
+      if cd[(orderUids + cd[(orderUids + (32 * idx) + 36)] + 36)] != 56:
+          revert with 0, 'GPv2: invalid uid'
+      if 0 >= block.timestamp:
+          revert with 0, 'GPv2: order still valid'
+      mem[mem[64] len cd[(orderUids + cd[(orderUids + (32 * idx) + 36)] + 36)]] = call.data[orderUids + cd[(orderUids + (32 * idx) + 36)] + 68 len cd[(orderUids + cd[(orderUids + (32 * idx) + 36)] + 36)]]
+      mem[cd[(orderUids + cd[(orderUids + (32 * idx) + 36)] + 36)] + mem[64]] = 2
+      stor2[call.data[orderUids + cd[(orderUids + (32 * idx) + 36)] + 68 len cd[(orderUids + cd[(orderUids + (32 * idx) + 36)] + 36)]]] = 0
+      idx = idx + 1
+      continue 
+
+def settle(address[] tokens, uint256[] clearingPrices, tuple[] trades, tuple[][3] interactions): # not payable
+  require calldata.size - 4 >=′ 128
+  require tokens <= LOCK8605463013()
+  require tokens + 35 <′ calldata.size
+  require tokens.length <= LOCK8605463013()
+  require tokens + (32 * tokens.length) + 36 <= calldata.size
+  require clearingPrices <= LOCK8605463013()
+  require clearingPrices + 35 <′ calldata.size
+  require clearingPrices.length <= LOCK8605463013()
+  require clearingPrices + (32 * clearingPrices.length) + 36 <= calldata.size
+  require trades <= LOCK8605463013()
+  require trades + 35 <′ calldata.size
+  require trades.length <= LOCK8605463013()
+  require trades + (32 * trades.length) + 36 <= calldata.size
+  require interactions <= LOCK8605463013()
+  require calldata.size >= interactions + 100
+  if stor1 == 2:
+      revert with 0, 'ReentrancyGuard: reentrant call'
+  stor1 = 2
+  require ext_code.size(0x2c4c28ddbdac9c5e7055b4c863b72ea0149d8afe)
+  static call 0x2c4c28ddbdac9c5e7055b4c863b72ea0149d8afe.isSolver(address prospectiveSolver) with:
+          gas gas_remaining wei
+         args caller
+  if not ext_call.success:
+      revert with ext_call.return_data[0 len return_data.size]
+  require return_data.size >=′ 32
+  require ext_call.return_data[0] == bool(ext_call.return_data[0])
+  if not ext_call.return_data[0]:
+      revert with 0, 'GPv2: not a solver'
+  require interactions.length <′ calldata.size + -interactions - 35
+  require cd[(interactions + interactions.length + 4)] <= LOCK8605463013()
+  require interactions + interactions.length + 36 <=′ calldata.size - (32 * cd[(interactions + interactions.length + 4)])
+  ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+
+def simulateDelegatecallInternal(address targetContract, bytes calldataPayload): # not payable
+  require calldata.size - 4 >=′ 64
+  require targetContract == targetContract
+  require calldataPayload <= LOCK8605463013()
+  require calldataPayload + 35 <′ calldata.size
+  require calldataPayload.length <= LOCK8605463013()
+  require ceil32(calldataPayload.length) + 128 >= 96 and ceil32(calldataPayload.length) + 128 <= LOCK8605463013()
+  require calldataPayload + calldataPayload.length + 36 <= calldata.size
+  mem[128 len calldataPayload.length] = calldataPayload[all]
+  mem[calldataPayload.length + 128] = 0
+  mem[ceil32(calldataPayload.length) + 128 len floor32(calldataPayload.length)] = call.data[calldataPayload + 36 len floor32(calldataPayload.length)]
+  mem[ceil32(calldataPayload.length) + floor32(calldataPayload.length) + -(calldataPayload.length % 32) + 160 len calldataPayload.length % 32] = mem[-(calldataPayload.length % 32) + floor32(calldataPayload.length) + 160 len calldataPayload.length % 32]
+  delegate targetContract with:
+     funct (Mask(32, -(8 * ceil32(calldataPayload.length) + -calldataPayload.length + 4) + 256, 0) >> -(8 * ceil32(calldataPayload.length) + -calldataPayload.length + 4) + 256)
+       gas gas_remaining wei
+      args mem[ceil32(calldataPayload.length) + 132 len calldataPayload.length - 4]
+  if not return_data.size:
+      mem[ceil32(calldataPayload.length) + 160 len floor32(calldataPayload.length)] = call.data[calldataPayload + 36 len floor32(calldataPayload.length)]
+      mem[ceil32(calldataPayload.length) + floor32(calldataPayload.length) + -(calldataPayload.length % 32) + 192 len calldataPayload.length % 32] = mem[-(calldataPayload.length % 32) + floor32(calldataPayload.length) + 160 len calldataPayload.length % 32]
+      mem[calldataPayload.length + ceil32(calldataPayload.length) + 160] = bool(delegate.return_code) << 248
+      mem[ceil32(calldataPayload.length) + 128] = calldataPayload.length + 1
+      revert with memory
+        from ceil32(calldataPayload.length) + 160
+         len Mask(8 * -ceil32(calldataPayload.length) + calldataPayload.length + 32, 0, 0), mem[calldataPayload.length + 160 len -calldataPayload.length + ceil32(calldataPayload.length)]
+  mem[64] = ceil32(calldataPayload.length) + ceil32(return_data.size) + 129
+  mem[ceil32(calldataPayload.length) + 128] = return_data.size
+  mem[ceil32(calldataPayload.length) + 160 len return_data.size] = ext_call.return_data[0 len return_data.size]
+  mem[ceil32(calldataPayload.length) + ceil32(return_data.size) + 161 len floor32(Mask(8 * -ceil32(calldataPayload.length) + calldataPayload.length + 32, 0, 0), mem[calldataPayload.length + 160 len -calldataPayload.length + ceil32(calldataPayload.length)])] = mem[ceil32(calldataPayload.length) + 160 len floor32(Mask(8 * -ceil32(calldataPayload.length) + calldataPayload.length + 32, 0, 0), mem[calldataPayload.length + 160 len -calldataPayload.length + ceil32(calldataPayload.length)])]
+  mem[ceil32(calldataPayload.length) + ceil32(return_data.size) + floor32(Mask(8 * -ceil32(calldataPayload.length) + calldataPayload.length + 32, 0, 0), mem[calldataPayload.length + 160 len -calldataPayload.length + ceil32(calldataPayload.length)]) + -(Mask(8 * -ceil32(calldataPayload.length) + calldataPayload.length + 32, 0, 0), mem[calldataPayload.length + 160 len -calldataPayload.length + ceil32(calldataPayload.length)] % 32) + 193 len Mask(8 * -ceil32(calldataPayload.length) + calldataPayload.length + 32, 0, 0), mem[calldataPayload.length + 160 len -calldataPayload.length + ceil32(calldataPayload.length)] % 32] = mem[ceil32(calldataPayload.length) + -(Mask(8 * -ceil32(calldataPayload.length) + calldataPayload.length + 32, 0, 0), mem[calldataPayload.length + 160 len -calldataPayload.length + ceil32(calldataPayload.length)] % 32) + floor32(Mask(8 * -ceil32(calldataPayload.length) + calldataPayload.length + 32, 0, 0), mem[calldataPayload.length + 160 len -calldataPayload.length + ceil32(calldataPayload.length)]) + 192 len Mask(8 * -ceil32(calldataPayload.length) + calldataPayload.length + 32, 0, 0), mem[calldataPayload.length + 160 len -calldataPayload.length + ceil32(calldataPayload.length)] % 32]
+  mem[return_data.size + ceil32(calldataPayload.length) + ceil32(return_data.size) + 161] = bool(delegate.return_code) << 248
+  revert with memory
+    from ceil32(calldataPayload.length) + ceil32(return_data.size) + 161
+     len return_data.size + 1
+
+def simulateDelegatecall(address targetContract, bytes calldataPayload): # not payable
+  require calldata.size - 4 >=′ 64
+  require targetContract == targetContract
+  require calldataPayload <= LOCK8605463013()
+  require calldataPayload + 35 <′ calldata.size
+  require calldataPayload.length <= LOCK8605463013()
+  require ceil32(calldataPayload.length) + 128 >= 96 and ceil32(calldataPayload.length) + 128 <= LOCK8605463013()
+  require calldataPayload + calldataPayload.length + 36 <= calldata.size
+  mem[128 len calldataPayload.length] = calldataPayload[all]
+  mem[calldataPayload.length + 128] = 0
+  mem[ceil32(calldataPayload.length) + 164] = targetContract
+  mem[ceil32(calldataPayload.length) + 196] = 64
+  mem[ceil32(calldataPayload.length) + 228] = calldataPayload.length
+  mem[ceil32(calldataPayload.length) + 260 len ceil32(calldataPayload.length)] = calldataPayload[all], mem[calldataPayload.length + 128 len ceil32(calldataPayload.length) - calldataPayload.length]
+  if not calldataPayload.length % 32:
+      mem[ceil32(calldataPayload.length) + 128] = calldataPayload.length + 100
+      mem[64] = calldataPayload.length + ceil32(calldataPayload.length) + 260
+      mem[ceil32(calldataPayload.length) + 164 len 28] = address(targetContract) << 64
+      mem[ceil32(calldataPayload.length) + 160 len 4] = simulateDelegatecallInternal(address targetContract, bytes calldataPayload)
+      mem[calldataPayload.length + ceil32(calldataPayload.length) + 260 len floor32(Mask(8 * -ceil32(calldataPayload.length) + calldataPayload.length + 32, 0, 0), mem[calldataPayload.length + 160 len -calldataPayload.length + ceil32(calldataPayload.length)])] = mem[ceil32(calldataPayload.length) + 160 len floor32(Mask(8 * -ceil32(calldataPayload.length) + calldataPayload.length + 32, 0, 0), mem[calldataPayload.length + 160 len -calldataPayload.length + ceil32(calldataPayload.length)])]
+      mem[calldataPayload.length + ceil32(calldataPayload.length) + floor32(Mask(8 * -ceil32(calldataPayload.length) + calldataPayload.length + 32, 0, 0), mem[calldataPayload.length + 160 len -calldataPayload.length + ceil32(calldataPayload.length)]) + -(Mask(8 * -ceil32(calldataPayload.length) + calldataPayload.length + 32, 0, 0), mem[calldataPayload.length + 160 len -calldataPayload.length + ceil32(calldataPayload.length)] % 32) + 292 len Mask(8 * -ceil32(calldataPayload.length) + calldataPayload.length + 32, 0, 0), mem[calldataPayload.length + 160 len -calldataPayload.length + ceil32(calldataPayload.length)] % 32] = mem[ceil32(calldataPayload.length) + -(Mask(8 * -ceil32(calldataPayload.length) + calldataPayload.length + 32, 0, 0), mem[calldataPayload.length + 160 len -calldataPayload.length + ceil32(calldataPayload.length)] % 32) + floor32(Mask(8 * -ceil32(calldataPayload.length) + calldataPayload.length + 32, 0, 0), mem[calldataPayload.length + 160 len -calldataPayload.length + ceil32(calldataPayload.length)]) + 192 len Mask(8 * -ceil32(calldataPayload.length) + calldataPayload.length + 32, 0, 0), mem[calldataPayload.length + 160 len -calldataPayload.length + ceil32(calldataPayload.length)] % 32]
+      call this.address.mem[calldataPayload.length + ceil32(calldataPayload.length) + 260 len 4] with:
+           gas gas_remaining wei
+          args mem[calldataPayload.length + ceil32(calldataPayload.length) + 264 len Mask(8 * -ceil32(calldataPayload.length) + calldataPayload.length + 32, 0, 0), mem[calldataPayload.length + 160 len -calldataPayload.length + ceil32(calldataPayload.length)] - 4]
+      if not return_data.size:
+          if calldataPayload.length - 1 < calldataPayload.length:
+              revert with memory
+                from 128
+                 len calldataPayload.length - 1
+      else:
+          mem[calldataPayload.length + ceil32(calldataPayload.length) + 292 len return_data.size] = ext_call.return_data[0 len return_data.size]
+          if return_data.size - 1 < return_data.size:
+              revert with memory
+                from calldataPayload.length + ceil32(calldataPayload.length) + 292
+                 len return_data.size - 1
+  else:
+      mem[floor32(calldataPayload.length) + ceil32(calldataPayload.length) + 260] = mem[floor32(calldataPayload.length) + ceil32(calldataPayload.length) + -(calldataPayload.length % 32) + 292 len calldataPayload.length % 32]
+      mem[ceil32(calldataPayload.length) + 128] = floor32(calldataPayload.length) + 132
+      mem[64] = floor32(calldataPayload.length) + ceil32(calldataPayload.length) + 292
+      mem[ceil32(calldataPayload.length) + 164 len 28] = address(targetContract) << 64
+      mem[ceil32(calldataPayload.length) + 160 len 4] = simulateDelegatecallInternal(address targetContract, bytes calldataPayload)
+      mem[floor32(calldataPayload.length) + ceil32(calldataPayload.length) + 292 len floor32(Mask(8 * -ceil32(calldataPayload.length) + calldataPayload.length + 32, 0, 0), mem[calldataPayload.length + 160 len -calldataPayload.length + ceil32(calldataPayload.length)])] = mem[ceil32(calldataPayload.length) + 160 len floor32(Mask(8 * -ceil32(calldataPayload.length) + calldataPayload.length + 32, 0, 0), mem[calldataPayload.length + 160 len -calldataPayload.length + ceil32(calldataPayload.length)])]
+      mem[floor32(calldataPayload.length) + ceil32(calldataPayload.length) + floor32(Mask(8 * -ceil32(calldataPayload.length) + calldataPayload.length + 32, 0, 0), mem[calldataPayload.length + 160 len -calldataPayload.length + ceil32(calldataPayload.length)]) + -(Mask(8 * -ceil32(calldataPayload.length) + calldataPayload.length + 32, 0, 0), mem[calldataPayload.length + 160 len -calldataPayload.length + ceil32(calldataPayload.length)] % 32) + 324 len Mask(8 * -ceil32(calldataPayload.length) + calldataPayload.length + 32, 0, 0), mem[calldataPayload.length + 160 len -calldataPayload.length + ceil32(calldataPayload.length)] % 32] = mem[ceil32(calldataPayload.length) + -(Mask(8 * -ceil32(calldataPayload.length) + calldataPayload.length + 32, 0, 0), mem[calldataPayload.length + 160 len -calldataPayload.length + ceil32(calldataPayload.length)] % 32) + floor32(Mask(8 * -ceil32(calldataPayload.length) + calldataPayload.length + 32, 0, 0), mem[calldataPayload.length + 160 len -calldataPayload.length + ceil32(calldataPayload.length)]) + 192 len Mask(8 * -ceil32(calldataPayload.length) + calldataPayload.length + 32, 0, 0), mem[calldataPayload.length + 160 len -calldataPayload.length + ceil32(calldataPayload.length)] % 32]
+      call this.address.mem[floor32(calldataPayload.length) + ceil32(calldataPayload.length) + 292 len 4] with:
+           gas gas_remaining wei
+          args mem[floor32(calldataPayload.length) + ceil32(calldataPayload.length) + 296 len Mask(8 * -ceil32(calldataPayload.length) + calldataPayload.length + 32, 0, 0), mem[calldataPayload.length + 160 len -calldataPayload.length + ceil32(calldataPayload.length)] - 4]
+      if not return_data.size:
+          if calldataPayload.length - 1 < calldataPayload.length:
+              revert with memory
+                from 128
+                 len calldataPayload.length - 1
+      else:
+          mem[floor32(calldataPayload.length) + ceil32(calldataPayload.length) + 324 len return_data.size] = ext_call.return_data[0 len return_data.size]
+          if return_data.size - 1 < return_data.size:
+              revert with memory
+                from floor32(calldataPayload.length) + ceil32(calldataPayload.length) + 324
+                 len return_data.size - 1
+  revert
+
+def swap(tuple[] swaps, address[] tokens, tuple trade): # not payable
+  require calldata.size - 4 >=′ 96
+  require swaps <= LOCK8605463013()
+  require swaps + 35 <′ calldata.size
+  require swaps.length <= LOCK8605463013()
+  require swaps + (32 * swaps.length) + 36 <= calldata.size
+  require tokens <= LOCK8605463013()
+  require tokens + 35 <′ calldata.size
+  require tokens.length <= LOCK8605463013()
+  require tokens + (32 * tokens.length) + 36 <= calldata.size
+  require trade <= LOCK8605463013()
+  require calldata.size + -trade - 4 >=′ 352
+  if stor1 == 2:
+      revert with 0, 'ReentrancyGuard: reentrant call'
+  stor1 = 2
+  require ext_code.size(0x2c4c28ddbdac9c5e7055b4c863b72ea0149d8afe)
+  static call 0x2c4c28ddbdac9c5e7055b4c863b72ea0149d8afe.isSolver(address prospectiveSolver) with:
+          gas gas_remaining wei
+         args caller
+  if not ext_call.success:
+      revert with ext_call.return_data[0 len return_data.size]
+  require return_data.size >=′ 32
+  require ext_call.return_data[0] == bool(ext_call.return_data[0])
+  if not ext_call.return_data[0]:
+      revert with 0, 'GPv2: not a solver'
+  require trade.length < tokens.length
+  require cd[(trade + 36)] < tokens.length
+  require Mask(251, 0, cd[(trade + 260)]) * 0.03125 <= 3
+  require cd[(trade + 324)] <′ calldata.size + -trade - 35
+  require cd[(trade + cd[(trade + 324)] + 4)] <= LOCK8605463013()
+  require trade + cd[(trade + 324)] + 36 <=′ calldata.size - cd[(trade + cd[(trade + 324)] + 4)]
+  require Mask(251, 0, cd[(trade + 260)]) * 0.03125 <= 3
+  if bool(cd[(trade + 260)]):
+      if Mask(1, 3, cd[(trade + 260)]):
+          if Mask(1, 2, cd[(trade + 260)]):
+              if Mask(1, 4, cd[(trade + 260)]):
+                  if not Mask(256, -5, cd[(trade + 260)]):
+                      if cd[(trade + cd[(trade + 324)] + 4)] != 65:
+                          revert with 0, 'GPv2: malformed ecdsa signature'
+                      signer = erecover(sha3(6401, 0xc078f884a2676e1345748b1feace7b0abee5d00ecadb6e574dcdd109a63e8943, sha3(0xd5a25ba2e97094ad7d83dc28a6572da797d6b3e7fc6663bd93efb789fc17e489, address(cd[((32 * trade.length) + tokens + 36)]), address(cd[((32 * cd[(trade + 36)]) + tokens + 36)]), address(cd[(trade + 68)]), cd[(trade + 100)], cd[(trade + 132)], cd[(trade + 164)] << 224, cd[(trade + 196)], cd[(trade + 228)], 0x6ed88e868af0a1983e3886d5f3e95a2fafbd6c3450bc229e27342283dc429ccc, bool(Mask(1, 1, cd[(trade + 260)])), 0x4ac99ace14ee0a5ef932dc609df0943ab7ac16b7583634612f8dc35a4289a6ce, 0x4ac99ace14ee0a5ef932dc609df0943ab7ac16b7583634612f8dc35a4289a6ce)), Mask(256, -248, cd[(trade + cd[(trade + 324)] + 100)]) << 248, cd[(trade + cd[(trade + 324)] + 36)], cd[(trade + cd[(trade + 324)] + 68)]) # precompiled
+                      if not erecover.result:
+                          revert with ext_call.return_data[0 len return_data.size]
+                      if not address(signer):
+                          revert with 0, 'GPv2: invalid ecdsa signature'
+                      require tokens.length <= LOCK8605463013()
+                      if address(cd[(trade + 68)]):
+                          if not tokens.length:
+                              if cd[(trade + 292)] > cd[(trade + 100)]:
+                                  revert with 0, 'GPv2: limit too high'
+                          else:
+                      else:
+                  else:
+                      require Mask(251, 0, cd[(trade + 260)]) * 0.03125 <= 3
+                      if Mask(251, 0, cd[(trade + 260)]) * 0.03125 == 1:
+                          if cd[(trade + cd[(trade + 324)] + 4)] != 65:
+                              revert with 0, 'GPv2: malformed ecdsa signature'
+                          signer = erecover(sha3(Mask(224, 32, '\x19Ethereum Signed Message:\n32') >> 32, sha3(6401, 0xc078f884a2676e1345748b1feace7b0abee5d00ecadb6e574dcdd109a63e8943, sha3(0xd5a25ba2e97094ad7d83dc28a6572da797d6b3e7fc6663bd93efb789fc17e489, address(cd[((32 * trade.length) + tokens + 36)]), address(cd[((32 * cd[(trade + 36)]) + tokens + 36)]), address(cd[(trade + 68)]), cd[(trade + 100)], cd[(trade + 132)], cd[(trade + 164)] << 224, cd[(trade + 196)], cd[(trade + 228)], 0x6ed88e868af0a1983e3886d5f3e95a2fafbd6c3450bc229e27342283dc429ccc, bool(Mask(1, 1, cd[(trade + 260)])), 0x4ac99ace14ee0a5ef932dc609df0943ab7ac16b7583634612f8dc35a4289a6ce, 0x4ac99ace14ee0a5ef932dc609df0943ab7ac16b7583634612f8dc35a4289a6ce))), Mask(256, -248, cd[(trade + cd[(trade + 324)] + 100)]) << 248, cd[(trade + cd[(trade + 324)] + 36)], cd[(trade + cd[(trade + 324)] + 68)]) # precompiled
+                          if not erecover.result:
+                              revert with ext_call.return_data[0 len return_data.size]
+                          if not address(signer):
+                              revert with 0, 'GPv2: invalid ecdsa signature'
+                          require tokens.length <= LOCK8605463013()
+                          if address(cd[(trade + 68)]):
+                          else:
+                              if not tokens.length:
+                      else:
+                          require Mask(251, 0, cd[(trade + 260)]) * 0.03125 <= 3
+                          if Mask(251, 0, cd[(trade + 260)]) * 0.03125 != 2:
+                              if cd[(trade + cd[(trade + 324)] + 4)] != 20:
+                                  revert with 0, 'GPv2: malformed presignature'
+                          else:
+                              require 20 <= cd[(trade + cd[(trade + 324)] + 4)]
+                              require cd[(trade + cd[(trade + 324)] + 4)] <= cd[(trade + cd[(trade + 324)] + 4)]
+                              mem[ceil32(return_data.size) + 772] = cd[(trade + cd[(trade + 324)] + 4)] - 20
+                              mem[ceil32(return_data.size) + 804 len cd[(trade + cd[(trade + 324)] + 4)] - 20] = call.data[trade + cd[(trade + 324)] + 56 len cd[(trade + cd[(trade + 324)] + 4)] - 20]
+                              mem[cd[(trade + cd[(trade + 324)] + 4)] + ceil32(return_data.size) + 784] = 0
+                              require ext_code.size(Mask(64, 96, cd[(trade + cd[(trade + 324)] + 36)]) >> 96)
+                              static call Mask(64, 96, cd[(trade + cd[(trade + 324)] + 36)]) >> 96.isValidSignature(bytes32 , bytes ) with:
+                                      gas gas_remaining wei
+                                     args sha3(6401, 0xc078f884a2676e1345748b1feace7b0abee5d00ecadb6e574dcdd109a63e8943, sha3(0xd5a25ba2e97094ad7d83dc28a6572da797d6b3e7fc6663bd93efb789fc17e489, address(cd[((32 * trade.length) + tokens + 36)]), address(cd[((32 * cd[(trade + 36)]) + tokens + 36)]), address(cd[(trade + 68)]), cd[(trade + 100)], cd[(trade + 132)], cd[(trade + 164)] << 224, cd[(trade + 196)], cd[(trade + 228)], 0x6ed88e868af0a1983e3886d5f3e95a2fafbd6c3450bc229e27342283dc429ccc, bool(Mask(1, 1, cd[(trade + 260)])), 0x4ac99ace14ee0a5ef932dc609df0943ab7ac16b7583634612f8dc35a4289a6ce, 0x4ac99ace14ee0a5ef932dc609df0943ab7ac16b7583634612f8dc35a4289a6ce)), Array(len=cd[(trade + cd[(trade + 324)] + 4)] - 20, data=mem[ceil32(return_data.size) + 804 len floor32(cd[(trade + cd[(trade + 324)] + 4)] + 11)])
+                              if not ext_call.success:
+                                  revert with ext_call.return_data[0 len return_data.size]
+                              require return_data.size >= 32
+                              if Mask(32, 224, ext_call.return_data[0]) != 0x1626ba7e00000000000000000000000000000000000000000000000000000000:
+                                  revert with 0, 'GPv2: invalid eip1271 signature'
+              else:
+                  if not Mask(256, -5, cd[(trade + 260)]):
+                      if cd[(trade + cd[(trade + 324)] + 4)] != 65:
+                          revert with 0, 'GPv2: malformed ecdsa signature'
+                      signer = erecover(sha3(6401, 0xc078f884a2676e1345748b1feace7b0abee5d00ecadb6e574dcdd109a63e8943, sha3(0xd5a25ba2e97094ad7d83dc28a6572da797d6b3e7fc6663bd93efb789fc17e489, address(cd[((32 * trade.length) + tokens + 36)]), address(cd[((32 * cd[(trade + 36)]) + tokens + 36)]), address(cd[(trade + 68)]), cd[(trade + 100)], cd[(trade + 132)], cd[(trade + 164)] << 224, cd[(trade + 196)], cd[(trade + 228)], 0x6ed88e868af0a1983e3886d5f3e95a2fafbd6c3450bc229e27342283dc429ccc, bool(Mask(1, 1, cd[(trade + 260)])), 0x4ac99ace14ee0a5ef932dc609df0943ab7ac16b7583634612f8dc35a4289a6ce, 0x5a28e9363bb942b639270062aa6bb295f434bcdfc42c97267bf003f272060dc9)), Mask(256, -248, cd[(trade + cd[(trade + 324)] + 100)]) << 248, cd[(trade + cd[(trade + 324)] + 36)], cd[(trade + cd[(trade + 324)] + 68)]) # precompiled
+                      if not erecover.result:
+                          revert with ext_call.return_data[0 len return_data.size]
+                      if not address(signer):
+                          revert with 0, 'GPv2: invalid ecdsa signature'
+                      require tokens.length <= LOCK8605463013()
+                      if address(cd[(trade + 68)]):
+                          if not tokens.length:
+                              if cd[(trade + 292)] > cd[(trade + 100)]:
+                                  revert with 0, 'GPv2: limit too high'
+                          else:
+                      else:
+                  else:
+                      require Mask(251, 0, cd[(trade + 260)]) * 0.03125 <= 3
+                      if Mask(251, 0, cd[(trade + 260)]) * 0.03125 == 1:
+                          if cd[(trade + cd[(trade + 324)] + 4)] != 65:
+                              revert with 0, 'GPv2: malformed ecdsa signature'
+                          signer = erecover(sha3(Mask(224, 32, '\x19Ethereum Signed Message:\n32') >> 32, sha3(6401, 0xc078f884a2676e1345748b1feace7b0abee5d00ecadb6e574dcdd109a63e8943, sha3(0xd5a25ba2e97094ad7d83dc28a6572da797d6b3e7fc6663bd93efb789fc17e489, address(cd[((32 * trade.length) + tokens + 36)]), address(cd[((32 * cd[(trade + 36)]) + tokens + 36)]), address(cd[(trade + 68)]), cd[(trade + 100)], cd[(trade + 132)], cd[(trade + 164)] << 224, cd[(trade + 196)], cd[(trade + 228)], 0x6ed88e868af0a1983e3886d5f3e95a2fafbd6c3450bc229e27342283dc429ccc, bool(Mask(1, 1, cd[(trade + 260)])), 0x4ac99ace14ee0a5ef932dc609df0943ab7ac16b7583634612f8dc35a4289a6ce, 0x5a28e9363bb942b639270062aa6bb295f434bcdfc42c97267bf003f272060dc9))), Mask(256, -248, cd[(trade + cd[(trade + 324)] + 100)]) << 248, cd[(trade + cd[(trade + 324)] + 36)], cd[(trade + cd[(trade + 324)] + 68)]) # precompiled
+                          if not erecover.result:
+                              revert with ext_call.return_data[0 len return_data.size]
+                          if not address(signer):
+                              revert with 0, 'GPv2: invalid ecdsa signature'
+                          require tokens.length <= LOCK8605463013()
+                          if address(cd[(trade + 68)]):
+                          else:
+                              if not tokens.length:
+                      else:
+                          require Mask(251, 0, cd[(trade + 260)]) * 0.03125 <= 3
+                          if Mask(251, 0, cd[(trade + 260)]) * 0.03125 != 2:
+                              if cd[(trade + cd[(trade + 324)] + 4)] != 20:
+                                  revert with 0, 'GPv2: malformed presignature'
+                          else:
+                              require 20 <= cd[(trade + cd[(trade + 324)] + 4)]
+                              require cd[(trade + cd[(trade + 324)] + 4)] <= cd[(trade + cd[(trade + 324)] + 4)]
+                              mem[ceil32(return_data.size) + 772] = cd[(trade + cd[(trade + 324)] + 4)] - 20
+                              mem[ceil32(return_data.size) + 804 len cd[(trade + cd[(trade + 324)] + 4)] - 20] = call.data[trade + cd[(trade + 324)] + 56 len cd[(trade + cd[(trade + 324)] + 4)] - 20]
+                              mem[cd[(trade + cd[(trade + 324)] + 4)] + ceil32(return_data.size) + 784] = 0
+                              require ext_code.size(Mask(64, 96, cd[(trade + cd[(trade + 324)] + 36)]) >> 96)
+                              static call Mask(64, 96, cd[(trade + cd[(trade + 324)] + 36)]) >> 96.isValidSignature(bytes32 , bytes ) with:
+                                      gas gas_remaining wei
+                                     args sha3(6401, 0xc078f884a2676e1345748b1feace7b0abee5d00ecadb6e574dcdd109a63e8943, sha3(0xd5a25ba2e97094ad7d83dc28a6572da797d6b3e7fc6663bd93efb789fc17e489, address(cd[((32 * trade.length) + tokens + 36)]), address(cd[((32 * cd[(trade + 36)]) + tokens + 36)]), address(cd[(trade + 68)]), cd[(trade + 100)], cd[(trade + 132)], cd[(trade + 164)] << 224, cd[(trade + 196)], cd[(trade + 228)], 0x6ed88e868af0a1983e3886d5f3e95a2fafbd6c3450bc229e27342283dc429ccc, bool(Mask(1, 1, cd[(trade + 260)])), 0x4ac99ace14ee0a5ef932dc609df0943ab7ac16b7583634612f8dc35a4289a6ce, 0x5a28e9363bb942b639270062aa6bb295f434bcdfc42c97267bf003f272060dc9)), Array(len=cd[(trade + cd[(trade + 324)] + 4)] - 20, data=mem[ceil32(return_data.size) + 804 len floor32(cd[(trade + cd[(trade + 324)] + 4)] + 11)])
+                              if not ext_call.success:
+                                  revert with ext_call.return_data[0 len return_data.size]
+                              require return_data.size >= 32
+                              if Mask(32, 224, ext_call.return_data[0]) != 0x1626ba7e00000000000000000000000000000000000000000000000000000000:
+                                  revert with 0, 'GPv2: invalid eip1271 signature'
+          else:
+              if Mask(1, 4, cd[(trade + 260)]):
+                  if not Mask(256, -5, cd[(trade + 260)]):
+                      if cd[(trade + cd[(trade + 324)] + 4)] != 65:
+                          revert with 0, 'GPv2: malformed ecdsa signature'
+                      signer = erecover(sha3(6401, 0xc078f884a2676e1345748b1feace7b0abee5d00ecadb6e574dcdd109a63e8943, sha3(0xd5a25ba2e97094ad7d83dc28a6572da797d6b3e7fc6663bd93efb789fc17e489, address(cd[((32 * trade.length) + tokens + 36)]), address(cd[((32 * cd[(trade + 36)]) + tokens + 36)]), address(cd[(trade + 68)]), cd[(trade + 100)], cd[(trade + 132)], cd[(trade + 164)] << 224, cd[(trade + 196)], cd[(trade + 228)], 0x6ed88e868af0a1983e3886d5f3e95a2fafbd6c3450bc229e27342283dc429ccc, bool(Mask(1, 1, cd[(trade + 260)])), 0xabee3b73373acd583a130924aad6dc38cfdc44ba0555ba94ce2ff63980ea0632, 0x4ac99ace14ee0a5ef932dc609df0943ab7ac16b7583634612f8dc35a4289a6ce)), Mask(256, -248, cd[(trade + cd[(trade + 324)] + 100)]) << 248, cd[(trade + cd[(trade + 324)] + 36)], cd[(trade + cd[(trade + 324)] + 68)]) # precompiled
+                      if not erecover.result:
+                          revert with ext_call.return_data[0 len return_data.size]
+                      if not address(signer):
+                          revert with 0, 'GPv2: invalid ecdsa signature'
+                      require tokens.length <= LOCK8605463013()
+                      if address(cd[(trade + 68)]):
+                          if not tokens.length:
+                              if cd[(trade + 292)] > cd[(trade + 100)]:
+                                  revert with 0, 'GPv2: limit too high'
+                          else:
+                      else:
+                  else:
+                      require Mask(251, 0, cd[(trade + 260)]) * 0.03125 <= 3
+                      if Mask(251, 0, cd[(trade + 260)]) * 0.03125 == 1:
+                          if cd[(trade + cd[(trade + 324)] + 4)] != 65:
+                              revert with 0, 'GPv2: malformed ecdsa signature'
+                          signer = erecover(sha3(Mask(224, 32, '\x19Ethereum Signed Message:\n32') >> 32, sha3(6401, 0xc078f884a2676e1345748b1feace7b0abee5d00ecadb6e574dcdd109a63e8943, sha3(0xd5a25ba2e97094ad7d83dc28a6572da797d6b3e7fc6663bd93efb789fc17e489, address(cd[((32 * trade.length) + tokens + 36)]), address(cd[((32 * cd[(trade + 36)]) + tokens + 36)]), address(cd[(trade + 68)]), cd[(trade + 100)], cd[(trade + 132)], cd[(trade + 164)] << 224, cd[(trade + 196)], cd[(trade + 228)], 0x6ed88e868af0a1983e3886d5f3e95a2fafbd6c3450bc229e27342283dc429ccc, bool(Mask(1, 1, cd[(trade + 260)])), 0xabee3b73373acd583a130924aad6dc38cfdc44ba0555ba94ce2ff63980ea0632, 0x4ac99ace14ee0a5ef932dc609df0943ab7ac16b7583634612f8dc35a4289a6ce))), Mask(256, -248, cd[(trade + cd[(trade + 324)] + 100)]) << 248, cd[(trade + cd[(trade + 324)] + 36)], cd[(trade + cd[(trade + 324)] + 68)]) # precompiled
+                          if not erecover.result:
+                              revert with ext_call.return_data[0 len return_data.size]
+                          if not address(signer):
+                              revert with 0, 'GPv2: invalid ecdsa signature'
+                          require tokens.length <= LOCK8605463013()
+                          if address(cd[(trade + 68)]):
+                          else:
+                              if not tokens.length:
+                      else:
+                          require Mask(251, 0, cd[(trade + 260)]) * 0.03125 <= 3
+                          if Mask(251, 0, cd[(trade + 260)]) * 0.03125 != 2:
+                              if cd[(trade + cd[(trade + 324)] + 4)] != 20:
+                                  revert with 0, 'GPv2: malformed presignature'
+                          else:
+                              require 20 <= cd[(trade + cd[(trade + 324)] + 4)]
+                              require cd[(trade + cd[(trade + 324)] + 4)] <= cd[(trade + cd[(trade + 324)] + 4)]
+                              mem[ceil32(return_data.size) + 772] = cd[(trade + cd[(trade + 324)] + 4)] - 20
+                              mem[ceil32(return_data.size) + 804 len cd[(trade + cd[(trade + 324)] + 4)] - 20] = call.data[trade + cd[(trade + 324)] + 56 len cd[(trade + cd[(trade + 324)] + 4)] - 20]
+                              mem[cd[(trade + cd[(trade + 324)] + 4)] + ceil32(return_data.size) + 784] = 0
+                              require ext_code.size(Mask(64, 96, cd[(trade + cd[(trade + 324)] + 36)]) >> 96)
+                              static call Mask(64, 96, cd[(trade + cd[(trade + 324)] + 36)]) >> 96.isValidSignature(bytes32 , bytes ) with:
+                                      gas gas_remaining wei
+                                     args sha3(6401, 0xc078f884a2676e1345748b1feace7b0abee5d00ecadb6e574dcdd109a63e8943, sha3(0xd5a25ba2e97094ad7d83dc28a6572da797d6b3e7fc6663bd93efb789fc17e489, address(cd[((32 * trade.length) + tokens + 36)]), address(cd[((32 * cd[(trade + 36)]) + tokens + 36)]), address(cd[(trade + 68)]), cd[(trade + 100)], cd[(trade + 132)], cd[(trade + 164)] << 224, cd[(trade + 196)], cd[(trade + 228)], 0x6ed88e868af0a1983e3886d5f3e95a2fafbd6c3450bc229e27342283dc429ccc, bool(Mask(1, 1, cd[(trade + 260)])), 0xabee3b73373acd583a130924aad6dc38cfdc44ba0555ba94ce2ff63980ea0632, 0x4ac99ace14ee0a5ef932dc609df0943ab7ac16b7583634612f8dc35a4289a6ce)), Array(len=cd[(trade + cd[(trade + 324)] + 4)] - 20, data=mem[ceil32(return_data.size) + 804 len floor32(cd[(trade + cd[(trade + 324)] + 4)] + 11)])
+                              if not ext_call.success:
+                                  revert with ext_call.return_data[0 len return_data.size]
+                              require return_data.size >= 32
+                              if Mask(32, 224, ext_call.return_data[0]) != 0x1626ba7e00000000000000000000000000000000000000000000000000000000:
+                                  revert with 0, 'GPv2: invalid eip1271 signature'
+              else:
+                  if not Mask(256, -5, cd[(trade + 260)]):
+                      if cd[(trade + cd[(trade + 324)] + 4)] != 65:
+                          revert with 0, 'GPv2: malformed ecdsa signature'
+                      signer = erecover(sha3(6401, 0xc078f884a2676e1345748b1feace7b0abee5d00ecadb6e574dcdd109a63e8943, sha3(0xd5a25ba2e97094ad7d83dc28a6572da797d6b3e7fc6663bd93efb789fc17e489, address(cd[((32 * trade.length) + tokens + 36)]), address(cd[((32 * cd[(trade + 36)]) + tokens + 36)]), address(cd[(trade + 68)]), cd[(trade + 100)], cd[(trade + 132)], cd[(trade + 164)] << 224, cd[(trade + 196)], cd[(trade + 228)], 0x6ed88e868af0a1983e3886d5f3e95a2fafbd6c3450bc229e27342283dc429ccc, bool(Mask(1, 1, cd[(trade + 260)])), 0xabee3b73373acd583a130924aad6dc38cfdc44ba0555ba94ce2ff63980ea0632, 0x5a28e9363bb942b639270062aa6bb295f434bcdfc42c97267bf003f272060dc9)), Mask(256, -248, cd[(trade + cd[(trade + 324)] + 100)]) << 248, cd[(trade + cd[(trade + 324)] + 36)], cd[(trade + cd[(trade + 324)] + 68)]) # precompiled
+                      if not erecover.result:
+                          revert with ext_call.return_data[0 len return_data.size]
+                      if not address(signer):
+                          revert with 0, 'GPv2: invalid ecdsa signature'
+                      require tokens.length <= LOCK8605463013()
+                      if address(cd[(trade + 68)]):
+                          if not tokens.length:
+                              if cd[(trade + 292)] > cd[(trade + 100)]:
+                                  revert with 0, 'GPv2: limit too high'
+                          else:
+                      else:
+                  else:
+                      require Mask(251, 0, cd[(trade + 260)]) * 0.03125 <= 3
+                      if Mask(251, 0, cd[(trade + 260)]) * 0.03125 == 1:
+                          if cd[(trade + cd[(trade + 324)] + 4)] != 65:
+                              revert with 0, 'GPv2: malformed ecdsa signature'
+                          signer = erecover(sha3(Mask(224, 32, '\x19Ethereum Signed Message:\n32') >> 32, sha3(6401, 0xc078f884a2676e1345748b1feace7b0abee5d00ecadb6e574dcdd109a63e8943, sha3(0xd5a25ba2e97094ad7d83dc28a6572da797d6b3e7fc6663bd93efb789fc17e489, address(cd[((32 * trade.length) + tokens + 36)]), address(cd[((32 * cd[(trade + 36)]) + tokens + 36)]), address(cd[(trade + 68)]), cd[(trade + 100)], cd[(trade + 132)], cd[(trade + 164)] << 224, cd[(trade + 196)], cd[(trade + 228)], 0x6ed88e868af0a1983e3886d5f3e95a2fafbd6c3450bc229e27342283dc429ccc, bool(Mask(1, 1, cd[(trade + 260)])), 0xabee3b73373acd583a130924aad6dc38cfdc44ba0555ba94ce2ff63980ea0632, 0x5a28e9363bb942b639270062aa6bb295f434bcdfc42c97267bf003f272060dc9))), Mask(256, -248, cd[(trade + cd[(trade + 324)] + 100)]) << 248, cd[(trade + cd[(trade + 324)] + 36)], cd[(trade + cd[(trade + 324)] + 68)]) # precompiled
+                          if not erecover.result:
+                              revert with ext_call.return_data[0 len return_data.size]
+                          if not address(signer):
+                              revert with 0, 'GPv2: invalid ecdsa signature'
+                          require tokens.length <= LOCK8605463013()
+                          if address(cd[(trade + 68)]):
+                          else:
+                              if not tokens.length:
+                      else:
+                          require Mask(251, 0, cd[(trade + 260)]) * 0.03125 <= 3
+                          if Mask(251, 0, cd[(trade + 260)]) * 0.03125 != 2:
+                              if cd[(trade + cd[(trade + 324)] + 4)] != 20:
+                                  revert with 0, 'GPv2: malformed presignature'
+                          else:
+                              require 20 <= cd[(trade + cd[(trade + 324)] + 4)]
+                              require cd[(trade + cd[(trade + 324)] + 4)] <= cd[(trade + cd[(trade + 324)] + 4)]
+                              mem[ceil32(return_data.size) + 772] = cd[(trade + cd[(trade + 324)] + 4)] - 20
+                              mem[ceil32(return_data.size) + 804 len cd[(trade + cd[(trade + 324)] + 4)] - 20] = call.data[trade + cd[(trade + 324)] + 56 len cd[(trade + cd[(trade + 324)] + 4)] - 20]
+                              mem[cd[(trade + cd[(trade + 324)] + 4)] + ceil32(return_data.size) + 784] = 0
+                              require ext_code.size(Mask(64, 96, cd[(trade + cd[(trade + 324)] + 36)]) >> 96)
+                              static call Mask(64, 96, cd[(trade + cd[(trade + 324)] + 36)]) >> 96.isValidSignature(bytes32 , bytes ) with:
+                                      gas gas_remaining wei
+                                     args sha3(6401, 0xc078f884a2676e1345748b1feace7b0abee5d00ecadb6e574dcdd109a63e8943, sha3(0xd5a25ba2e97094ad7d83dc28a6572da797d6b3e7fc6663bd93efb789fc17e489, address(cd[((32 * trade.length) + tokens + 36)]), address(cd[((32 * cd[(trade + 36)]) + tokens + 36)]), address(cd[(trade + 68)]), cd[(trade + 100)], cd[(trade + 132)], cd[(trade + 164)] << 224, cd[(trade + 196)], cd[(trade + 228)], 0x6ed88e868af0a1983e3886d5f3e95a2fafbd6c3450bc229e27342283dc429ccc, bool(Mask(1, 1, cd[(trade + 260)])), 0xabee3b73373acd583a130924aad6dc38cfdc44ba0555ba94ce2ff63980ea0632, 0x5a28e9363bb942b639270062aa6bb295f434bcdfc42c97267bf003f272060dc9)), Array(len=cd[(trade + cd[(trade + 324)] + 4)] - 20, data=mem[ceil32(return_data.size) + 804 len floor32(cd[(trade + cd[(trade + 324)] + 4)] + 11)])
+                              if not ext_call.success:
+                                  revert with ext_call.return_data[0 len return_data.size]
+                              require return_data.size >= 32
+                              if Mask(32, 224, ext_call.return_data[0]) != 0x1626ba7e00000000000000000000000000000000000000000000000000000000:
+                                  revert with 0, 'GPv2: invalid eip1271 signature'
+      else:
+          if Mask(1, 4, cd[(trade + 260)]):
+              if not Mask(256, -5, cd[(trade + 260)]):
+                  if cd[(trade + cd[(trade + 324)] + 4)] != 65:
+                      revert with 0, 'GPv2: malformed ecdsa signature'
+                  signer = erecover(sha3(6401, 0xc078f884a2676e1345748b1feace7b0abee5d00ecadb6e574dcdd109a63e8943, sha3(0xd5a25ba2e97094ad7d83dc28a6572da797d6b3e7fc6663bd93efb789fc17e489, address(cd[((32 * trade.length) + tokens + 36)]), address(cd[((32 * cd[(trade + 36)]) + tokens + 36)]), address(cd[(trade + 68)]), cd[(trade + 100)], cd[(trade + 132)], cd[(trade + 164)] << 224, cd[(trade + 196)], cd[(trade + 228)], 0x6ed88e868af0a1983e3886d5f3e95a2fafbd6c3450bc229e27342283dc429ccc, bool(Mask(1, 1, cd[(trade + 260)])), 0x5a28e9363bb942b639270062aa6bb295f434bcdfc42c97267bf003f272060dc9, 0x4ac99ace14ee0a5ef932dc609df0943ab7ac16b7583634612f8dc35a4289a6ce)), Mask(256, -248, cd[(trade + cd[(trade + 324)] + 100)]) << 248, cd[(trade + cd[(trade + 324)] + 36)], cd[(trade + cd[(trade + 324)] + 68)]) # precompiled
+                  if not erecover.result:
+                      revert with ext_call.return_data[0 len return_data.size]
+                  if not address(signer):
+                      revert with 0, 'GPv2: invalid ecdsa signature'
+                  require tokens.length <= LOCK8605463013()
+                  if not address(cd[(trade + 68)]):
+                      if not tokens.length:
+                          if cd[(trade + 292)] > cd[(trade + 100)]:
+                              revert with 0, 'GPv2: limit too high'
+                      else:
+                  else:
+                      if not tokens.length:
+                      if cd[(trade + 292)] > cd[(trade + 100)]:
+                          revert with 0, 'GPv2: limit too high'
+              else:
+                  require Mask(251, 0, cd[(trade + 260)]) * 0.03125 <= 3
+                  if Mask(251, 0, cd[(trade + 260)]) * 0.03125 == 1:
+                      if cd[(trade + cd[(trade + 324)] + 4)] != 65:
+                          revert with 0, 'GPv2: malformed ecdsa signature'
+                      signer = erecover(sha3(Mask(224, 32, '\x19Ethereum Signed Message:\n32') >> 32, sha3(6401, 0xc078f884a2676e1345748b1feace7b0abee5d00ecadb6e574dcdd109a63e8943, sha3(0xd5a25ba2e97094ad7d83dc28a6572da797d6b3e7fc6663bd93efb789fc17e489, address(cd[((32 * trade.length) + tokens + 36)]), address(cd[((32 * cd[(trade + 36)]) + tokens + 36)]), address(cd[(trade + 68)]), cd[(trade + 100)], cd[(trade + 132)], cd[(trade + 164)] << 224, cd[(trade + 196)], cd[(trade + 228)], 0x6ed88e868af0a1983e3886d5f3e95a2fafbd6c3450bc229e27342283dc429ccc, bool(Mask(1, 1, cd[(trade + 260)])), 0x5a28e9363bb942b639270062aa6bb295f434bcdfc42c97267bf003f272060dc9, 0x4ac99ace14ee0a5ef932dc609df0943ab7ac16b7583634612f8dc35a4289a6ce))), Mask(256, -248, cd[(trade + cd[(trade + 324)] + 100)]) << 248, cd[(trade + cd[(trade + 324)] + 36)], cd[(trade + cd[(trade + 324)] + 68)]) # precompiled
+                      if not erecover.result:
+                          revert with ext_call.return_data[0 len return_data.size]
+                      if not address(signer):
+                          revert with 0, 'GPv2: invalid ecdsa signature'
+                      require tokens.length <= LOCK8605463013()
+                  else:
+                      require Mask(251, 0, cd[(trade + 260)]) * 0.03125 <= 3
+                      if Mask(251, 0, cd[(trade + 260)]) * 0.03125 != 2:
+                          if cd[(trade + cd[(trade + 324)] + 4)] != 20:
+                              revert with 0, 'GPv2: malformed presignature'
+                      else:
+                          require 20 <= cd[(trade + cd[(trade + 324)] + 4)]
+                          require cd[(trade + cd[(trade + 324)] + 4)] <= cd[(trade + cd[(trade + 324)] + 4)]
+                          mem[ceil32(return_data.size) + 772] = cd[(trade + cd[(trade + 324)] + 4)] - 20
+                          mem[ceil32(return_data.size) + 804 len cd[(trade + cd[(trade + 324)] + 4)] - 20] = call.data[trade + cd[(trade + 324)] + 56 len cd[(trade + cd[(trade + 324)] + 4)] - 20]
+                          mem[cd[(trade + cd[(trade + 324)] + 4)] + ceil32(return_data.size) + 784] = 0
+                          require ext_code.size(Mask(64, 96, cd[(trade + cd[(trade + 324)] + 36)]) >> 96)
+                          static call Mask(64, 96, cd[(trade + cd[(trade + 324)] + 36)]) >> 96.isValidSignature(bytes32 , bytes ) with:
+                                  gas gas_remaining wei
+                                 args sha3(6401, 0xc078f884a2676e1345748b1feace7b0abee5d00ecadb6e574dcdd109a63e8943, sha3(0xd5a25ba2e97094ad7d83dc28a6572da797d6b3e7fc6663bd93efb789fc17e489, address(cd[((32 * trade.length) + tokens + 36)]), address(cd[((32 * cd[(trade + 36)]) + tokens + 36)]), address(cd[(trade + 68)]), cd[(trade + 100)], cd[(trade + 132)], cd[(trade + 164)] << 224, cd[(trade + 196)], cd[(trade + 228)], 0x6ed88e868af0a1983e3886d5f3e95a2fafbd6c3450bc229e27342283dc429ccc, bool(Mask(1, 1, cd[(trade + 260)])), 0x5a28e9363bb942b639270062aa6bb295f434bcdfc42c97267bf003f272060dc9, 0x4ac99ace14ee0a5ef932dc609df0943ab7ac16b7583634612f8dc35a4289a6ce)), Array(len=cd[(trade + cd[(trade + 324)] + 4)] - 20, data=mem[ceil32(return_data.size) + 804 len floor32(cd[(trade + cd[(trade + 324)] + 4)] + 11)])
+                          if not ext_call.success:
+                              revert with ext_call.return_data[0 len return_data.size]
+                          require return_data.size >= 32
+                          if Mask(32, 224, ext_call.return_data[0]) != 0x1626ba7e00000000000000000000000000000000000000000000000000000000:
+                              revert with 0, 'GPv2: invalid eip1271 signature'
+                          if address(cd[(trade + 68)]):
+          else:
+              if not Mask(256, -5, cd[(trade + 260)]):
+                  if cd[(trade + cd[(trade + 324)] + 4)] != 65:
+                      revert with 0, 'GPv2: malformed ecdsa signature'
+                  signer = erecover(sha3(6401, 0xc078f884a2676e1345748b1feace7b0abee5d00ecadb6e574dcdd109a63e8943, sha3(0xd5a25ba2e97094ad7d83dc28a6572da797d6b3e7fc6663bd93efb789fc17e489, address(cd[((32 * trade.length) + tokens + 36)]), address(cd[((32 * cd[(trade + 36)]) + tokens + 36)]), address(cd[(trade + 68)]), cd[(trade + 100)], cd[(trade + 132)], cd[(trade + 164)] << 224, cd[(trade + 196)], cd[(trade + 228)], 0x6ed88e868af0a1983e3886d5f3e95a2fafbd6c3450bc229e27342283dc429ccc, bool(Mask(1, 1, cd[(trade + 260)])), 0x5a28e9363bb942b639270062aa6bb295f434bcdfc42c97267bf003f272060dc9, 0x5a28e9363bb942b639270062aa6bb295f434bcdfc42c97267bf003f272060dc9)), Mask(256, -248, cd[(trade + cd[(trade + 324)] + 100)]) << 248, cd[(trade + cd[(trade + 324)] + 36)], cd[(trade + cd[(trade + 324)] + 68)]) # precompiled
+                  if not erecover.result:
+                      revert with ext_call.return_data[0 len return_data.size]
+                  if not address(signer):
+                      revert with 0, 'GPv2: invalid ecdsa signature'
+                  require tokens.length <= LOCK8605463013()
+                  if not address(cd[(trade + 68)]):
+                      if not tokens.length:
+                          if cd[(trade + 292)] > cd[(trade + 100)]:
+                              revert with 0, 'GPv2: limit too high'
+                      else:
+                  else:
+                      if not tokens.length:
+                      if cd[(trade + 292)] > cd[(trade + 100)]:
+                          revert with 0, 'GPv2: limit too high'
+              else:
+                  require Mask(251, 0, cd[(trade + 260)]) * 0.03125 <= 3
+                  if Mask(251, 0, cd[(trade + 260)]) * 0.03125 == 1:
+                      if cd[(trade + cd[(trade + 324)] + 4)] != 65:
+                          revert with 0, 'GPv2: malformed ecdsa signature'
+                      signer = erecover(sha3(Mask(224, 32, '\x19Ethereum Signed Message:\n32') >> 32, sha3(6401, 0xc078f884a2676e1345748b1feace7b0abee5d00ecadb6e574dcdd109a63e8943, sha3(0xd5a25ba2e97094ad7d83dc28a6572da797d6b3e7fc6663bd93efb789fc17e489, address(cd[((32 * trade.length) + tokens + 36)]), address(cd[((32 * cd[(trade + 36)]) + tokens + 36)]), address(cd[(trade + 68)]), cd[(trade + 100)], cd[(trade + 132)], cd[(trade + 164)] << 224, cd[(trade + 196)], cd[(trade + 228)], 0x6ed88e868af0a1983e3886d5f3e95a2fafbd6c3450bc229e27342283dc429ccc, bool(Mask(1, 1, cd[(trade + 260)])), 0x5a28e9363bb942b639270062aa6bb295f434bcdfc42c97267bf003f272060dc9, 0x5a28e9363bb942b639270062aa6bb295f434bcdfc42c97267bf003f272060dc9))), Mask(256, -248, cd[(trade + cd[(trade + 324)] + 100)]) << 248, cd[(trade + cd[(trade + 324)] + 36)], cd[(trade + cd[(trade + 324)] + 68)]) # precompiled
+                      if not erecover.result:
+                          revert with ext_call.return_data[0 len return_data.size]
+                      if not address(signer):
+                          revert with 0, 'GPv2: invalid ecdsa signature'
+                      require tokens.length <= LOCK8605463013()
+                  else:
+                      require Mask(251, 0, cd[(trade + 260)]) * 0.03125 <= 3
+                      if Mask(251, 0, cd[(trade + 260)]) * 0.03125 != 2:
+                          if cd[(trade + cd[(trade + 324)] + 4)] != 20:
+                              revert with 0, 'GPv2: malformed presignature'
+                      else:
+                          require 20 <= cd[(trade + cd[(trade + 324)] + 4)]
+                          require cd[(trade + cd[(trade + 324)] + 4)] <= cd[(trade + cd[(trade + 324)] + 4)]
+                          mem[ceil32(return_data.size) + 772] = cd[(trade + cd[(trade + 324)] + 4)] - 20
+                          mem[ceil32(return_data.size) + 804 len cd[(trade + cd[(trade + 324)] + 4)] - 20] = call.data[trade + cd[(trade + 324)] + 56 len cd[(trade + cd[(trade + 324)] + 4)] - 20]
+                          mem[cd[(trade + cd[(trade + 324)] + 4)] + ceil32(return_data.size) + 784] = 0
+                          require ext_code.size(Mask(64, 96, cd[(trade + cd[(trade + 324)] + 36)]) >> 96)
+                          static call Mask(64, 96, cd[(trade + cd[(trade + 324)] + 36)]) >> 96.isValidSignature(bytes32 , bytes ) with:
+                                  gas gas_remaining wei
+                                 args sha3(6401, 0xc078f884a2676e1345748b1feace7b0abee5d00ecadb6e574dcdd109a63e8943, sha3(0xd5a25ba2e97094ad7d83dc28a6572da797d6b3e7fc6663bd93efb789fc17e489, address(cd[((32 * trade.length) + tokens + 36)]), address(cd[((32 * cd[(trade + 36)]) + tokens + 36)]), address(cd[(trade + 68)]), cd[(trade + 100)], cd[(trade + 132)], cd[(trade + 164)] << 224, cd[(trade + 196)], cd[(trade + 228)], 0x6ed88e868af0a1983e3886d5f3e95a2fafbd6c3450bc229e27342283dc429ccc, bool(Mask(1, 1, cd[(trade + 260)])), 0x5a28e9363bb942b639270062aa6bb295f434bcdfc42c97267bf003f272060dc9, 0x5a28e9363bb942b639270062aa6bb295f434bcdfc42c97267bf003f272060dc9)), Array(len=cd[(trade + cd[(trade + 324)] + 4)] - 20, data=mem[ceil32(return_data.size) + 804 len floor32(cd[(trade + cd[(trade + 324)] + 4)] + 11)])
+                          if not ext_call.success:
+                              revert with ext_call.return_data[0 len return_data.size]
+                          require return_data.size >= 32
+                          if Mask(32, 224, ext_call.return_data[0]) != 0x1626ba7e00000000000000000000000000000000000000000000000000000000:
+                              revert with 0, 'GPv2: invalid eip1271 signature'
+                          if address(cd[(trade + 68)]):
+  else:
+      if Mask(1, 3, cd[(trade + 260)]):
+          if Mask(1, 2, cd[(trade + 260)]):
+              if Mask(1, 4, cd[(trade + 260)]):
+                  if not Mask(256, -5, cd[(trade + 260)]):
+                      if cd[(trade + cd[(trade + 324)] + 4)] != 65:
+                          revert with 0, 'GPv2: malformed ecdsa signature'
+                      signer = erecover(sha3(6401, 0xc078f884a2676e1345748b1feace7b0abee5d00ecadb6e574dcdd109a63e8943, sha3(0xd5a25ba2e97094ad7d83dc28a6572da797d6b3e7fc6663bd93efb789fc17e489, address(cd[((32 * trade.length) + tokens + 36)]), address(cd[((32 * cd[(trade + 36)]) + tokens + 36)]), address(cd[(trade + 68)]), cd[(trade + 100)], cd[(trade + 132)], cd[(trade + 164)] << 224, cd[(trade + 196)], cd[(trade + 228)], 0xf3b277728b3fee749481eb3e0b3b48980dbbab78658fc419025cb16eee346775, bool(Mask(1, 1, cd[(trade + 260)])), 0x4ac99ace14ee0a5ef932dc609df0943ab7ac16b7583634612f8dc35a4289a6ce, 0x4ac99ace14ee0a5ef932dc609df0943ab7ac16b7583634612f8dc35a4289a6ce)), Mask(256, -248, cd[(trade + cd[(trade + 324)] + 100)]) << 248, cd[(trade + cd[(trade + 324)] + 36)], cd[(trade + cd[(trade + 324)] + 68)]) # precompiled
+                      if not erecover.result:
+                          revert with ext_call.return_data[0 len return_data.size]
+                      if not address(signer):
+                          revert with 0, 'GPv2: invalid ecdsa signature'
+                      require tokens.length <= LOCK8605463013()
+                      if address(cd[(trade + 68)]):
+                          if not tokens.length:
+                              if cd[(trade + 292)] < cd[(trade + 132)]:
+                                  revert with 0, 'GPv2: limit too low'
+                              if cd[(trade + 100)] > 0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff:
+                                  revert with 0, 'SafeCast: int256 overflow'
+                          else:
+                              if cd[(trade + 292)] >= cd[(trade + 132)]:
+                      else:
+                          if not tokens.length:
+                              if cd[(trade + 292)] >= cd[(trade + 132)]:
+                  else:
+                      require Mask(251, 0, cd[(trade + 260)]) * 0.03125 <= 3
+                      if Mask(251, 0, cd[(trade + 260)]) * 0.03125 == 1:
+                          if cd[(trade + cd[(trade + 324)] + 4)] != 65:
+                              revert with 0, 'GPv2: malformed ecdsa signature'
+                          signer = erecover(sha3(Mask(224, 32, '\x19Ethereum Signed Message:\n32') >> 32, sha3(6401, 0xc078f884a2676e1345748b1feace7b0abee5d00ecadb6e574dcdd109a63e8943, sha3(0xd5a25ba2e97094ad7d83dc28a6572da797d6b3e7fc6663bd93efb789fc17e489, address(cd[((32 * trade.length) + tokens + 36)]), address(cd[((32 * cd[(trade + 36)]) + tokens + 36)]), address(cd[(trade + 68)]), cd[(trade + 100)], cd[(trade + 132)], cd[(trade + 164)] << 224, cd[(trade + 196)], cd[(trade + 228)], 0xf3b277728b3fee749481eb3e0b3b48980dbbab78658fc419025cb16eee346775, bool(Mask(1, 1, cd[(trade + 260)])), 0x4ac99ace14ee0a5ef932dc609df0943ab7ac16b7583634612f8dc35a4289a6ce, 0x4ac99ace14ee0a5ef932dc609df0943ab7ac16b7583634612f8dc35a4289a6ce))), Mask(256, -248, cd[(trade + cd[(trade + 324)] + 100)]) << 248, cd[(trade + cd[(trade + 324)] + 36)], cd[(trade + cd[(trade + 324)] + 68)]) # precompiled
+                          if not erecover.result:
+                              revert with ext_call.return_data[0 len return_data.size]
+                          if not address(signer):
+                              revert with 0, 'GPv2: invalid ecdsa signature'
+                          require tokens.length <= LOCK8605463013()
+                          if address(cd[(trade + 68)]):
+                          else:
+                              if not tokens.length:
+                      else:
+                          require Mask(251, 0, cd[(trade + 260)]) * 0.03125 <= 3
+                          if Mask(251, 0, cd[(trade + 260)]) * 0.03125 != 2:
+                              if cd[(trade + cd[(trade + 324)] + 4)] != 20:
+                                  revert with 0, 'GPv2: malformed presignature'
+                          else:
+                              require 20 <= cd[(trade + cd[(trade + 324)] + 4)]
+                              require cd[(trade + cd[(trade + 324)] + 4)] <= cd[(trade + cd[(trade + 324)] + 4)]
+                              mem[ceil32(return_data.size) + 772] = cd[(trade + cd[(trade + 324)] + 4)] - 20
+                              mem[ceil32(return_data.size) + 804 len cd[(trade + cd[(trade + 324)] + 4)] - 20] = call.data[trade + cd[(trade + 324)] + 56 len cd[(trade + cd[(trade + 324)] + 4)] - 20]
+                              mem[cd[(trade + cd[(trade + 324)] + 4)] + ceil32(return_data.size) + 784] = 0
+                              require ext_code.size(Mask(64, 96, cd[(trade + cd[(trade + 324)] + 36)]) >> 96)
+                              static call Mask(64, 96, cd[(trade + cd[(trade + 324)] + 36)]) >> 96.isValidSignature(bytes32 , bytes ) with:
+                                      gas gas_remaining wei
+                                     args sha3(6401, 0xc078f884a2676e1345748b1feace7b0abee5d00ecadb6e574dcdd109a63e8943, sha3(0xd5a25ba2e97094ad7d83dc28a6572da797d6b3e7fc6663bd93efb789fc17e489, address(cd[((32 * trade.length) + tokens + 36)]), address(cd[((32 * cd[(trade + 36)]) + tokens + 36)]), address(cd[(trade + 68)]), cd[(trade + 100)], cd[(trade + 132)], cd[(trade + 164)] << 224, cd[(trade + 196)], cd[(trade + 228)], 0xf3b277728b3fee749481eb3e0b3b48980dbbab78658fc419025cb16eee346775, bool(Mask(1, 1, cd[(trade + 260)])), 0x4ac99ace14ee0a5ef932dc609df0943ab7ac16b7583634612f8dc35a4289a6ce, 0x4ac99ace14ee0a5ef932dc609df0943ab7ac16b7583634612f8dc35a4289a6ce)), Array(len=cd[(trade + cd[(trade + 324)] + 4)] - 20, data=mem[ceil32(return_data.size) + 804 len floor32(cd[(trade + cd[(trade + 324)] + 4)] + 11)])
+                              if not ext_call.success:
+                                  revert with ext_call.return_data[0 len return_data.size]
+                              require return_data.size >= 32
+                              if Mask(32, 224, ext_call.return_data[0]) != 0x1626ba7e00000000000000000000000000000000000000000000000000000000:
+                                  revert with 0, 'GPv2: invalid eip1271 signature'
+              else:
+                  if not Mask(256, -5, cd[(trade + 260)]):
+                      if cd[(trade + cd[(trade + 324)] + 4)] != 65:
+                          revert with 0, 'GPv2: malformed ecdsa signature'
+                      signer = erecover(sha3(6401, 0xc078f884a2676e1345748b1feace7b0abee5d00ecadb6e574dcdd109a63e8943, sha3(0xd5a25ba2e97094ad7d83dc28a6572da797d6b3e7fc6663bd93efb789fc17e489, address(cd[((32 * trade.length) + tokens + 36)]), address(cd[((32 * cd[(trade + 36)]) + tokens + 36)]), address(cd[(trade + 68)]), cd[(trade + 100)], cd[(trade + 132)], cd[(trade + 164)] << 224, cd[(trade + 196)], cd[(trade + 228)], 0xf3b277728b3fee749481eb3e0b3b48980dbbab78658fc419025cb16eee346775, bool(Mask(1, 1, cd[(trade + 260)])), 0x4ac99ace14ee0a5ef932dc609df0943ab7ac16b7583634612f8dc35a4289a6ce, 0x5a28e9363bb942b639270062aa6bb295f434bcdfc42c97267bf003f272060dc9)), Mask(256, -248, cd[(trade + cd[(trade + 324)] + 100)]) << 248, cd[(trade + cd[(trade + 324)] + 36)], cd[(trade + cd[(trade + 324)] + 68)]) # precompiled
+                      if not erecover.result:
+                          revert with ext_call.return_data[0 len return_data.size]
+                      if not address(signer):
+                          revert with 0, 'GPv2: invalid ecdsa signature'
+                      require tokens.length <= LOCK8605463013()
+                      if address(cd[(trade + 68)]):
+                          if not tokens.length:
+                              if cd[(trade + 292)] < cd[(trade + 132)]:
+                                  revert with 0, 'GPv2: limit too low'
+                              if cd[(trade + 100)] > 0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff:
+                                  revert with 0, 'SafeCast: int256 overflow'
+                          else:
+                              if cd[(trade + 292)] >= cd[(trade + 132)]:
+                      else:
+                          if not tokens.length:
+                              if cd[(trade + 292)] >= cd[(trade + 132)]:
+                  else:
+                      require Mask(251, 0, cd[(trade + 260)]) * 0.03125 <= 3
+                      if Mask(251, 0, cd[(trade + 260)]) * 0.03125 == 1:
+                          if cd[(trade + cd[(trade + 324)] + 4)] != 65:
+                              revert with 0, 'GPv2: malformed ecdsa signature'
+                          signer = erecover(sha3(Mask(224, 32, '\x19Ethereum Signed Message:\n32') >> 32, sha3(6401, 0xc078f884a2676e1345748b1feace7b0abee5d00ecadb6e574dcdd109a63e8943, sha3(0xd5a25ba2e97094ad7d83dc28a6572da797d6b3e7fc6663bd93efb789fc17e489, address(cd[((32 * trade.length) + tokens + 36)]), address(cd[((32 * cd[(trade + 36)]) + tokens + 36)]), address(cd[(trade + 68)]), cd[(trade + 100)], cd[(trade + 132)], cd[(trade + 164)] << 224, cd[(trade + 196)], cd[(trade + 228)], 0xf3b277728b3fee749481eb3e0b3b48980dbbab78658fc419025cb16eee346775, bool(Mask(1, 1, cd[(trade + 260)])), 0x4ac99ace14ee0a5ef932dc609df0943ab7ac16b7583634612f8dc35a4289a6ce, 0x5a28e9363bb942b639270062aa6bb295f434bcdfc42c97267bf003f272060dc9))), Mask(256, -248, cd[(trade + cd[(trade + 324)] + 100)]) << 248, cd[(trade + cd[(trade + 324)] + 36)], cd[(trade + cd[(trade + 324)] + 68)]) # precompiled
+                          if not erecover.result:
+                              revert with ext_call.return_data[0 len return_data.size]
+                          if not address(signer):
+                              revert with 0, 'GPv2: invalid ecdsa signature'
+                          require tokens.length <= LOCK8605463013()
+                          if address(cd[(trade + 68)]):
+                          else:
+                              if not tokens.length:
+                      else:
+                          require Mask(251, 0, cd[(trade + 260)]) * 0.03125 <= 3
+                          if Mask(251, 0, cd[(trade + 260)]) * 0.03125 != 2:
+                              if cd[(trade + cd[(trade + 324)] + 4)] != 20:
+                                  revert with 0, 'GPv2: malformed presignature'
+                          else:
+                              require 20 <= cd[(trade + cd[(trade + 324)] + 4)]
+                              require cd[(trade + cd[(trade + 324)] + 4)] <= cd[(trade + cd[(trade + 324)] + 4)]
+                              mem[ceil32(return_data.size) + 772] = cd[(trade + cd[(trade + 324)] + 4)] - 20
+                              mem[ceil32(return_data.size) + 804 len cd[(trade + cd[(trade + 324)] + 4)] - 20] = call.data[trade + cd[(trade + 324)] + 56 len cd[(trade + cd[(trade + 324)] + 4)] - 20]
+                              mem[cd[(trade + cd[(trade + 324)] + 4)] + ceil32(return_data.size) + 784] = 0
+                              require ext_code.size(Mask(64, 96, cd[(trade + cd[(trade + 324)] + 36)]) >> 96)
+                              static call Mask(64, 96, cd[(trade + cd[(trade + 324)] + 36)]) >> 96.isValidSignature(bytes32 , bytes ) with:
+                                      gas gas_remaining wei
+                                     args sha3(6401, 0xc078f884a2676e1345748b1feace7b0abee5d00ecadb6e574dcdd109a63e8943, sha3(0xd5a25ba2e97094ad7d83dc28a6572da797d6b3e7fc6663bd93efb789fc17e489, address(cd[((32 * trade.length) + tokens + 36)]), address(cd[((32 * cd[(trade + 36)]) + tokens + 36)]), address(cd[(trade + 68)]), cd[(trade + 100)], cd[(trade + 132)], cd[(trade + 164)] << 224, cd[(trade + 196)], cd[(trade + 228)], 0xf3b277728b3fee749481eb3e0b3b48980dbbab78658fc419025cb16eee346775, bool(Mask(1, 1, cd[(trade + 260)])), 0x4ac99ace14ee0a5ef932dc609df0943ab7ac16b7583634612f8dc35a4289a6ce, 0x5a28e9363bb942b639270062aa6bb295f434bcdfc42c97267bf003f272060dc9)), Array(len=cd[(trade + cd[(trade + 324)] + 4)] - 20, data=mem[ceil32(return_data.size) + 804 len floor32(cd[(trade + cd[(trade + 324)] + 4)] + 11)])
+                              if not ext_call.success:
+                                  revert with ext_call.return_data[0 len return_data.size]
+                              require return_data.size >= 32
+                              if Mask(32, 224, ext_call.return_data[0]) != 0x1626ba7e00000000000000000000000000000000000000000000000000000000:
+                                  revert with 0, 'GPv2: invalid eip1271 signature'
+          else:
+              if Mask(1, 4, cd[(trade + 260)]):
+                  if not Mask(256, -5, cd[(trade + 260)]):
+                      if cd[(trade + cd[(trade + 324)] + 4)] != 65:
+                          revert with 0, 'GPv2: malformed ecdsa signature'
+                      signer = erecover(sha3(6401, 0xc078f884a2676e1345748b1feace7b0abee5d00ecadb6e574dcdd109a63e8943, sha3(0xd5a25ba2e97094ad7d83dc28a6572da797d6b3e7fc6663bd93efb789fc17e489, address(cd[((32 * trade.length) + tokens + 36)]), address(cd[((32 * cd[(trade + 36)]) + tokens + 36)]), address(cd[(trade + 68)]), cd[(trade + 100)], cd[(trade + 132)], cd[(trade + 164)] << 224, cd[(trade + 196)], cd[(trade + 228)], 0xf3b277728b3fee749481eb3e0b3b48980dbbab78658fc419025cb16eee346775, bool(Mask(1, 1, cd[(trade + 260)])), 0xabee3b73373acd583a130924aad6dc38cfdc44ba0555ba94ce2ff63980ea0632, 0x4ac99ace14ee0a5ef932dc609df0943ab7ac16b7583634612f8dc35a4289a6ce)), Mask(256, -248, cd[(trade + cd[(trade + 324)] + 100)]) << 248, cd[(trade + cd[(trade + 324)] + 36)], cd[(trade + cd[(trade + 324)] + 68)]) # precompiled
+                      if not erecover.result:
+                          revert with ext_call.return_data[0 len return_data.size]
+                      if not address(signer):
+                          revert with 0, 'GPv2: invalid ecdsa signature'
+                      require tokens.length <= LOCK8605463013()
+                      if address(cd[(trade + 68)]):
+                          if not tokens.length:
+                              if cd[(trade + 292)] < cd[(trade + 132)]:
+                                  revert with 0, 'GPv2: limit too low'
+                              if cd[(trade + 100)] > 0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff:
+                                  revert with 0, 'SafeCast: int256 overflow'
+                          else:
+                              if cd[(trade + 292)] >= cd[(trade + 132)]:
+                      else:
+                          if not tokens.length:
+                              if cd[(trade + 292)] >= cd[(trade + 132)]:
+                  else:
+                      require Mask(251, 0, cd[(trade + 260)]) * 0.03125 <= 3
+                      if Mask(251, 0, cd[(trade + 260)]) * 0.03125 == 1:
+                          if cd[(trade + cd[(trade + 324)] + 4)] != 65:
+                              revert with 0, 'GPv2: malformed ecdsa signature'
+                          signer = erecover(sha3(Mask(224, 32, '\x19Ethereum Signed Message:\n32') >> 32, sha3(6401, 0xc078f884a2676e1345748b1feace7b0abee5d00ecadb6e574dcdd109a63e8943, sha3(0xd5a25ba2e97094ad7d83dc28a6572da797d6b3e7fc6663bd93efb789fc17e489, address(cd[((32 * trade.length) + tokens + 36)]), address(cd[((32 * cd[(trade + 36)]) + tokens + 36)]), address(cd[(trade + 68)]), cd[(trade + 100)], cd[(trade + 132)], cd[(trade + 164)] << 224, cd[(trade + 196)], cd[(trade + 228)], 0xf3b277728b3fee749481eb3e0b3b48980dbbab78658fc419025cb16eee346775, bool(Mask(1, 1, cd[(trade + 260)])), 0xabee3b73373acd583a130924aad6dc38cfdc44ba0555ba94ce2ff63980ea0632, 0x4ac99ace14ee0a5ef932dc609df0943ab7ac16b7583634612f8dc35a4289a6ce))), Mask(256, -248, cd[(trade + cd[(trade + 324)] + 100)]) << 248, cd[(trade + cd[(trade + 324)] + 36)], cd[(trade + cd[(trade + 324)] + 68)]) # precompiled
+                          if not erecover.result:
+                              revert with ext_call.return_data[0 len return_data.size]
+                          if not address(signer):
+                              revert with 0, 'GPv2: invalid ecdsa signature'
+                          require tokens.length <= LOCK8605463013()
+                          if address(cd[(trade + 68)]):
+                          else:
+                              if not tokens.length:
+                      else:
+                          require Mask(251, 0, cd[(trade + 260)]) * 0.03125 <= 3
+                          if Mask(251, 0, cd[(trade + 260)]) * 0.03125 != 2:
+                              if cd[(trade + cd[(trade + 324)] + 4)] != 20:
+                                  revert with 0, 'GPv2: malformed presignature'
+                          else:
+                              require 20 <= cd[(trade + cd[(trade + 324)] + 4)]
+                              require cd[(trade + cd[(trade + 324)] + 4)] <= cd[(trade + cd[(trade + 324)] + 4)]
+                              mem[ceil32(return_data.size) + 772] = cd[(trade + cd[(trade + 324)] + 4)] - 20
+                              mem[ceil32(return_data.size) + 804 len cd[(trade + cd[(trade + 324)] + 4)] - 20] = call.data[trade + cd[(trade + 324)] + 56 len cd[(trade + cd[(trade + 324)] + 4)] - 20]
+                              mem[cd[(trade + cd[(trade + 324)] + 4)] + ceil32(return_data.size) + 784] = 0
+                              require ext_code.size(Mask(64, 96, cd[(trade + cd[(trade + 324)] + 36)]) >> 96)
+                              static call Mask(64, 96, cd[(trade + cd[(trade + 324)] + 36)]) >> 96.isValidSignature(bytes32 , bytes ) with:
+                                      gas gas_remaining wei
+                                     args sha3(6401, 0xc078f884a2676e1345748b1feace7b0abee5d00ecadb6e574dcdd109a63e8943, sha3(0xd5a25ba2e97094ad7d83dc28a6572da797d6b3e7fc6663bd93efb789fc17e489, address(cd[((32 * trade.length) + tokens + 36)]), address(cd[((32 * cd[(trade + 36)]) + tokens + 36)]), address(cd[(trade + 68)]), cd[(trade + 100)], cd[(trade + 132)], cd[(trade + 164)] << 224, cd[(trade + 196)], cd[(trade + 228)], 0xf3b277728b3fee749481eb3e0b3b48980dbbab78658fc419025cb16eee346775, bool(Mask(1, 1, cd[(trade + 260)])), 0xabee3b73373acd583a130924aad6dc38cfdc44ba0555ba94ce2ff63980ea0632, 0x4ac99ace14ee0a5ef932dc609df0943ab7ac16b7583634612f8dc35a4289a6ce)), Array(len=cd[(trade + cd[(trade + 324)] + 4)] - 20, data=mem[ceil32(return_data.size) + 804 len floor32(cd[(trade + cd[(trade + 324)] + 4)] + 11)])
+                              if not ext_call.success:
+                                  revert with ext_call.return_data[0 len return_data.size]
+                              require return_data.size >= 32
+                              if Mask(32, 224, ext_call.return_data[0]) != 0x1626ba7e00000000000000000000000000000000000000000000000000000000:
+                                  revert with 0, 'GPv2: invalid eip1271 signature'
+              else:
+                  if not Mask(256, -5, cd[(trade + 260)]):
+                      if cd[(trade + cd[(trade + 324)] + 4)] != 65:
+                          revert with 0, 'GPv2: malformed ecdsa signature'
+                      signer = erecover(sha3(6401, 0xc078f884a2676e1345748b1feace7b0abee5d00ecadb6e574dcdd109a63e8943, sha3(0xd5a25ba2e97094ad7d83dc28a6572da797d6b3e7fc6663bd93efb789fc17e489, address(cd[((32 * trade.length) + tokens + 36)]), address(cd[((32 * cd[(trade + 36)]) + tokens + 36)]), address(cd[(trade + 68)]), cd[(trade + 100)], cd[(trade + 132)], cd[(trade + 164)] << 224, cd[(trade + 196)], cd[(trade + 228)], 0xf3b277728b3fee749481eb3e0b3b48980dbbab78658fc419025cb16eee346775, bool(Mask(1, 1, cd[(trade + 260)])), 0xabee3b73373acd583a130924aad6dc38cfdc44ba0555ba94ce2ff63980ea0632, 0x5a28e9363bb942b639270062aa6bb295f434bcdfc42c97267bf003f272060dc9)), Mask(256, -248, cd[(trade + cd[(trade + 324)] + 100)]) << 248, cd[(trade + cd[(trade + 324)] + 36)], cd[(trade + cd[(trade + 324)] + 68)]) # precompiled
+                      if not erecover.result:
+                          revert with ext_call.return_data[0 len return_data.size]
+                      if not address(signer):
+                          revert with 0, 'GPv2: invalid ecdsa signature'
+                      require tokens.length <= LOCK8605463013()
+                      if address(cd[(trade + 68)]):
+                          if not tokens.length:
+                              if cd[(trade + 292)] < cd[(trade + 132)]:
+                                  revert with 0, 'GPv2: limit too low'
+                              if cd[(trade + 100)] > 0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff:
+                                  revert with 0, 'SafeCast: int256 overflow'
+                          else:
+                              if cd[(trade + 292)] >= cd[(trade + 132)]:
+                      else:
+                          if not tokens.length:
+                              if cd[(trade + 292)] >= cd[(trade + 132)]:
+                  else:
+                      require Mask(251, 0, cd[(trade + 260)]) * 0.03125 <= 3
+                      if Mask(251, 0, cd[(trade + 260)]) * 0.03125 == 1:
+                          if cd[(trade + cd[(trade + 324)] + 4)] != 65:
+                              revert with 0, 'GPv2: malformed ecdsa signature'
+                          signer = erecover(sha3(Mask(224, 32, '\x19Ethereum Signed Message:\n32') >> 32, sha3(6401, 0xc078f884a2676e1345748b1feace7b0abee5d00ecadb6e574dcdd109a63e8943, sha3(0xd5a25ba2e97094ad7d83dc28a6572da797d6b3e7fc6663bd93efb789fc17e489, address(cd[((32 * trade.length) + tokens + 36)]), address(cd[((32 * cd[(trade + 36)]) + tokens + 36)]), address(cd[(trade + 68)]), cd[(trade + 100)], cd[(trade + 132)], cd[(trade + 164)] << 224, cd[(trade + 196)], cd[(trade + 228)], 0xf3b277728b3fee749481eb3e0b3b48980dbbab78658fc419025cb16eee346775, bool(Mask(1, 1, cd[(trade + 260)])), 0xabee3b73373acd583a130924aad6dc38cfdc44ba0555ba94ce2ff63980ea0632, 0x5a28e9363bb942b639270062aa6bb295f434bcdfc42c97267bf003f272060dc9))), Mask(256, -248, cd[(trade + cd[(trade + 324)] + 100)]) << 248, cd[(trade + cd[(trade + 324)] + 36)], cd[(trade + cd[(trade + 324)] + 68)]) # precompiled
+                          if not erecover.result:
+                              revert with ext_call.return_data[0 len return_data.size]
+                          if not address(signer):
+                              revert with 0, 'GPv2: invalid ecdsa signature'
+                          require tokens.length <= LOCK8605463013()
+                          if address(cd[(trade + 68)]):
+                          else:
+                              if not tokens.length:
+                      else:
+                          require Mask(251, 0, cd[(trade + 260)]) * 0.03125 <= 3
+                          if Mask(251, 0, cd[(trade + 260)]) * 0.03125 != 2:
+                              if cd[(trade + cd[(trade + 324)] + 4)] != 20:
+                                  revert with 0, 'GPv2: malformed presignature'
+                          else:
+                              require 20 <= cd[(trade + cd[(trade + 324)] + 4)]
+                              require cd[(trade + cd[(trade + 324)] + 4)] <= cd[(trade + cd[(trade + 324)] + 4)]
+                              mem[ceil32(return_data.size) + 772] = cd[(trade + cd[(trade + 324)] + 4)] - 20
+                              mem[ceil32(return_data.size) + 804 len cd[(trade + cd[(trade + 324)] + 4)] - 20] = call.data[trade + cd[(trade + 324)] + 56 len cd[(trade + cd[(trade + 324)] + 4)] - 20]
+                              mem[cd[(trade + cd[(trade + 324)] + 4)] + ceil32(return_data.size) + 784] = 0
+                              require ext_code.size(Mask(64, 96, cd[(trade + cd[(trade + 324)] + 36)]) >> 96)
+                              static call Mask(64, 96, cd[(trade + cd[(trade + 324)] + 36)]) >> 96.isValidSignature(bytes32 , bytes ) with:
+                                      gas gas_remaining wei
+                                     args sha3(6401, 0xc078f884a2676e1345748b1feace7b0abee5d00ecadb6e574dcdd109a63e8943, sha3(0xd5a25ba2e97094ad7d83dc28a6572da797d6b3e7fc6663bd93efb789fc17e489, address(cd[((32 * trade.length) + tokens + 36)]), address(cd[((32 * cd[(trade + 36)]) + tokens + 36)]), address(cd[(trade + 68)]), cd[(trade + 100)], cd[(trade + 132)], cd[(trade + 164)] << 224, cd[(trade + 196)], cd[(trade + 228)], 0xf3b277728b3fee749481eb3e0b3b48980dbbab78658fc419025cb16eee346775, bool(Mask(1, 1, cd[(trade + 260)])), 0xabee3b73373acd583a130924aad6dc38cfdc44ba0555ba94ce2ff63980ea0632, 0x5a28e9363bb942b639270062aa6bb295f434bcdfc42c97267bf003f272060dc9)), Array(len=cd[(trade + cd[(trade + 324)] + 4)] - 20, data=mem[ceil32(return_data.size) + 804 len floor32(cd[(trade + cd[(trade + 324)] + 4)] + 11)])
+                              if not ext_call.success:
+                                  revert with ext_call.return_data[0 len return_data.size]
+                              require return_data.size >= 32
+                              if Mask(32, 224, ext_call.return_data[0]) != 0x1626ba7e00000000000000000000000000000000000000000000000000000000:
+                                  revert with 0, 'GPv2: invalid eip1271 signature'
+      else:
+          if Mask(1, 4, cd[(trade + 260)]):
+              if not Mask(256, -5, cd[(trade + 260)]):
+                  if cd[(trade + cd[(trade + 324)] + 4)] != 65:
+                      revert with 0, 'GPv2: malformed ecdsa signature'
+                  signer = erecover(sha3(6401, 0xc078f884a2676e1345748b1feace7b0abee5d00ecadb6e574dcdd109a63e8943, sha3(0xd5a25ba2e97094ad7d83dc28a6572da797d6b3e7fc6663bd93efb789fc17e489, address(cd[((32 * trade.length) + tokens + 36)]), address(cd[((32 * cd[(trade + 36)]) + tokens + 36)]), address(cd[(trade + 68)]), cd[(trade + 100)], cd[(trade + 132)], cd[(trade + 164)] << 224, cd[(trade + 196)], cd[(trade + 228)], 0xf3b277728b3fee749481eb3e0b3b48980dbbab78658fc419025cb16eee346775, bool(Mask(1, 1, cd[(trade + 260)])), 0x5a28e9363bb942b639270062aa6bb295f434bcdfc42c97267bf003f272060dc9, 0x4ac99ace14ee0a5ef932dc609df0943ab7ac16b7583634612f8dc35a4289a6ce)), Mask(256, -248, cd[(trade + cd[(trade + 324)] + 100)]) << 248, cd[(trade + cd[(trade + 324)] + 36)], cd[(trade + cd[(trade + 324)] + 68)]) # precompiled
+                  if not erecover.result:
+                      revert with ext_call.return_data[0 len return_data.size]
+                  if not address(signer):
+                      revert with 0, 'GPv2: invalid ecdsa signature'
+                  require tokens.length <= LOCK8605463013()
+                  if not address(cd[(trade + 68)]):
+                      if not tokens.length:
+                          if cd[(trade + 292)] < cd[(trade + 132)]:
+                              revert with 0, 'GPv2: limit too low'
+                          if cd[(trade + 100)] > 0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff:
+                              revert with 0, 'SafeCast: int256 overflow'
+                      else:
+                          if cd[(trade + 292)] >= cd[(trade + 132)]:
+                  else:
+                      if not tokens.length:
+                      if cd[(trade + 292)] < cd[(trade + 132)]:
+                          revert with 0, 'GPv2: limit too low'
+                      if cd[(trade + 100)] > 0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff:
+                          revert with 0, 'SafeCast: int256 overflow'
+              else:
+                  require Mask(251, 0, cd[(trade + 260)]) * 0.03125 <= 3
+                  if Mask(251, 0, cd[(trade + 260)]) * 0.03125 == 1:
+                      if cd[(trade + cd[(trade + 324)] + 4)] != 65:
+                          revert with 0, 'GPv2: malformed ecdsa signature'
+                      signer = erecover(sha3(Mask(224, 32, '\x19Ethereum Signed Message:\n32') >> 32, sha3(6401, 0xc078f884a2676e1345748b1feace7b0abee5d00ecadb6e574dcdd109a63e8943, sha3(0xd5a25ba2e97094ad7d83dc28a6572da797d6b3e7fc6663bd93efb789fc17e489, address(cd[((32 * trade.length) + tokens + 36)]), address(cd[((32 * cd[(trade + 36)]) + tokens + 36)]), address(cd[(trade + 68)]), cd[(trade + 100)], cd[(trade + 132)], cd[(trade + 164)] << 224, cd[(trade + 196)], cd[(trade + 228)], 0xf3b277728b3fee749481eb3e0b3b48980dbbab78658fc419025cb16eee346775, bool(Mask(1, 1, cd[(trade + 260)])), 0x5a28e9363bb942b639270062aa6bb295f434bcdfc42c97267bf003f272060dc9, 0x4ac99ace14ee0a5ef932dc609df0943ab7ac16b7583634612f8dc35a4289a6ce))), Mask(256, -248, cd[(trade + cd[(trade + 324)] + 100)]) << 248, cd[(trade + cd[(trade + 324)] + 36)], cd[(trade + cd[(trade + 324)] + 68)]) # precompiled
+                      if not erecover.result:
+                          revert with ext_call.return_data[0 len return_data.size]
+                      if not address(signer):
+                          revert with 0, 'GPv2: invalid ecdsa signature'
+                      require tokens.length <= LOCK8605463013()
+                      if not address(cd[(trade + 68)]):
+                      else:
+                          if not tokens.length:
+                              if cd[(trade + 292)] >= cd[(trade + 132)]:
+                  else:
+                      require Mask(251, 0, cd[(trade + 260)]) * 0.03125 <= 3
+                      if Mask(251, 0, cd[(trade + 260)]) * 0.03125 != 2:
+                          if cd[(trade + cd[(trade + 324)] + 4)] != 20:
+                              revert with 0, 'GPv2: malformed presignature'
+                      else:
+                          require 20 <= cd[(trade + cd[(trade + 324)] + 4)]
+                          require cd[(trade + cd[(trade + 324)] + 4)] <= cd[(trade + cd[(trade + 324)] + 4)]
+                          mem[ceil32(return_data.size) + 772] = cd[(trade + cd[(trade + 324)] + 4)] - 20
+                          mem[ceil32(return_data.size) + 804 len cd[(trade + cd[(trade + 324)] + 4)] - 20] = call.data[trade + cd[(trade + 324)] + 56 len cd[(trade + cd[(trade + 324)] + 4)] - 20]
+                          mem[cd[(trade + cd[(trade + 324)] + 4)] + ceil32(return_data.size) + 784] = 0
+                          require ext_code.size(Mask(64, 96, cd[(trade + cd[(trade + 324)] + 36)]) >> 96)
+                          static call Mask(64, 96, cd[(trade + cd[(trade + 324)] + 36)]) >> 96.isValidSignature(bytes32 , bytes ) with:
+                                  gas gas_remaining wei
+                                 args sha3(6401, 0xc078f884a2676e1345748b1feace7b0abee5d00ecadb6e574dcdd109a63e8943, sha3(0xd5a25ba2e97094ad7d83dc28a6572da797d6b3e7fc6663bd93efb789fc17e489, address(cd[((32 * trade.length) + tokens + 36)]), address(cd[((32 * cd[(trade + 36)]) + tokens + 36)]), address(cd[(trade + 68)]), cd[(trade + 100)], cd[(trade + 132)], cd[(trade + 164)] << 224, cd[(trade + 196)], cd[(trade + 228)], 0xf3b277728b3fee749481eb3e0b3b48980dbbab78658fc419025cb16eee346775, bool(Mask(1, 1, cd[(trade + 260)])), 0x5a28e9363bb942b639270062aa6bb295f434bcdfc42c97267bf003f272060dc9, 0x4ac99ace14ee0a5ef932dc609df0943ab7ac16b7583634612f8dc35a4289a6ce)), Array(len=cd[(trade + cd[(trade + 324)] + 4)] - 20, data=mem[ceil32(return_data.size) + 804 len floor32(cd[(trade + cd[(trade + 324)] + 4)] + 11)])
+                          if not ext_call.success:
+                              revert with ext_call.return_data[0 len return_data.size]
+                          require return_data.size >= 32
+                          if Mask(32, 224, ext_call.return_data[0]) != 0x1626ba7e00000000000000000000000000000000000000000000000000000000:
+                              revert with 0, 'GPv2: invalid eip1271 signature'
+                          if address(cd[(trade + 68)]):
+          else:
+              if not Mask(256, -5, cd[(trade + 260)]):
+                  if cd[(trade + cd[(trade + 324)] + 4)] != 65:
+                      revert with 0, 'GPv2: malformed ecdsa signature'
+                  signer = erecover(sha3(6401, 0xc078f884a2676e1345748b1feace7b0abee5d00ecadb6e574dcdd109a63e8943, sha3(0xd5a25ba2e97094ad7d83dc28a6572da797d6b3e7fc6663bd93efb789fc17e489, address(cd[((32 * trade.length) + tokens + 36)]), address(cd[((32 * cd[(trade + 36)]) + tokens + 36)]), address(cd[(trade + 68)]), cd[(trade + 100)], cd[(trade + 132)], cd[(trade + 164)] << 224, cd[(trade + 196)], cd[(trade + 228)], 0xf3b277728b3fee749481eb3e0b3b48980dbbab78658fc419025cb16eee346775, bool(Mask(1, 1, cd[(trade + 260)])), 0x5a28e9363bb942b639270062aa6bb295f434bcdfc42c97267bf003f272060dc9, 0x5a28e9363bb942b639270062aa6bb295f434bcdfc42c97267bf003f272060dc9)), Mask(256, -248, cd[(trade + cd[(trade + 324)] + 100)]) << 248, cd[(trade + cd[(trade + 324)] + 36)], cd[(trade + cd[(trade + 324)] + 68)]) # precompiled
+                  if not erecover.result:
+                      revert with ext_call.return_data[0 len return_data.size]
+                  if not address(signer):
+                      revert with 0, 'GPv2: invalid ecdsa signature'
+                  require tokens.length <= LOCK8605463013()
+                  if not address(cd[(trade + 68)]):
+                      if not tokens.length:
+                          if cd[(trade + 292)] < cd[(trade + 132)]:
+                              revert with 0, 'GPv2: limit too low'
+                          if cd[(trade + 100)] > 0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff:
+                              revert with 0, 'SafeCast: int256 overflow'
+                      else:
+                          if cd[(trade + 292)] >= cd[(trade + 132)]:
+                  else:
+                      if not tokens.length:
+                      if cd[(trade + 292)] < cd[(trade + 132)]:
+                          revert with 0, 'GPv2: limit too low'
+                      if cd[(trade + 100)] > 0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff:
+                          revert with 0, 'SafeCast: int256 overflow'
+              else:
+                  require Mask(251, 0, cd[(trade + 260)]) * 0.03125 <= 3
+                  if Mask(251, 0, cd[(trade + 260)]) * 0.03125 == 1:
+                      if cd[(trade + cd[(trade + 324)] + 4)] != 65:
+                          revert with 0, 'GPv2: malformed ecdsa signature'
+                      signer = erecover(sha3(Mask(224, 32, '\x19Ethereum Signed Message:\n32') >> 32, sha3(6401, 0xc078f884a2676e1345748b1feace7b0abee5d00ecadb6e574dcdd109a63e8943, sha3(0xd5a25ba2e97094ad7d83dc28a6572da797d6b3e7fc6663bd93efb789fc17e489, address(cd[((32 * trade.length) + tokens + 36)]), address(cd[((32 * cd[(trade + 36)]) + tokens + 36)]), address(cd[(trade + 68)]), cd[(trade + 100)], cd[(trade + 132)], cd[(trade + 164)] << 224, cd[(trade + 196)], cd[(trade + 228)], 0xf3b277728b3fee749481eb3e0b3b48980dbbab78658fc419025cb16eee346775, bool(Mask(1, 1, cd[(trade + 260)])), 0x5a28e9363bb942b639270062aa6bb295f434bcdfc42c97267bf003f272060dc9, 0x5a28e9363bb942b639270062aa6bb295f434bcdfc42c97267bf003f272060dc9))), Mask(256, -248, cd[(trade + cd[(trade + 324)] + 100)]) << 248, cd[(trade + cd[(trade + 324)] + 36)], cd[(trade + cd[(trade + 324)] + 68)]) # precompiled
+                      if not erecover.result:
+                          revert with ext_call.return_data[0 len return_data.size]
+                      if not address(signer):
+                          revert with 0, 'GPv2: invalid ecdsa signature'
+                      require tokens.length <= LOCK8605463013()
+                      if not address(cd[(trade + 68)]):
+                      else:
+                          if not tokens.length:
+                              if cd[(trade + 292)] >= cd[(trade + 132)]:
+                  else:
+                      require Mask(251, 0, cd[(trade + 260)]) * 0.03125 <= 3
+                      if Mask(251, 0, cd[(trade + 260)]) * 0.03125 != 2:
+                          if cd[(trade + cd[(trade + 324)] + 4)] != 20:
+                              revert with 0, 'GPv2: malformed presignature'
+                      else:
+                          require 20 <= cd[(trade + cd[(trade + 324)] + 4)]
+                          require cd[(trade + cd[(trade + 324)] + 4)] <= cd[(trade + cd[(trade + 324)] + 4)]
+                          mem[ceil32(return_data.size) + 772] = cd[(trade + cd[(trade + 324)] + 4)] - 20
+                          mem[ceil32(return_data.size) + 804 len cd[(trade + cd[(trade + 324)] + 4)] - 20] = call.data[trade + cd[(trade + 324)] + 56 len cd[(trade + cd[(trade + 324)] + 4)] - 20]
+                          mem[cd[(trade + cd[(trade + 324)] + 4)] + ceil32(return_data.size) + 784] = 0
+                          require ext_code.size(Mask(64, 96, cd[(trade + cd[(trade + 324)] + 36)]) >> 96)
+                          static call Mask(64, 96, cd[(trade + cd[(trade + 324)] + 36)]) >> 96.isValidSignature(bytes32 , bytes ) with:
+                                  gas gas_remaining wei
+                                 args sha3(6401, 0xc078f884a2676e1345748b1feace7b0abee5d00ecadb6e574dcdd109a63e8943, sha3(0xd5a25ba2e97094ad7d83dc28a6572da797d6b3e7fc6663bd93efb789fc17e489, address(cd[((32 * trade.length) + tokens + 36)]), address(cd[((32 * cd[(trade + 36)]) + tokens + 36)]), address(cd[(trade + 68)]), cd[(trade + 100)], cd[(trade + 132)], cd[(trade + 164)] << 224, cd[(trade + 196)], cd[(trade + 228)], 0xf3b277728b3fee749481eb3e0b3b48980dbbab78658fc419025cb16eee346775, bool(Mask(1, 1, cd[(trade + 260)])), 0x5a28e9363bb942b639270062aa6bb295f434bcdfc42c97267bf003f272060dc9, 0x5a28e9363bb942b639270062aa6bb295f434bcdfc42c97267bf003f272060dc9)), Array(len=cd[(trade + cd[(trade + 324)] + 4)] - 20, data=mem[ceil32(return_data.size) + 804 len floor32(cd[(trade + cd[(trade + 324)] + 4)] + 11)])
+                          if not ext_call.success:
+                              revert with ext_call.return_data[0 len return_data.size]
+                          require return_data.size >= 32
+                          if Mask(32, 224, ext_call.return_data[0]) != 0x1626ba7e00000000000000000000000000000000000000000000000000000000:
+                              revert with 0, 'GPv2: invalid eip1271 signature'
+                          if address(cd[(trade + 68)]):
+  ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+
+

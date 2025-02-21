@@ -1,0 +1,31 @@
+# Palkeoramix decompiler. 
+
+def storage:
+  implementationAddress is address at storage 0
+
+def implementationAddress() payable: 
+  return implementationAddress
+
+#
+#  Regular functions
+#
+
+def _fallback(?) payable: # default function
+  revert
+
+def createForwarder(address parent, bytes32 salt) payable: 
+  require calldata.size - 4 >= 64
+  create2 contract with 0 wei
+                  salt: sha3(parent, salt)
+                  code: 0x3d602d80600a3d3981f3363d3d373d3d3d363d73, implementationAddress, 0x5af43d82803e903d91602b57fd5bf3
+  require ext_code.size(address(create2.new_address))
+  call address(create2.new_address).init(address _addressListFactory) with:
+       gas gas_remaining wei
+      args parent
+  if not ext_call.success:
+      revert with ext_call.return_data[0 len return_data.size]
+  log ForwarderCreated(
+        address newForwarderAddress=address(create2.new_address),
+        address parentAddress=parent)
+
+

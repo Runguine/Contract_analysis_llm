@@ -1,0 +1,589 @@
+# Palkeoramix decompiler. 
+#
+#  I failed with these: 
+#  - executeMetaTransaction(address userAddress, bytes functionSignature, bytes32 sigR, bytes32 sigS, uint8 sigV)
+#  All the rest is below.
+#
+
+const totalSupply = ext_call.return_data[0]
+const getChainId = chainid
+const ERC712_VERSION = ''
+const DEFAULT_ADMIN_ROLE = 0
+
+def storage:
+  roleAdmin is array of struct at storage 0
+  allowance is mapping of uint256 at storage 2
+  name is array of uint256 at storage 4
+  symbol is array of uint256 at storage 5
+  decimals is uint8 at storage 6
+  domainSeperator is uint256 at storage 7
+  nonce is mapping of uint256 at storage 8
+
+def name(): # not payable
+  return name[0 len name.length]
+
+def getDomainSeperator(): # not payable
+  return domainSeperator
+
+def getRoleAdmin(bytes32 role): # not payable
+  require calldata.size - 4 >= 32
+  return roleAdmin[role].field_512
+
+def getNonce(address user): # not payable
+  require calldata.size - 4 >= 32
+  return nonce[address(user)]
+
+def decimals(): # not payable
+  return decimals
+
+def getRoleMember(bytes32 role, uint256 index): # not payable
+  require calldata.size - 4 >= 64
+  if index >= roleAdmin[role].field_0:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  34,
+                  0xfe456e756d657261626c655365743a20696e646578206f7574206f6620626f756e64,
+                  mem[198 len 30]
+  return roleAdmin[role][index].field_0
+
+def hasRole(bytes32 role, address account): # not payable
+  require calldata.size - 4 >= 64
+  return bool(roleAdmin[role][1][address(account)].field_0)
+
+def symbol(): # not payable
+  return symbol[0 len symbol.length]
+
+def getRoleMemberCount(bytes32 role): # not payable
+  require calldata.size - 4 >= 32
+  return roleAdmin[role].field_0
+
+def allowance(address owner, address spender): # not payable
+  require calldata.size - 4 >= 64
+  return allowance[address(owner)][address(spender)]
+
+#
+#  Regular functions
+#
+
+def _fallback(?) payable: # default function
+  revert
+
+def balanceOf(address account): # not payable
+  require calldata.size - 4 >= 32
+  require ext_code.size(0x7069f8cea562778bde0bac8f512d3f6b73e1e7f4)
+  static call 0x7069f8cea562778bde0bac8f512d3f6b73e1e7f4.balanceOf(address account) with:
+          gas gas_remaining wei
+         args account
+  if not ext_call.success:
+      revert with ext_call.return_data[0 len return_data.size]
+  require return_data.size >= 32
+  return ext_call.return_data[0]
+
+def transfer(address recipient, uint256 amount): # not payable
+  require calldata.size - 4 >= 64
+  if caller != this.address:
+      log Transfer(
+            address from=amount,
+            address to=caller,
+            uint256 value=recipient)
+      call 0x7069f8cea562778bde0bac8f512d3f6b73e1e7f4 with:
+         funct uint32(amount)
+           gas gas_remaining wei
+          args Mask(224, 32, caller) << 736, mem[388 len 4]
+  else:
+      mem[96] = calldata.size
+      mem[128 len calldata.size] = call.data[0 len calldata.size]
+      log Transfer(
+            address from=amount,
+            address to=mem[calldata.size + 108 len 20],
+            uint256 value=recipient)
+      call 0x7069f8cea562778bde0bac8f512d3f6b73e1e7f4 with:
+         funct uint32(amount)
+           gas gas_remaining wei
+          args Mask(224, 32, caller) << 736, mem[ceil32(calldata.size) + 420 len 4]
+  require ext_call.success
+  return 1
+
+def unknown43ebc689(address _param1, array _param2, uint256 _param3): # not payable
+  require calldata.size - 4 >= 96
+  require _param2 <= unknown10000000()
+  require _param2 + 36 <= calldata.size
+  require _param2.length <= unknown10000000() and _param2 + (32 * _param2.length) + 36 <= calldata.size
+  mem[128 len 32 * _param2.length] = call.data[_param2 + 36 len 32 * _param2.length]
+  mem[(32 * _param2.length) + 128] = 0
+  require 0x7069f8cea562778bde0bac8f512d3f6b73e1e7f4 == caller
+  idx = 0
+  while idx < _param2.length:
+      require idx < _param2.length
+      _9 = mem[(32 * idx) + 128]
+      mem[(32 * _param2.length) + 128] = _param3
+      log Transfer(
+            address from=_param3,
+            address to=_param1,
+            uint256 value=address(_9))
+      idx = idx + 1
+      continue 
+
+def approve(address spender, uint256 amount): # not payable
+  require calldata.size - 4 >= 64
+  if caller != this.address:
+      if not caller:
+          revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                      32,
+                      36,
+                      0x6845524332303a20617070726f76652066726f6d20746865207a65726f20616464726573,
+                      mem[200 len 28]
+      if not spender:
+          revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                      32,
+                      34,
+                      0x2945524332303a20617070726f766520746f20746865207a65726f20616464726573,
+                      mem[198 len 30]
+      if caller == caller:
+          require ext_code.size(0x7069f8cea562778bde0bac8f512d3f6b73e1e7f4)
+          static call 0x7069f8cea562778bde0bac8f512d3f6b73e1e7f4.DEFAULT_ADMIN_ROLE() with:
+                  gas gas_remaining wei
+          if not ext_call.success:
+              revert with ext_call.return_data[0 len return_data.size]
+          require return_data.size >= 32
+      allowance[caller][address(spender)] = amount
+      log Approval(
+            address owner=amount,
+            address spender=caller,
+            uint256 value=spender)
+  else:
+      mem[96] = calldata.size
+      mem[128 len calldata.size] = call.data[0 len calldata.size]
+      if not mem[calldata.size + 108 len 20]:
+          revert with 0, 
+                      32,
+                      36,
+                      0x6845524332303a20617070726f76652066726f6d20746865207a65726f20616464726573,
+                      mem[ceil32(calldata.size) + 232 len 28]
+      if not spender:
+          revert with 0, 
+                      32,
+                      34,
+                      0x2945524332303a20617070726f766520746f20746865207a65726f20616464726573,
+                      mem[ceil32(calldata.size) + 230 len 30]
+      if mem[calldata.size + 108 len 20] != caller:
+          allowance[mem[calldata.size + 108 len 20]][address(spender)] = amount
+      else:
+          require ext_code.size(0x7069f8cea562778bde0bac8f512d3f6b73e1e7f4)
+          static call 0x7069f8cea562778bde0bac8f512d3f6b73e1e7f4.DEFAULT_ADMIN_ROLE() with:
+                  gas gas_remaining wei
+          if not ext_call.success:
+              revert with ext_call.return_data[0 len return_data.size]
+          require return_data.size >= 32
+          allowance[address(mem[calldata.size + 96])][address(spender)] = amount
+      log Approval(
+            address owner=amount,
+            address spender=mem[calldata.size + 108 len 20],
+            uint256 value=spender)
+  return 1
+
+def increaseAllowance(address spender, uint256 addedValue): # not payable
+  require calldata.size - 4 >= 64
+  if caller != this.address:
+      if addedValue + allowance[caller][address(spender)] < allowance[caller][address(spender)]:
+          revert with 0, 'SafeMath: addition overflow'
+      if not caller:
+          revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                      32,
+                      36,
+                      0x6845524332303a20617070726f76652066726f6d20746865207a65726f20616464726573,
+                      mem[200 len 28]
+      if not spender:
+          revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                      32,
+                      34,
+                      0x2945524332303a20617070726f766520746f20746865207a65726f20616464726573,
+                      mem[198 len 30]
+      if caller == caller:
+          require ext_code.size(0x7069f8cea562778bde0bac8f512d3f6b73e1e7f4)
+          static call 0x7069f8cea562778bde0bac8f512d3f6b73e1e7f4.DEFAULT_ADMIN_ROLE() with:
+                  gas gas_remaining wei
+          if not ext_call.success:
+              revert with ext_call.return_data[0 len return_data.size]
+          require return_data.size >= 32
+      allowance[caller][address(spender)] += addedValue
+      log Approval(
+            address owner=(addedValue + allowance[caller][address(spender)]),
+            address spender=caller,
+            uint256 value=spender)
+  else:
+      mem[96] = calldata.size
+      mem[128 len calldata.size] = call.data[0 len calldata.size]
+      mem[ceil32(calldata.size) + 128] = calldata.size
+      mem[ceil32(calldata.size) + 160 len calldata.size] = call.data[0 len calldata.size]
+      if addedValue + allowance[mem[calldata.size + ceil32(calldata.size) + 140 len 20]][address(spender)] < allowance[mem[calldata.size + ceil32(calldata.size) + 140 len 20]][address(spender)]:
+          revert with 0, 'SafeMath: addition overflow'
+      if not mem[calldata.size + 108 len 20]:
+          revert with 0, 
+                      32,
+                      36,
+                      0x6845524332303a20617070726f76652066726f6d20746865207a65726f20616464726573,
+                      mem[(2 * ceil32(calldata.size)) + 264 len 28]
+      if not spender:
+          revert with 0, 
+                      32,
+                      34,
+                      0x2945524332303a20617070726f766520746f20746865207a65726f20616464726573,
+                      mem[(2 * ceil32(calldata.size)) + 262 len 30]
+      if mem[calldata.size + 108 len 20] == caller:
+          require ext_code.size(0x7069f8cea562778bde0bac8f512d3f6b73e1e7f4)
+          static call 0x7069f8cea562778bde0bac8f512d3f6b73e1e7f4.DEFAULT_ADMIN_ROLE() with:
+                  gas gas_remaining wei
+          if not ext_call.success:
+              revert with ext_call.return_data[0 len return_data.size]
+          require return_data.size >= 32
+      allowance[address(mem[calldata.size + 96])][address(spender)] = addedValue + allowance[mem[calldata.size + ceil32(calldata.size) + 140 len 20]][address(spender)]
+      log Approval(
+            address owner=(addedValue + allowance[mem[calldata.size + ceil32(calldata.size) + 140 len 20]][address(spender)]),
+            address spender=mem[calldata.size + 108 len 20],
+            uint256 value=spender)
+  return 1
+
+def decreaseAllowance(address spender, uint256 subtractedValue): # not payable
+  require calldata.size - 4 >= 64
+  if caller != this.address:
+      if subtractedValue > allowance[caller][address(spender)]:
+          revert with 0, 
+                      32,
+                      37,
+                      0x7345524332303a2064656372656173656420616c6c6f77616e63652062656c6f77207a6572,
+                      mem[165 len 27],
+                      mem[219 len 5]
+      if not caller:
+          revert with 0, 32, 36, 0x6845524332303a20617070726f76652066726f6d20746865207a65726f20616464726573, mem[296 len 28]
+      if not spender:
+          revert with 0, 32, 34, 0x2945524332303a20617070726f766520746f20746865207a65726f20616464726573, mem[294 len 30]
+      if caller == caller:
+          require ext_code.size(0x7069f8cea562778bde0bac8f512d3f6b73e1e7f4)
+          static call 0x7069f8cea562778bde0bac8f512d3f6b73e1e7f4.DEFAULT_ADMIN_ROLE() with:
+                  gas gas_remaining wei
+          if not ext_call.success:
+              revert with ext_call.return_data[0 len return_data.size]
+          require return_data.size >= 32
+      allowance[caller][address(spender)] -= subtractedValue
+      log Approval(
+            address owner=(allowance[caller][address(spender)] - subtractedValue),
+            address spender=caller,
+            uint256 value=spender)
+  else:
+      mem[96] = calldata.size
+      mem[128 len calldata.size] = call.data[0 len calldata.size]
+      mem[ceil32(calldata.size) + 224] = calldata.size
+      mem[ceil32(calldata.size) + 256 len calldata.size] = call.data[0 len calldata.size]
+      if subtractedValue > allowance[mem[calldata.size + ceil32(calldata.size) + 236 len 20]][address(spender)]:
+          mem[(2 * ceil32(calldata.size)) + 260] = 32
+          mem[(2 * ceil32(calldata.size)) + 292] = 37
+          mem[(2 * ceil32(calldata.size)) + 324 len 64] = 0x7345524332303a2064656372656173656420616c6c6f77616e63652062656c6f77207a6572, mem[ceil32(calldata.size) + 197 len 27]
+          mem[(2 * ceil32(calldata.size)) + 356] = calldata.size % unknown10000000()
+          revert with 0, 
+                      32,
+                      37,
+                      0x7345524332303a2064656372656173656420616c6c6f77616e63652062656c6f77207a6572,
+                      mem[ceil32(calldata.size) + 197 len 27],
+                      calldata.size % unknown10000000()
+      if not mem[calldata.size + 108 len 20]:
+          revert with 0, 
+                      32,
+                      36,
+                      0x6845524332303a20617070726f76652066726f6d20746865207a65726f20616464726573,
+                      mem[(2 * ceil32(calldata.size)) + 360 len 28]
+      if not spender:
+          revert with 0, 
+                      32,
+                      34,
+                      0x2945524332303a20617070726f766520746f20746865207a65726f20616464726573,
+                      mem[(2 * ceil32(calldata.size)) + 358 len 30]
+      if mem[calldata.size + 108 len 20] == caller:
+          require ext_code.size(0x7069f8cea562778bde0bac8f512d3f6b73e1e7f4)
+          static call 0x7069f8cea562778bde0bac8f512d3f6b73e1e7f4.DEFAULT_ADMIN_ROLE() with:
+                  gas gas_remaining wei
+          if not ext_call.success:
+              revert with ext_call.return_data[0 len return_data.size]
+          require return_data.size >= 32
+      allowance[address(mem[calldata.size + 96])][address(spender)] = allowance[mem[calldata.size + ceil32(calldata.size) + 236 len 20]][address(spender)] - subtractedValue
+      log Approval(
+            address owner=(allowance[mem[calldata.size + ceil32(calldata.size) + 236 len 20]][address(spender)] - subtractedValue),
+            address spender=mem[calldata.size + 108 len 20],
+            uint256 value=spender)
+  return 1
+
+def renounceRole(bytes32 role, address account): # not payable
+  require calldata.size - 4 >= 64
+  if caller != this.address:
+      if account != caller:
+          revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                      32,
+                      47,
+                      0x6f416363657373436f6e74726f6c3a2063616e206f6e6c792072656e6f756e636520726f6c657320666f722073656c,
+                      mem[211 len 17]
+      if roleAdmin[role][1][address(account)].field_0:
+          require roleAdmin[role].field_0 - 1 < roleAdmin[role].field_0
+          require roleAdmin[role][1][address(account)].field_0 - 1 < roleAdmin[role].field_0
+          roleAdmin[role][roleAdmin[role][1][address(account)].field_0].field_0 = roleAdmin[role][roleAdmin[role].field_0].field_0
+          roleAdmin[role][1][roleAdmin[role][roleAdmin[role].field_0].field_0].field_0 = roleAdmin[role][1][address(account)].field_0
+          require roleAdmin[role].field_0
+          roleAdmin[role][roleAdmin[role].field_0].field_0 = 0
+          roleAdmin[role].field_0--
+          roleAdmin[role][1][address(account)].field_0 = 0
+          if caller != this.address:
+              log RoleRevoked(
+                    bytes32 role=role,
+                    address account=account,
+                    address sender=caller)
+          else:
+              mem[96] = calldata.size
+              mem[128 len calldata.size] = call.data[0 len calldata.size]
+              log RoleRevoked(
+                    bytes32 role=role,
+                    address account=account,
+                    address sender=mem[calldata.size + 108 len 20])
+  else:
+      mem[96] = calldata.size
+      mem[128 len calldata.size] = call.data[0 len calldata.size]
+      if account != mem[calldata.size + 108 len 20]:
+          revert with 0, 
+                      32,
+                      47,
+                      0x6f416363657373436f6e74726f6c3a2063616e206f6e6c792072656e6f756e636520726f6c657320666f722073656c,
+                      mem[ceil32(calldata.size) + 243 len 17]
+      if roleAdmin[role][1][address(account)].field_0:
+          require roleAdmin[role].field_0 - 1 < roleAdmin[role].field_0
+          require roleAdmin[role][1][address(account)].field_0 - 1 < roleAdmin[role].field_0
+          roleAdmin[role][roleAdmin[role][1][address(account)].field_0].field_0 = roleAdmin[role][roleAdmin[role].field_0].field_0
+          roleAdmin[role][1][roleAdmin[role][roleAdmin[role].field_0].field_0].field_0 = roleAdmin[role][1][address(account)].field_0
+          require roleAdmin[role].field_0
+          roleAdmin[role][roleAdmin[role].field_0].field_0 = 0
+          roleAdmin[role].field_0--
+          roleAdmin[role][1][address(account)].field_0 = 0
+          if caller != this.address:
+              log RoleRevoked(
+                    bytes32 role=role,
+                    address account=account,
+                    address sender=caller)
+          else:
+              mem[ceil32(calldata.size) + 128] = calldata.size
+              mem[ceil32(calldata.size) + 160 len calldata.size] = call.data[0 len calldata.size]
+              log RoleRevoked(
+                    bytes32 role=role,
+                    address account=account,
+                    address sender=mem[calldata.size + ceil32(calldata.size) + 140 len 20])
+
+def revokeRole(bytes32 role, address account): # not payable
+  require calldata.size - 4 >= 64
+  if caller != this.address:
+      if not roleAdmin[roleAdmin[role].field_512][1][caller].field_0:
+          revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                      32,
+                      48,
+                      0x73416363657373436f6e74726f6c3a2073656e646572206d75737420626520616e2061646d696e20746f207265766f6b,
+                      mem[212 len 16]
+      if roleAdmin[role][1][address(account)].field_0:
+          require roleAdmin[role].field_0 - 1 < roleAdmin[role].field_0
+          require roleAdmin[role][1][address(account)].field_0 - 1 < roleAdmin[role].field_0
+          roleAdmin[role][roleAdmin[role][1][address(account)].field_0].field_0 = roleAdmin[role][roleAdmin[role].field_0].field_0
+          roleAdmin[role][1][roleAdmin[role][roleAdmin[role].field_0].field_0].field_0 = roleAdmin[role][1][address(account)].field_0
+          require roleAdmin[role].field_0
+          roleAdmin[role][roleAdmin[role].field_0].field_0 = 0
+          roleAdmin[role].field_0--
+          roleAdmin[role][1][address(account)].field_0 = 0
+          if caller != this.address:
+              log RoleRevoked(
+                    bytes32 role=role,
+                    address account=account,
+                    address sender=caller)
+          else:
+              mem[96] = calldata.size
+              mem[128 len calldata.size] = call.data[0 len calldata.size]
+              log RoleRevoked(
+                    bytes32 role=role,
+                    address account=account,
+                    address sender=mem[calldata.size + 108 len 20])
+  else:
+      mem[96] = calldata.size
+      mem[128 len calldata.size] = call.data[0 len calldata.size]
+      if not roleAdmin[roleAdmin[role].field_512][1][address(mem[calldata.size + 96])].field_0:
+          revert with 0, 
+                      32,
+                      48,
+                      0x73416363657373436f6e74726f6c3a2073656e646572206d75737420626520616e2061646d696e20746f207265766f6b,
+                      mem[ceil32(calldata.size) + 244 len 16]
+      if roleAdmin[role][1][address(account)].field_0:
+          require roleAdmin[role].field_0 - 1 < roleAdmin[role].field_0
+          require roleAdmin[role][1][address(account)].field_0 - 1 < roleAdmin[role].field_0
+          roleAdmin[role][roleAdmin[role][1][address(account)].field_0].field_0 = roleAdmin[role][roleAdmin[role].field_0].field_0
+          roleAdmin[role][1][roleAdmin[role][roleAdmin[role].field_0].field_0].field_0 = roleAdmin[role][1][address(account)].field_0
+          require roleAdmin[role].field_0
+          roleAdmin[role][roleAdmin[role].field_0].field_0 = 0
+          roleAdmin[role].field_0--
+          roleAdmin[role][1][address(account)].field_0 = 0
+          if caller != this.address:
+              log RoleRevoked(
+                    bytes32 role=role,
+                    address account=account,
+                    address sender=caller)
+          else:
+              mem[ceil32(calldata.size) + 128] = calldata.size
+              mem[ceil32(calldata.size) + 160 len calldata.size] = call.data[0 len calldata.size]
+              log RoleRevoked(
+                    bytes32 role=role,
+                    address account=account,
+                    address sender=mem[calldata.size + ceil32(calldata.size) + 140 len 20])
+
+def transferFrom(address sender, address recipient, uint256 amount): # not payable
+  require calldata.size - 4 >= 96
+  log Transfer(
+        address from=amount,
+        address to=sender,
+        uint256 value=recipient)
+  mem[260 len 128] = 1478360895, address(sender) << 64, 0, address(recipient), amount, Mask(224, 32, caller) >> 32
+  mem[416 len 4] = Mask(32, 64, caller) >> 64
+  call 0x7069f8cea562778bde0bac8f512d3f6b73e1e7f4 with:
+     funct uint32(amount)
+       gas gas_remaining wei
+      args Mask(224, 32, caller) << 736, mem[388 len 4]
+  if not return_data.size:
+      require ext_call.success
+      if caller != this.address:
+          if amount > allowance[address(sender)][caller]:
+              revert with 0, 
+                          'RERC20: transfer amount exceeds allowanc',
+                          Mask(64, -256, 0x5245524332303a207472616e7366657220616d6f756e74206578636565647320616c6c6f77616e63, 0) << 256
+          if not sender:
+              revert with 0, 32, 36, 0x6845524332303a20617070726f76652066726f6d20746865207a65726f20616464726573, mem[460 len 28]
+          if not caller:
+              revert with 0, 32, 34, 0x2945524332303a20617070726f766520746f20746865207a65726f20616464726573, mem[458 len 30]
+          if sender == caller:
+              require ext_code.size(0x7069f8cea562778bde0bac8f512d3f6b73e1e7f4)
+              static call 0x7069f8cea562778bde0bac8f512d3f6b73e1e7f4.DEFAULT_ADMIN_ROLE() with:
+                      gas gas_remaining wei
+              if not ext_call.success:
+                  revert with ext_call.return_data[0 len return_data.size]
+              require return_data.size >= 32
+          allowance[address(sender)][caller] -= amount
+          log Approval(
+                address owner=(allowance[address(sender)][caller] - amount),
+                address spender=sender,
+                uint256 value=caller)
+      else:
+          mem[260] = calldata.size
+          mem[292 len calldata.size] = call.data[0 len calldata.size]
+          mem[ceil32(calldata.size) + 388] = calldata.size
+          mem[ceil32(calldata.size) + 420 len calldata.size] = call.data[0 len calldata.size]
+          if amount > allowance[address(sender)][mem[calldata.size + ceil32(calldata.size) + 400 len 20]]:
+              mem[(2 * ceil32(calldata.size)) + 424] = 32
+              mem[(2 * ceil32(calldata.size)) + 456] = 40
+              mem[(2 * ceil32(calldata.size)) + 488 len 64] = 0x5245524332303a207472616e7366657220616d6f756e74206578636565647320616c6c6f77616e63, mem[ceil32(calldata.size) + 364 len 24]
+              mem[(2 * ceil32(calldata.size)) + 520] = uint64(calldata.size)
+              revert with 0, 
+                          32,
+                          40,
+                          0x5245524332303a207472616e7366657220616d6f756e74206578636565647320616c6c6f77616e63,
+                          mem[ceil32(calldata.size) + 364 len 24],
+                          uint64(calldata.size)
+          if not sender:
+              revert with 0, 
+                          32,
+                          36,
+                          0x6845524332303a20617070726f76652066726f6d20746865207a65726f20616464726573,
+                          mem[(2 * ceil32(calldata.size)) + 524 len 28]
+          if not mem[calldata.size + 272 len 20]:
+              revert with 0, 
+                          32,
+                          34,
+                          0x2945524332303a20617070726f766520746f20746865207a65726f20616464726573,
+                          mem[(2 * ceil32(calldata.size)) + 522 len 30]
+          if sender == caller:
+              require ext_code.size(0x7069f8cea562778bde0bac8f512d3f6b73e1e7f4)
+              static call 0x7069f8cea562778bde0bac8f512d3f6b73e1e7f4.DEFAULT_ADMIN_ROLE() with:
+                      gas gas_remaining wei
+              if not ext_call.success:
+                  revert with ext_call.return_data[0 len return_data.size]
+              require return_data.size >= 32
+          allowance[address(sender)][address(mem[calldata.size + 260])] = allowance[address(sender)][mem[calldata.size + ceil32(calldata.size) + 400 len 20]] - amount
+          log Approval(
+                address owner=(allowance[address(sender)][mem[calldata.size + ceil32(calldata.size) + 400 len 20]] - amount),
+                address spender=sender,
+                uint256 value=mem[calldata.size + 272 len 20])
+  else:
+      mem[292 len return_data.size] = ext_call.return_data[0 len return_data.size]
+      require ext_call.success
+      if caller != this.address:
+          if amount > allowance[address(sender)][caller]:
+              revert with 0, 
+                          32,
+                          40,
+                          0x5245524332303a207472616e7366657220616d6f756e74206578636565647320616c6c6f77616e63,
+                          mem[ceil32(return_data.size) + 333 len 24],
+                          mem[ceil32(return_data.size) + 381 len 8]
+          if not sender:
+              revert with 0, 
+                          32,
+                          36,
+                          0x6845524332303a20617070726f76652066726f6d20746865207a65726f20616464726573,
+                          mem[ceil32(return_data.size) + 461 len 28]
+          if not caller:
+              revert with 0, 
+                          32,
+                          34,
+                          0x2945524332303a20617070726f766520746f20746865207a65726f20616464726573,
+                          mem[ceil32(return_data.size) + 459 len 30]
+          if sender == caller:
+              require ext_code.size(0x7069f8cea562778bde0bac8f512d3f6b73e1e7f4)
+              static call 0x7069f8cea562778bde0bac8f512d3f6b73e1e7f4.DEFAULT_ADMIN_ROLE() with:
+                      gas gas_remaining wei
+              if not ext_call.success:
+                  revert with ext_call.return_data[0 len return_data.size]
+              require return_data.size >= 32
+          allowance[address(sender)][caller] -= amount
+          log Approval(
+                address owner=(allowance[address(sender)][caller] - amount),
+                address spender=sender,
+                uint256 value=caller)
+      else:
+          mem[ceil32(return_data.size) + 261] = calldata.size
+          mem[ceil32(return_data.size) + 293 len calldata.size] = call.data[0 len calldata.size]
+          mem[ceil32(return_data.size) + ceil32(calldata.size) + 389] = calldata.size
+          mem[ceil32(return_data.size) + ceil32(calldata.size) + 421 len calldata.size] = call.data[0 len calldata.size]
+          if amount > allowance[address(sender)][mem[calldata.size + ceil32(return_data.size) + ceil32(calldata.size) + 401 len 20]]:
+              mem[ceil32(return_data.size) + (2 * ceil32(calldata.size)) + 425] = 32
+              mem[ceil32(return_data.size) + (2 * ceil32(calldata.size)) + 457] = 40
+              mem[ceil32(return_data.size) + (2 * ceil32(calldata.size)) + 489 len 64] = 0x5245524332303a207472616e7366657220616d6f756e74206578636565647320616c6c6f77616e63, mem[ceil32(return_data.size) + ceil32(calldata.size) + 365 len 24]
+              mem[ceil32(return_data.size) + (2 * ceil32(calldata.size)) + 521] = uint64(calldata.size)
+              revert with 0, 
+                          32,
+                          40,
+                          0x5245524332303a207472616e7366657220616d6f756e74206578636565647320616c6c6f77616e63,
+                          mem[ceil32(return_data.size) + ceil32(calldata.size) + 365 len 24],
+                          uint64(calldata.size)
+          if not sender:
+              revert with 0, 
+                          32,
+                          36,
+                          0x6845524332303a20617070726f76652066726f6d20746865207a65726f20616464726573,
+                          mem[ceil32(return_data.size) + (2 * ceil32(calldata.size)) + 525 len 28]
+          if not mem[calldata.size + ceil32(return_data.size) + 273 len 20]:
+              revert with 0, 
+                          32,
+                          34,
+                          0x2945524332303a20617070726f766520746f20746865207a65726f20616464726573,
+                          mem[ceil32(return_data.size) + (2 * ceil32(calldata.size)) + 523 len 30]
+          if sender == caller:
+              require ext_code.size(0x7069f8cea562778bde0bac8f512d3f6b73e1e7f4)
+              static call 0x7069f8cea562778bde0bac8f512d3f6b73e1e7f4.DEFAULT_ADMIN_ROLE() with:
+                      gas gas_remaining wei
+              if not ext_call.success:
+                  revert with ext_call.return_data[0 len return_data.size]
+              require return_data.size >= 32
+          allowance[address(sender)][address(mem[calldata.size + ceil32(return_data.size) + 261])] = allowance[address(sender)][mem[calldata.size + ceil32(return_data.size) + ceil32(calldata.size) + 401 len 20]] - amount
+          log Approval(
+                address owner=(allowance[address(sender)][mem[calldata.size + ceil32(return_data.size) + ceil32(calldata.size) + 401 len 20]] - amount),
+                address spender=sender,
+                uint256 value=mem[calldata.size + ceil32(return_data.size) + 273 len 20])
+  return 1
+
+

@@ -1,0 +1,1047 @@
+# Palkeoramix decompiler. 
+
+const totalSupply = 100000000000 * 10^18
+const decimals = 18
+const oldRSR = 0x8762db106b2c2a0bccb3a80d1ed41273552616e8
+const WEIGHT_ONE = 10^18
+
+def storage:
+  paused is uint8 at storage 0
+  owner is address at storage 0 offset 8
+  mageAddress is address at storage 1
+  stor2 is mapping of uint256 at storage 2
+  stor3 is mapping of uint256 at storage 3
+  stor4 is uint256 at storage 4
+  stor5 is array of struct at storage 5
+  stor6 is array of struct at storage 6
+  nonces is mapping of uint256 at storage 7
+  phase is uint8 at storage 8
+  pauserAddress is address at storage 8 offset 8
+  weights is mapping of struct at storage 9
+  stor10 is mapping of uint8 at storage 10
+  stor11 is array of struct at storage 11
+  stor12 is mapping of uint8 at storage 12
+  stor13 is mapping of uint8 at storage 13
+
+def balCrossed(address _param1) payable: 
+  require calldata.size - 4 >=′ 32
+  require _param1 == _param1
+  return bool(stor12[_param1])
+
+def allowanceCrossed(address _param1, address _param2) payable: 
+  require calldata.size - 4 >=′ 64
+  require _param1 == _param1
+  require _param2 == _param2
+  return bool(stor13[_param1][_param2])
+
+def paused() payable: 
+  return bool(paused)
+
+def weights(address _param1, address _param2) payable: 
+  require calldata.size - 4 >=′ 64
+  require _param1 == _param1
+  require _param2 == _param2
+  return uint64(weights[_param1][_param2].field_0)
+
+def nonces(address _param1) payable: 
+  require calldata.size - 4 >=′ 32
+  require _param1 == _param1
+  return nonces[address(_param1)]
+
+def hasWeights(address _param1) payable: 
+  require calldata.size - 4 >=′ 32
+  require _param1 == _param1
+  return bool(stor10[_param1])
+
+def owner() payable: 
+  return owner
+
+def pauser() payable: 
+  return pauserAddress
+
+def phase() payable: 
+  if phase >= 2:
+      revert with Panic(33)  # If you convert a value that is too big or negative into an enum type.
+  return phase
+
+def mage() payable: 
+  return mageAddress
+
+#
+#  Regular functions
+#
+
+def _fallback(?) payable: # default function
+  revert
+
+def renounceOwnership() payable: 
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  owner = 0
+  log OwnershipTransferred(
+        address previousOwner=owner,
+        address newOwner=0)
+
+def renouncePauser() payable: 
+  if pauserAddress != caller:
+      if mageAddress != caller:
+          if owner != caller:
+              revert with 0, 'only pauser, mage, or owner'
+  log PauserChanged(
+        address previousPauser=0,
+        address newPauser=pauserAddress)
+  pauserAddress = 0
+
+def pause() payable: 
+  if pauserAddress != caller:
+      if mageAddress != caller:
+          if owner != caller:
+              revert with 0, 'only pauser, mage, or owner'
+  if phase > 1:
+      revert with Panic(33)  # If you convert a value that is too big or negative into an enum type.
+  if phase != 1:
+      revert with 0, 'only during working phase'
+  if paused:
+      revert with 0, 'Pausable: paused'
+  paused = 1
+  log Paused(address account=caller)
+
+def unpause() payable: 
+  if pauserAddress != caller:
+      if mageAddress != caller:
+          if owner != caller:
+              revert with 0, 'only pauser, mage, or owner'
+  if phase > 1:
+      revert with Panic(33)  # If you convert a value that is too big or negative into an enum type.
+  if phase != 1:
+      revert with 0, 'only during working phase'
+  if not paused:
+      revert with 0, 'Pausable: not paused'
+  paused = 0
+  log Unpaused(address account=caller)
+
+def transferOwnership(address newOwner) payable: 
+  require calldata.size - 4 >=′ 32
+  require newOwner == newOwner
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  if not newOwner:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'Ownable: new owner is the zero address'
+  owner = newOwner
+  log OwnershipTransferred(
+        address previousOwner=owner,
+        address newOwner=newOwner)
+
+def changePauser(address newPauser) payable: 
+  require calldata.size - 4 >=′ 32
+  require newPauser == newPauser
+  if pauserAddress != caller:
+      if mageAddress != caller:
+          if owner != caller:
+              revert with 0, 'only pauser, mage, or owner'
+  if not newPauser:
+      revert with 0, 'use renouncePauser'
+  log PauserChanged(
+        address previousPauser=newPauser,
+        address newPauser=pauserAddress)
+  pauserAddress = newPauser
+
+def DOMAIN_SEPARATOR() payable: 
+  if this.address != 0x320623b8e4ff03373931769a31fc52a4e78b5d70:
+      return sha3(0x8b73c3c69bb8fe3d512ecc4cf759cc79239f7b179b0ffacaa9a75d522b39400f, 0xf0432dd353091b2639c193d4a7cd6e15e40d9d9c04fe280c7c530d929480e782, 0xc89efdaa54c0f20c7adf612882df0950f5a951637e0307cdcb4c672f298b8bc6, chainid, this.address)
+  if 1 != chainid:
+      return sha3(0x8b73c3c69bb8fe3d512ecc4cf759cc79239f7b179b0ffacaa9a75d522b39400f, 0xf0432dd353091b2639c193d4a7cd6e15e40d9d9c04fe280c7c530d929480e782, 0xc89efdaa54c0f20c7adf612882df0950f5a951637e0307cdcb4c672f298b8bc6, chainid, this.address)
+  return 0x9f8c51bd66d73da0099b2b055d0e925e241e9ea0e86b4ab43836e79a2a92a6df
+
+def castSpell(address spell) payable: 
+  require calldata.size - 4 >=′ 32
+  require spell == spell
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  log MageChanged(
+        address oldMage=mageAddress,
+        address newMage=spell)
+  mageAddress = spell
+  require ext_code.size(spell)
+  call spell.cast() with:
+       gas gas_remaining wei
+  if not ext_call.success:
+      revert with ext_call.return_data[0 len return_data.size]
+  log MageChanged(
+        address oldMage=mageAddress,
+        address newMage=0)
+  mageAddress = 0
+  log SpellCast(address addr=spell)
+
+def approve(address spender, uint256 amount) payable: 
+  require calldata.size - 4 >=′ 64
+  require spender == spender
+  if paused:
+      revert with 0, 'Pausable: paused'
+  if not caller:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: approve from the zero address'
+  if not spender:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: approve to the zero address'
+  stor3[caller][address(spender)] = amount
+  log Approval(
+        address owner=amount,
+        address spender=caller,
+        uint256 value=spender)
+  stor13[caller][address(spender)] = 1
+  return 1
+
+def allowance(address owner, address spender) payable: 
+  require calldata.size - 4 >=′ 64
+  require owner == owner
+  require spender == spender
+  if stor13[address(owner)][address(spender)]:
+      return stor3[address(owner)][address(spender)]
+  require ext_code.size(0x8762db106b2c2a0bccb3a80d1ed41273552616e8)
+  static call 0x8762db106b2c2a0bccb3a80d1ed41273552616e8.allowance(address owner, address spender) with:
+          gas gas_remaining wei
+         args address(owner), spender
+  if not ext_call.success:
+      revert with ext_call.return_data[0 len return_data.size]
+  require return_data.size >=′ 32
+  return ext_call.return_data[0]
+
+def moveToWorking() payable: 
+  if mageAddress != caller:
+      if owner != caller:
+          revert with 0, 'only mage or owner'
+  if phase > 1:
+      revert with Panic(33)  # If you convert a value that is too big or negative into an enum type.
+  if phase:
+      revert with 0, 'only during setup phase'
+  require ext_code.size(0x8762db106b2c2a0bccb3a80d1ed41273552616e8)
+  static call 0x8762db106b2c2a0bccb3a80d1ed41273552616e8.paused() with:
+          gas gas_remaining wei
+  if not ext_call.success:
+      revert with ext_call.return_data[0 len return_data.size]
+  require return_data.size >=′ 32
+  require ext_call.return_data[0] == bool(ext_call.return_data[0])
+  if not ext_call.return_data[0]:
+      revert with 0, 'waiting for oldRSR to pause'
+  phase = 1
+  if not paused:
+      revert with 0, 'Pausable: not paused'
+  paused = 0
+  log Unpaused(address account=caller)
+  owner = 0
+  log OwnershipTransferred(
+        address previousOwner=owner,
+        address newOwner=0)
+
+def decreaseAllowance(address spender, uint256 subtractedValue) payable: 
+  require calldata.size - 4 >=′ 64
+  require spender == spender
+  if paused:
+      revert with 0, 'Pausable: paused'
+  if stor13[caller][address(spender)]:
+      if stor3[caller][address(spender)] < subtractedValue:
+          revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: decreased allowance below zero'
+      if not caller:
+          revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: approve from the zero address'
+      if not spender:
+          revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: approve to the zero address'
+  else:
+      stor13[caller][address(spender)] = 1
+      require ext_code.size(0x8762db106b2c2a0bccb3a80d1ed41273552616e8)
+      static call 0x8762db106b2c2a0bccb3a80d1ed41273552616e8.allowance(address owner, address spender) with:
+              gas gas_remaining wei
+             args caller, spender
+      if not ext_call.success:
+          revert with ext_call.return_data[0 len return_data.size]
+      require return_data.size >=′ 32
+      if not caller:
+          revert with 0, 'ERC20: approve from the zero address'
+      if not spender:
+          revert with 0, 'ERC20: approve to the zero address'
+      stor3[caller][address(spender)] = ext_call.return_data[0]
+      log Approval(
+            address owner=ext_call.return_data[0],
+            address spender=caller,
+            uint256 value=spender)
+      if stor3[caller][address(spender)] < subtractedValue:
+          revert with 0, 'ERC20: decreased allowance below zero'
+      if not caller:
+          revert with 0, 'ERC20: approve from the zero address'
+      if not spender:
+          revert with 0, 'ERC20: approve to the zero address'
+  ('bool', ('param', 'spender'))
+  stor3[caller][address(spender)] = stor3[caller][address(spender)] - subtractedValue
+  log Approval(
+        address owner=(stor3[caller][address(spender)] - subtractedValue),
+        address spender=caller,
+        uint256 value=spender)
+  return 1
+
+def increaseAllowance(address spender, uint256 addedValue) payable: 
+  require calldata.size - 4 >=′ 64
+  require spender == spender
+  if paused:
+      revert with 0, 'Pausable: paused'
+  if stor13[caller][address(spender)]:
+      if stor3[caller][address(spender)] > !addedValue:
+          revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+      if not caller:
+          revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: approve from the zero address'
+      if not spender:
+          revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: approve to the zero address'
+  else:
+      stor13[caller][address(spender)] = 1
+      require ext_code.size(0x8762db106b2c2a0bccb3a80d1ed41273552616e8)
+      static call 0x8762db106b2c2a0bccb3a80d1ed41273552616e8.allowance(address owner, address spender) with:
+              gas gas_remaining wei
+             args caller, spender
+      if not ext_call.success:
+          revert with ext_call.return_data[0 len return_data.size]
+      require return_data.size >=′ 32
+      if not caller:
+          revert with 0, 'ERC20: approve from the zero address'
+      if not spender:
+          revert with 0, 'ERC20: approve to the zero address'
+      stor3[caller][address(spender)] = ext_call.return_data[0]
+      log Approval(
+            address owner=ext_call.return_data[0],
+            address spender=caller,
+            uint256 value=spender)
+      if stor3[caller][address(spender)] > !addedValue:
+          revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+      if not caller:
+          revert with 0, 'ERC20: approve from the zero address'
+      if not spender:
+          revert with 0, 'ERC20: approve to the zero address'
+  ('bool', ('param', 'spender'))
+  stor3[caller][address(spender)] = stor3[caller][address(spender)] + addedValue
+  log Approval(
+        address owner=(stor3[caller][address(spender)] + addedValue),
+        address spender=caller,
+        uint256 value=spender)
+  return 1
+
+def permit(address owner, address spender, uint256 value, uint256 deadline, uint8 v, bytes32 r, bytes32 s) payable: 
+  require calldata.size - 4 >=′ 224
+  require owner == owner
+  require spender == spender
+  require v == v
+  if paused:
+      revert with 0, 'Pausable: paused'
+  if block.timestamp > deadline:
+      revert with 0, 'ERC20Permit: expired deadline'
+  nonces[address(owner)]++
+  if s > 0x7fffffffffffffffffffffffffffffff5d576e7357a4501ddfe92f46681b20a0:
+      revert with 0, 'ECDSA: invalid signature 's' value'
+  if v != 27:
+      if v != 28:
+          revert with 0, 'ECDSA: invalid signature 'v' value'
+  if this.address != 0x320623b8e4ff03373931769a31fc52a4e78b5d70:
+      signer = erecover(sha3(0, sha3(0x8b73c3c69bb8fe3d512ecc4cf759cc79239f7b179b0ffacaa9a75d522b39400f, 0xf0432dd353091b2639c193d4a7cd6e15e40d9d9c04fe280c7c530d929480e782, 0xc89efdaa54c0f20c7adf612882df0950f5a951637e0307cdcb4c672f298b8bc6, chainid, this.address), sha3(0x6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9, address(owner), address(spender), value, nonces[address(owner)], deadline)), v << 248, r, s) # precompiled
+  else:
+      if 1 != chainid:
+          signer = erecover(sha3(0, sha3(0x8b73c3c69bb8fe3d512ecc4cf759cc79239f7b179b0ffacaa9a75d522b39400f, 0xf0432dd353091b2639c193d4a7cd6e15e40d9d9c04fe280c7c530d929480e782, 0xc89efdaa54c0f20c7adf612882df0950f5a951637e0307cdcb4c672f298b8bc6, chainid, this.address), sha3(0x6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9, address(owner), address(spender), value, nonces[address(owner)], deadline)), v << 248, r, s) # precompiled
+      else:
+          signer = erecover(sha3(0, 0x9f8c51bd66d73da0099b2b055d0e925e241e9ea0e86b4ab43836e79a2a92a6df, sha3(0x6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9, address(owner), address(spender), value, nonces[address(owner)], deadline)), v << 248, r, s) # precompiled
+  if not erecover.result:
+      revert with ext_call.return_data[0 len return_data.size]
+  if not address(signer):
+      revert with 0, 'ECDSA: invalid signature'
+  if address(signer) != owner:
+      revert with 0, 'ERC20Permit: invalid signature'
+  if not owner:
+      revert with 0, 'ERC20: approve from the zero address'
+  if not spender:
+      revert with 0, 'ERC20: approve to the zero address'
+  stor3[address(owner)][address(spender)] = value
+  log Approval(
+        address owner=value,
+        address spender=owner,
+        uint256 value=spender)
+  stor13[address(owner)][address(spender)] = 1
+
+def balanceOf(address account) payable: 
+  mem[64] = 96
+  require calldata.size - 4 >=′ 32
+  require account == account
+  if stor12[address(account)]:
+      return stor2[address(account)]
+  if stor10[address(account)]:
+      if var45002 >= var45001:
+          if var45003 > !stor2[address(account)]:
+              revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+          return (var45003 + stor2[address(account)])
+      if var51001 >= stor[var51002]:
+          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+      mem[0] = account
+      mem[32] = sha3(address(var57001), 9)
+      mem[96] = 0x70a0823100000000000000000000000000000000000000000000000000000000
+      mem[100] = address(var57001)
+      require ext_code.size(0x8762db106b2c2a0bccb3a80d1ed41273552616e8)
+      static call 0x8762db106b2c2a0bccb3a80d1ed41273552616e8.mem[var59003 len 4] with:
+              gas gas_remaining wei
+             args mem[var59003 + 4 len var59004 - 4]
+      if not ext_call.success:
+          revert with ext_call.return_data[0 len return_data.size]
+      require var63002 - var63001 >=′ 32
+      if var69001 and var69002 > -1 / var69001:
+          revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+  else:
+      mem[100] = account
+      require ext_code.size(0x8762db106b2c2a0bccb3a80d1ed41273552616e8)
+      static call 0x8762db106b2c2a0bccb3a80d1ed41273552616e8.balanceOf(address account) with:
+              gas gas_remaining wei
+             args account
+      mem[96] = ext_call.return_data[0]
+      if not ext_call.success:
+          revert with ext_call.return_data[0 len return_data.size]
+      mem[64] = ceil32(return_data.size) + 96
+      require return_data.size >=′ 32
+      if var51002 >= var51001:
+          if var51003 > !stor2[address(account)]:
+              revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+          return (var51003 + stor2[address(account)])
+      if var57001 >= stor[var57002]:
+          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+      mem[0] = account
+      mem[32] = sha3(address(var63001), 9)
+      mem[ceil32(return_data.size) + 96] = 0x70a0823100000000000000000000000000000000000000000000000000000000
+      mem[ceil32(return_data.size) + 100] = address(var63001)
+      require ext_code.size(0x8762db106b2c2a0bccb3a80d1ed41273552616e8)
+      static call 0x8762db106b2c2a0bccb3a80d1ed41273552616e8.mem[var65003 len 4] with:
+              gas gas_remaining wei
+             args mem[var65003 + 4 len var65004 - 4]
+      if not ext_call.success:
+          revert with ext_call.return_data[0 len return_data.size]
+      require var69002 - var69001 >=′ 32
+      if var75001 and var75002 > -1 / var75001:
+          revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+  ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+
+def siphon(address from, address oldTo, address newTo, uint64 weight) payable: 
+  require calldata.size - 4 >=′ 128
+  require from == from
+  require oldTo == oldTo
+  require newTo == newTo
+  require weight == weight
+  if mageAddress != caller:
+      if owner != caller:
+          revert with 0, 'only mage or owner'
+  if phase > 1:
+      revert with Panic(33)  # If you convert a value that is too big or negative into an enum type.
+  if phase:
+      revert with 0, 'only during setup phase'
+  if not stor10[address(from)]:
+      if not stor11[address(from)][1][address(from)].field_0:
+          stor11[address(from)].field_0++
+          address(stor11[address(from)][stor11[address(from)].field_0].field_0) = from
+          Mask(96, 0, stor11[address(from)][stor11[address(from)].field_0].field_160) = 0
+          stor11[address(from)][1][address(from)].field_0 = stor11[address(from)].field_0
+      uint16(weights[address(from)][address(from)].field_0) = 0
+      weights[address(from)][address(from)].field_16 % unknown10000000() = 15258789062500
+      stor10[address(from)] = 1
+  if weight > uint64(weights[address(from)][address(oldTo)].field_0):
+      revert with 0, 'weight too big'
+  if not from:
+      revert with 0, 'from cannot be zero address'
+  if uint64(weights[address(from)][address(oldTo)].field_0) < weight:
+      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+  uint64(weights[address(from)][address(oldTo)].field_0) = uint64(uint64(weights[address(from)][address(oldTo)].field_0) - weight)
+  if uint64(weights[address(from)][address(newTo)].field_0) > -weight + LOCK8605463013():
+      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+  uint64(weights[address(from)][address(newTo)].field_0) = uint64(weight + uint64(weights[address(from)][address(newTo)].field_0))
+  if not stor11[address(newTo)][1][address(from)].field_0:
+      stor11[address(newTo)].field_0++
+      address(stor11[address(newTo)][stor11[address(newTo)].field_0].field_0) = from
+      Mask(96, 0, stor11[address(newTo)][stor11[address(newTo)].field_0].field_160) = 0
+      stor11[address(newTo)][1][address(from)].field_0 = stor11[address(newTo)].field_0
+
+def transfer(address recipient, uint256 amount) payable: 
+  mem[64] = 96
+  require calldata.size - 4 >=′ 64
+  require recipient == recipient
+  if paused:
+      revert with 0, 'Pausable: paused'
+  if stor12[caller]:
+      if this.address == recipient:
+          revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'no transfers to this token address'
+      if not caller:
+          revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: transfer from the zero address'
+      if not recipient:
+          revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: transfer to the zero address'
+      if stor2[caller] < amount:
+          revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: transfer amount exceeds balance'
+  else:
+      stor12[caller] = 1
+      if stor10[caller]:
+          if var46002 < var46001:
+              if var52001 >= stor[var52002]:
+                  revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+              mem[0] = caller
+              mem[32] = sha3(address(var58001), 9)
+              mem[96] = 0x70a0823100000000000000000000000000000000000000000000000000000000
+              mem[100] = address(var58001)
+              require ext_code.size(0x8762db106b2c2a0bccb3a80d1ed41273552616e8)
+              static call 0x8762db106b2c2a0bccb3a80d1ed41273552616e8.mem[var60003 len 4] with:
+                      gas gas_remaining wei
+                     args mem[var60003 + 4 len var60004 - 4]
+              if not ext_call.success:
+                  revert with ext_call.return_data[0 len return_data.size]
+              require var64002 - var64001 >=′ 32
+              if var70001 and var70002 > -1 / var70001:
+                  revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+              ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+          if not caller:
+              revert with 0, 'ERC20: mint to the zero address'
+          if stor4 > !var46003:
+              revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+          stor4 += var46003
+          if stor2[caller] > !var46003:
+              revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+          stor2[caller] += var46003
+          log Transfer(
+                address from=var46003,
+                address to=0,
+                uint256 value=caller)
+          if this.address == recipient:
+              revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'no transfers to this token address'
+          if not caller:
+              revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: transfer from the zero address'
+          if not recipient:
+              revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: transfer to the zero address'
+          if stor2[caller] < amount:
+              revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: transfer amount exceeds balance'
+      else:
+          mem[100] = caller
+          require ext_code.size(0x8762db106b2c2a0bccb3a80d1ed41273552616e8)
+          static call 0x8762db106b2c2a0bccb3a80d1ed41273552616e8.balanceOf(address account) with:
+                  gas gas_remaining wei
+                 args caller
+          mem[96] = ext_call.return_data[0]
+          if not ext_call.success:
+              revert with ext_call.return_data[0 len return_data.size]
+          mem[64] = ceil32(return_data.size) + 96
+          require return_data.size >=′ 32
+          if var52002 < var52001:
+              if var58001 >= stor[var58002]:
+                  revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+              mem[0] = caller
+              mem[32] = sha3(address(var64001), 9)
+              mem[ceil32(return_data.size) + 96] = 0x70a0823100000000000000000000000000000000000000000000000000000000
+              mem[ceil32(return_data.size) + 100] = address(var64001)
+              require ext_code.size(0x8762db106b2c2a0bccb3a80d1ed41273552616e8)
+              static call 0x8762db106b2c2a0bccb3a80d1ed41273552616e8.mem[var66003 len 4] with:
+                      gas gas_remaining wei
+                     args mem[var66003 + 4 len var66004 - 4]
+              if not ext_call.success:
+                  revert with ext_call.return_data[0 len return_data.size]
+              require var70002 - var70001 >=′ 32
+              if var76001 and var76002 > -1 / var76001:
+                  revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+              ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+          if not caller:
+              revert with 0, 'ERC20: mint to the zero address'
+          if stor4 > !var52003:
+              revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+          stor4 += var52003
+          if stor2[caller] > !var52003:
+              revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+          stor2[caller] += var52003
+          log Transfer(
+                address from=var52003,
+                address to=0,
+                uint256 value=caller)
+          if this.address == recipient:
+              revert with 0, 'no transfers to this token address'
+          if not caller:
+              revert with 0, 'ERC20: transfer from the zero address'
+          if not recipient:
+              revert with 0, 'ERC20: transfer to the zero address'
+          if stor2[caller] < amount:
+              revert with 0, 'ERC20: transfer amount exceeds balance'
+  ('ge', ('stor', ('map', ('mask_shl', 160, 0, 0, 'caller'), ('name', 'stor2', 2))), ('param', 'amount'))
+  stor2[caller] -= amount
+  if stor2[recipient] > !amount:
+      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+  stor2[recipient] += amount
+  log Transfer(
+        address from=amount,
+        address to=caller,
+        uint256 value=recipient)
+  return 1
+
+def name() payable: 
+  if bool(stor5.length):
+      if bool(stor5.length) == uint255(stor5.length) * 0.5 < 32:
+          revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+      if bool(stor5.length):
+          if bool(stor5.length) == uint255(stor5.length) * 0.5 < 32:
+              revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+          if Mask(256, -1, stor5.length):
+              if 31 < uint255(stor5.length) * 0.5:
+                  mem[128] = uint256(stor5.field_0)
+                  idx = 128
+                  s = 0
+                  while (uint255(stor5.length) * 0.5) + 96 > idx:
+                      mem[idx + 32] = stor5[s].field_256
+                      idx = idx + 32
+                      s = s + 1
+                      continue 
+                  return Array(len=2 * Mask(256, -1, stor5.length), data=mem[128 len ceil32(uint255(stor5.length) * 0.5)])
+              mem[128] = 256 * Mask(248, 0, stor5.length.field_8)
+      else:
+          if bool(stor5.length) == stor5.length.field_1 % 128 < 32:
+              revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+          if stor5.length.field_1 % 128:
+              if 31 < stor5.length.field_1 % 128:
+                  mem[128] = uint256(stor5.field_0)
+                  idx = 128
+                  s = 0
+                  while stor5.length.field_1 % 128 + 96 > idx:
+                      mem[idx + 32] = stor5[s].field_256
+                      idx = idx + 32
+                      s = s + 1
+                      continue 
+                  return Array(len=2 * Mask(256, -1, stor5.length), data=mem[128 len ceil32(uint255(stor5.length) * 0.5)])
+              mem[128] = 256 * Mask(248, 0, stor5.length.field_8)
+      mem[ceil32(uint255(stor5.length) * 0.5) + 192 len ceil32(uint255(stor5.length) * 0.5)] = mem[128 len ceil32(uint255(stor5.length) * 0.5)]
+      if ceil32(uint255(stor5.length) * 0.5) > uint255(stor5.length) * 0.5:
+          mem[ceil32(uint255(stor5.length) * 0.5) + (uint255(stor5.length) * 0.5) + 192] = 0
+      return Array(len=2 * Mask(256, -1, stor5.length), data=mem[128 len ceil32(uint255(stor5.length) * 0.5)], mem[(2 * ceil32(uint255(stor5.length) * 0.5)) + 192 len 2 * ceil32(uint255(stor5.length) * 0.5)]), 
+  if bool(stor5.length) == stor5.length.field_1 % 128 < 32:
+      revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+  if bool(stor5.length):
+      if bool(stor5.length) == uint255(stor5.length) * 0.5 < 32:
+          revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+      if Mask(256, -1, stor5.length):
+          if 31 < uint255(stor5.length) * 0.5:
+              mem[128] = uint256(stor5.field_0)
+              idx = 128
+              s = 0
+              while (uint255(stor5.length) * 0.5) + 96 > idx:
+                  mem[idx + 32] = stor5[s].field_256
+                  idx = idx + 32
+                  s = s + 1
+                  continue 
+              return Array(len=stor5.length % 128, data=mem[128 len ceil32(stor5.length.field_1 % 128)])
+          mem[128] = 256 * Mask(248, 0, stor5.length.field_8)
+  else:
+      if bool(stor5.length) == stor5.length.field_1 % 128 < 32:
+          revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+      if stor5.length.field_1 % 128:
+          if 31 < stor5.length.field_1 % 128:
+              mem[128] = uint256(stor5.field_0)
+              idx = 128
+              s = 0
+              while stor5.length.field_1 % 128 + 96 > idx:
+                  mem[idx + 32] = stor5[s].field_256
+                  idx = idx + 32
+                  s = s + 1
+                  continue 
+              return Array(len=stor5.length % 128, data=mem[128 len ceil32(stor5.length.field_1 % 128)])
+          mem[128] = 256 * Mask(248, 0, stor5.length.field_8)
+  mem[ceil32(stor5.length.field_1 % 128) + 192 len ceil32(stor5.length.field_1 % 128)] = mem[128 len ceil32(stor5.length.field_1 % 128)]
+  if ceil32(stor5.length.field_1 % 128) > stor5.length.field_1 % 128:
+      mem[ceil32(stor5.length.field_1 % 128) + stor5.length.field_1 % 128 + 192] = 0
+  return Array(len=stor5.length % 128, data=mem[128 len ceil32(stor5.length.field_1 % 128)], mem[(2 * ceil32(stor5.length.field_1 % 128)) + 192 len 2 * ceil32(stor5.length.field_1 % 128)]), 
+
+def symbol() payable: 
+  if bool(stor6.length):
+      if bool(stor6.length) == uint255(stor6.length) * 0.5 < 32:
+          revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+      if bool(stor6.length):
+          if bool(stor6.length) == uint255(stor6.length) * 0.5 < 32:
+              revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+          if Mask(256, -1, stor6.length):
+              if 31 < uint255(stor6.length) * 0.5:
+                  mem[128] = uint256(stor6.field_0)
+                  idx = 128
+                  s = 0
+                  while (uint255(stor6.length) * 0.5) + 96 > idx:
+                      mem[idx + 32] = stor6[s].field_256
+                      idx = idx + 32
+                      s = s + 1
+                      continue 
+                  return Array(len=2 * Mask(256, -1, stor6.length), data=mem[128 len ceil32(uint255(stor6.length) * 0.5)])
+              mem[128] = 256 * Mask(248, 0, stor6.length.field_8)
+      else:
+          if bool(stor6.length) == stor6.length.field_1 % 128 < 32:
+              revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+          if stor6.length.field_1 % 128:
+              if 31 < stor6.length.field_1 % 128:
+                  mem[128] = uint256(stor6.field_0)
+                  idx = 128
+                  s = 0
+                  while stor6.length.field_1 % 128 + 96 > idx:
+                      mem[idx + 32] = stor6[s].field_256
+                      idx = idx + 32
+                      s = s + 1
+                      continue 
+                  return Array(len=2 * Mask(256, -1, stor6.length), data=mem[128 len ceil32(uint255(stor6.length) * 0.5)])
+              mem[128] = 256 * Mask(248, 0, stor6.length.field_8)
+      mem[ceil32(uint255(stor6.length) * 0.5) + 192 len ceil32(uint255(stor6.length) * 0.5)] = mem[128 len ceil32(uint255(stor6.length) * 0.5)]
+      if ceil32(uint255(stor6.length) * 0.5) > uint255(stor6.length) * 0.5:
+          mem[ceil32(uint255(stor6.length) * 0.5) + (uint255(stor6.length) * 0.5) + 192] = 0
+      return Array(len=2 * Mask(256, -1, stor6.length), data=mem[128 len ceil32(uint255(stor6.length) * 0.5)], mem[(2 * ceil32(uint255(stor6.length) * 0.5)) + 192 len 2 * ceil32(uint255(stor6.length) * 0.5)]), 
+  if bool(stor6.length) == stor6.length.field_1 % 128 < 32:
+      revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+  if bool(stor6.length):
+      if bool(stor6.length) == uint255(stor6.length) * 0.5 < 32:
+          revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+      if Mask(256, -1, stor6.length):
+          if 31 < uint255(stor6.length) * 0.5:
+              mem[128] = uint256(stor6.field_0)
+              idx = 128
+              s = 0
+              while (uint255(stor6.length) * 0.5) + 96 > idx:
+                  mem[idx + 32] = stor6[s].field_256
+                  idx = idx + 32
+                  s = s + 1
+                  continue 
+              return Array(len=stor6.length % 128, data=mem[128 len ceil32(stor6.length.field_1 % 128)])
+          mem[128] = 256 * Mask(248, 0, stor6.length.field_8)
+  else:
+      if bool(stor6.length) == stor6.length.field_1 % 128 < 32:
+          revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+      if stor6.length.field_1 % 128:
+          if 31 < stor6.length.field_1 % 128:
+              mem[128] = uint256(stor6.field_0)
+              idx = 128
+              s = 0
+              while stor6.length.field_1 % 128 + 96 > idx:
+                  mem[idx + 32] = stor6[s].field_256
+                  idx = idx + 32
+                  s = s + 1
+                  continue 
+              return Array(len=stor6.length % 128, data=mem[128 len ceil32(stor6.length.field_1 % 128)])
+          mem[128] = 256 * Mask(248, 0, stor6.length.field_8)
+  mem[ceil32(stor6.length.field_1 % 128) + 192 len ceil32(stor6.length.field_1 % 128)] = mem[128 len ceil32(stor6.length.field_1 % 128)]
+  if ceil32(stor6.length.field_1 % 128) > stor6.length.field_1 % 128:
+      mem[ceil32(stor6.length.field_1 % 128) + stor6.length.field_1 % 128 + 192] = 0
+  return Array(len=stor6.length % 128, data=mem[128 len ceil32(stor6.length.field_1 % 128)], mem[(2 * ceil32(stor6.length.field_1 % 128)) + 192 len 2 * ceil32(stor6.length.field_1 % 128)]), 
+
+def partiallyCross(address to, uint256 n) payable: 
+  mem[64] = 96
+  require calldata.size - 4 >=′ 64
+  require to == to
+  if phase > 1:
+      revert with Panic(33)  # If you convert a value that is too big or negative into an enum type.
+  if phase != 1:
+      revert with 0, 'only during working phase'
+  if not stor12[address(to)]:
+      mem[0] = to
+      mem[32] = 11
+      if var75001 > 0:
+          s = var75001 > 0
+          s = var75003
+          while var78001:
+              if stor11[address(to)].field_0 < 1:
+                  revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+              if stor11[address(to)].field_0 - 1 >= stor11[address(to)].field_0:
+                  revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+              mem[0] = to
+              mem[32] = sha3(address(stor11[address(to)][stor11[address(to)].field_0].field_0), 9)
+              mem[mem[64] + 4] = address(stor11[address(to)][stor11[address(to)].field_0].field_0)
+              require ext_code.size(0x8762db106b2c2a0bccb3a80d1ed41273552616e8)
+              static call 0x8762db106b2c2a0bccb3a80d1ed41273552616e8.balanceOf(address account) with:
+                      gas gas_remaining wei
+                     args address(stor11[address(to)][stor11[address(to)].field_0].field_0)
+              mem[mem[64]] = ext_call.return_data[0]
+              if not ext_call.success:
+                  revert with ext_call.return_data[0 len return_data.size]
+              _152 = mem[64]
+              mem[64] = mem[64] + ceil32(return_data.size)
+              require return_data.size >=′ 32
+              if mem[_152] and uint64(weights[address(stor11[address(to)][stor11[address(to)].field_0].field_0)][address(to)].field_0) > -1 / mem[_152]:
+                  revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+              if not to:
+                  revert with 0, 'ERC20: mint to the zero address'
+              if stor4 > !(mem[_152] * uint64(weights[address(stor11[address(to)][stor11[address(to)].field_0].field_0)][address(to)].field_0) / 10^18):
+                  revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+              stor4 += mem[_152] * uint64(weights[address(stor11[address(to)][stor11[address(to)].field_0].field_0)][address(to)].field_0) / 10^18
+              if stor2[address(to)] > !(mem[_152] * uint64(weights[address(stor11[address(to)][stor11[address(to)].field_0].field_0)][address(to)].field_0) / 10^18):
+                  revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+              stor2[address(to)] += mem[_152] * uint64(weights[address(stor11[address(to)][stor11[address(to)].field_0].field_0)][address(to)].field_0) / 10^18
+              mem[mem[64]] = mem[_152] * uint64(weights[address(stor11[address(to)][stor11[address(to)].field_0].field_0)][address(to)].field_0) / 10^18
+              log Transfer(
+                    address from=mem[mem[64]],
+                    address to=0,
+                    uint256 value=to)
+              uint64(weights[address(stor11[address(to)][stor11[address(to)].field_0].field_0)][address(to)].field_0) = 0
+              if stor11[address(to)][1][address(stor11[address(to)][stor11[address(to)].field_0].field_0)].field_0:
+                  if stor11[address(to)][1][address(stor11[address(to)][stor11[address(to)].field_0].field_0)].field_0 < 1:
+                      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+                  if stor11[address(to)].field_0 < 1:
+                      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+                  if stor11[address(to)].field_0 - 1 != stor11[address(to)][1][address(stor11[address(to)][stor11[address(to)].field_0].field_0)].field_0 - 1:
+                      if stor11[address(to)].field_0 - 1 >= stor11[address(to)].field_0:
+                          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                      if stor11[address(to)][1][address(stor11[address(to)][stor11[address(to)].field_0].field_0)].field_0 - 1 >= stor11[address(to)].field_0:
+                          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                      stor11[address(to)][stor11[address(to)][1][address(stor11[address(to)][stor11[address(to)].field_0].field_0)].field_0].field_0 = stor11[address(to)][stor11[address(to)].field_0].field_0
+                      stor11[address(to)][1][stor11[address(to)][stor11[address(to)].field_0].field_0].field_0 = stor11[address(to)][1][address(stor11[address(to)][stor11[address(to)].field_0].field_0)].field_0
+                  if not stor11[address(to)].field_0:
+                      revert with Panic(49)  # If you call .pop() on an empty array.
+                  stor11[address(to)][stor11[address(to)].field_0].field_0 = 0
+                  stor11[address(to)].field_0--
+                  stor11[address(to)][1][address(stor11[address(to)][stor11[address(to)].field_0].field_0)].field_0 = 0
+              if var78002 < 1:
+                  revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+              mem[0] = to
+              mem[32] = 11
+              if stor11[address(to)].field_0 <= 0:
+                  stop
+              s = stor11[address(to)].field_0 > 0
+              s = var78002 - 1
+              continue 
+
+def transferFrom(address sender, address recipient, uint256 amount) payable: 
+  mem[64] = 96
+  require calldata.size - 4 >=′ 96
+  require sender == sender
+  require recipient == recipient
+  if paused:
+      revert with 0, 'Pausable: paused'
+  if stor12[address(sender)]:
+      if stor13[address(sender)][caller]:
+          if this.address == recipient:
+              revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'no transfers to this token address'
+          if not sender:
+              revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: transfer from the zero address'
+          if not recipient:
+              revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: transfer to the zero address'
+          if stor2[address(sender)] < amount:
+              revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: transfer amount exceeds balance'
+          stor2[address(sender)] -= amount
+          if stor2[recipient] > !amount:
+              revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+          stor2[recipient] += amount
+          log Transfer(
+                address from=amount,
+                address to=sender,
+                uint256 value=recipient)
+          if stor3[address(sender)][caller] < amount:
+              revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: transfer amount exceeds allowance'
+          if not sender:
+              revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: approve from the zero address'
+          if not caller:
+              revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: approve to the zero address'
+      else:
+          stor13[address(sender)][caller] = 1
+          require ext_code.size(0x8762db106b2c2a0bccb3a80d1ed41273552616e8)
+          static call 0x8762db106b2c2a0bccb3a80d1ed41273552616e8.allowance(address owner, address spender) with:
+                  gas gas_remaining wei
+                 args address(sender), caller
+          if not ext_call.success:
+              revert with ext_call.return_data[0 len return_data.size]
+          require return_data.size >=′ 32
+          if not sender:
+              revert with 0, 'ERC20: approve from the zero address'
+          if not caller:
+              revert with 0, 'ERC20: approve to the zero address'
+          stor3[address(sender)][caller] = ext_call.return_data[0]
+          log Approval(
+                address owner=ext_call.return_data[0],
+                address spender=sender,
+                uint256 value=caller)
+          if this.address == recipient:
+              revert with 0, 'no transfers to this token address'
+          if not sender:
+              revert with 0, 'ERC20: transfer from the zero address'
+          if not recipient:
+              revert with 0, 'ERC20: transfer to the zero address'
+          if stor2[address(sender)] < amount:
+              revert with 0, 'ERC20: transfer amount exceeds balance'
+          stor2[address(sender)] -= amount
+          if stor2[recipient] > !amount:
+              revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+          stor2[recipient] += amount
+          log Transfer(
+                address from=amount,
+                address to=sender,
+                uint256 value=recipient)
+          if stor3[address(sender)][caller] < amount:
+              revert with 0, 'ERC20: transfer amount exceeds allowance'
+          if not sender:
+              revert with 0, 'ERC20: approve from the zero address'
+          if not caller:
+              revert with 0, 'ERC20: approve to the zero address'
+  else:
+      stor12[address(sender)] = 1
+      if stor10[address(sender)]:
+          if var49002 < var49001:
+              if var55001 >= stor[var55002]:
+                  revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+              mem[0] = sender
+              mem[32] = sha3(address(var61001), 9)
+              mem[96] = 0x70a0823100000000000000000000000000000000000000000000000000000000
+              mem[100] = address(var61001)
+              require ext_code.size(0x8762db106b2c2a0bccb3a80d1ed41273552616e8)
+              static call 0x8762db106b2c2a0bccb3a80d1ed41273552616e8.mem[var63003 len 4] with:
+                      gas gas_remaining wei
+                     args mem[var63003 + 4 len var63004 - 4]
+              if not ext_call.success:
+                  revert with ext_call.return_data[0 len return_data.size]
+              require var67002 - var67001 >=′ 32
+              ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+          if not sender:
+              revert with 0, 'ERC20: mint to the zero address'
+          if stor4 > !var49003:
+              revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+          stor4 += var49003
+          if stor2[address(sender)] > !var49003:
+              revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+          stor2[address(sender)] += var49003
+          log Transfer(
+                address from=var49003,
+                address to=0,
+                uint256 value=sender)
+          if stor13[address(sender)][caller]:
+              if this.address == recipient:
+                  revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'no transfers to this token address'
+              if not sender:
+                  revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: transfer from the zero address'
+              if not recipient:
+                  revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: transfer to the zero address'
+              if stor2[address(sender)] < amount:
+                  revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: transfer amount exceeds balance'
+              stor2[address(sender)] -= amount
+              if stor2[recipient] > !amount:
+                  revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+              stor2[recipient] += amount
+              log Transfer(
+                    address from=amount,
+                    address to=sender,
+                    uint256 value=recipient)
+              if stor3[address(sender)][caller] < amount:
+                  revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: transfer amount exceeds allowance'
+              if not sender:
+                  revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: approve from the zero address'
+              if not caller:
+                  revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: approve to the zero address'
+          else:
+              stor13[address(sender)][caller] = 1
+              require ext_code.size(0x8762db106b2c2a0bccb3a80d1ed41273552616e8)
+              static call 0x8762db106b2c2a0bccb3a80d1ed41273552616e8.allowance(address owner, address spender) with:
+                      gas gas_remaining wei
+                     args address(sender), caller
+              if not ext_call.success:
+                  revert with ext_call.return_data[0 len return_data.size]
+              require return_data.size >=′ 32
+              if not sender:
+                  revert with 0, 'ERC20: approve from the zero address'
+              if not caller:
+                  revert with 0, 'ERC20: approve to the zero address'
+              stor3[address(sender)][caller] = ext_call.return_data[0]
+              log Approval(
+                    address owner=ext_call.return_data[0],
+                    address spender=sender,
+                    uint256 value=caller)
+              if this.address == recipient:
+                  revert with 0, 'no transfers to this token address'
+              if not sender:
+                  revert with 0, 'ERC20: transfer from the zero address'
+              if not recipient:
+                  revert with 0, 'ERC20: transfer to the zero address'
+              if stor2[address(sender)] < amount:
+                  revert with 0, 'ERC20: transfer amount exceeds balance'
+              stor2[address(sender)] -= amount
+              if stor2[recipient] > !amount:
+                  revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+              stor2[recipient] += amount
+              log Transfer(
+                    address from=amount,
+                    address to=sender,
+                    uint256 value=recipient)
+              if stor3[address(sender)][caller] < amount:
+                  revert with 0, 'ERC20: transfer amount exceeds allowance'
+              if not sender:
+                  revert with 0, 'ERC20: approve from the zero address'
+              if not caller:
+                  revert with 0, 'ERC20: approve to the zero address'
+      else:
+          mem[100] = sender
+          require ext_code.size(0x8762db106b2c2a0bccb3a80d1ed41273552616e8)
+          static call 0x8762db106b2c2a0bccb3a80d1ed41273552616e8.balanceOf(address account) with:
+                  gas gas_remaining wei
+                 args sender
+          mem[96] = ext_call.return_data[0]
+          if not ext_call.success:
+              revert with ext_call.return_data[0 len return_data.size]
+          mem[64] = ceil32(return_data.size) + 96
+          require return_data.size >=′ 32
+          if var55002 < var55001:
+              if var61001 >= stor[var61002]:
+                  revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+              mem[0] = sender
+              mem[32] = sha3(address(var67001), 9)
+              mem[ceil32(return_data.size) + 96] = 0x70a0823100000000000000000000000000000000000000000000000000000000
+              mem[ceil32(return_data.size) + 100] = address(var67001)
+              require ext_code.size(0x8762db106b2c2a0bccb3a80d1ed41273552616e8)
+              static call 0x8762db106b2c2a0bccb3a80d1ed41273552616e8.mem[var69003 len 4] with:
+                      gas gas_remaining wei
+                     args mem[var69003 + 4 len var69004 - 4]
+              if not ext_call.success:
+                  revert with ext_call.return_data[0 len return_data.size]
+              require var73002 - var73001 >=′ 32
+              ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+          if not sender:
+              revert with 0, 'ERC20: mint to the zero address'
+          if stor4 > !var55003:
+              revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+          stor4 += var55003
+          if stor2[address(sender)] > !var55003:
+              revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+          stor2[address(sender)] += var55003
+          log Transfer(
+                address from=var55003,
+                address to=0,
+                uint256 value=sender)
+          if not stor13[address(sender)][caller]:
+              stor13[address(sender)][caller] = 1
+              require ext_code.size(0x8762db106b2c2a0bccb3a80d1ed41273552616e8)
+              static call 0x8762db106b2c2a0bccb3a80d1ed41273552616e8.allowance(address owner, address spender) with:
+                      gas gas_remaining wei
+                     args address(sender), caller
+              if not ext_call.success:
+                  revert with ext_call.return_data[0 len return_data.size]
+              require return_data.size >=′ 32
+              if not sender:
+                  revert with 0, 'ERC20: approve from the zero address'
+              if not caller:
+                  revert with 0, 'ERC20: approve to the zero address'
+              stor3[address(sender)][caller] = ext_call.return_data[0]
+              log Approval(
+                    address owner=ext_call.return_data[0],
+                    address spender=sender,
+                    uint256 value=caller)
+          if this.address == recipient:
+              revert with 0, 'no transfers to this token address'
+          if not sender:
+              revert with 0, 'ERC20: transfer from the zero address'
+          if not recipient:
+              revert with 0, 'ERC20: transfer to the zero address'
+          if stor2[address(sender)] < amount:
+              revert with 0, 'ERC20: transfer amount exceeds balance'
+          stor2[address(sender)] -= amount
+          if stor2[recipient] > !amount:
+              revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+          stor2[recipient] += amount
+          log Transfer(
+                address from=amount,
+                address to=sender,
+                uint256 value=recipient)
+          if stor3[address(sender)][caller] < amount:
+              revert with 0, 'ERC20: transfer amount exceeds allowance'
+          if not sender:
+              revert with 0, 'ERC20: approve from the zero address'
+          if not caller:
+              revert with 0, 'ERC20: approve to the zero address'
+  ('bool', 'caller')
+  stor3[address(sender)][caller] = stor3[address(sender)][caller] - amount
+  log Approval(
+        address owner=(stor3[address(sender)][caller] - amount),
+        address spender=sender,
+        uint256 value=caller)
+  return 1
+
+

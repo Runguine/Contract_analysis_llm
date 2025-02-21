@@ -1,0 +1,1199 @@
+# Palkeoramix decompiler. 
+#
+#  I failed with these: 
+#  - swap(address fromToken, string toToken, string destination, uint256 fromAmount, uint256 minReturnAmount)
+#  All the rest is below.
+#
+
+def storage:
+  stor0 is uint256 at storage 0
+  owner is address at storage 1
+  stor2 is array of struct at storage 2
+  stor3 is array of struct at storage 3
+
+def owner(): # not payable
+  return owner
+
+#
+#  Regular functions
+#
+
+def renounceOwnership(): # not payable
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  owner = 0
+  log OwnershipTransferred(
+        address previousOwner=owner,
+        address newOwner=0)
+
+def transferOwnership(address newOwner): # not payable
+  require calldata.size - 4 >=′ 32
+  require newOwner == newOwner
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  if not newOwner:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'Ownable: new owner is the zero address'
+  owner = newOwner
+  log OwnershipTransferred(
+        address previousOwner=owner,
+        address newOwner=newOwner)
+
+def withdrawETH(address to, uint256 amountOut): # not payable
+  require calldata.size - 4 >=′ 64
+  require to == to
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  if not to:
+      revert with 0, 'DESTINATION_CANNT_BE_0_ADDRESS'
+  if eth.balance(this.address) < amountOut:
+      revert with 0, 'AMOUNT_CANNT_MORE_THAN_BALANCE'
+  call to with:
+     value amountOut wei
+       gas gas_remaining wei
+  if not ext_call.success:
+      revert with 0, 'TransferHelper: ETH_TRANSFER_FAILED'
+  log WithdrawETH(uint256 amount=amountOut)
+
+def withdraw(address token, address recipient, uint256 amount): # not payable
+  require calldata.size - 4 >=′ 96
+  require token == token
+  require recipient == recipient
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  if not recipient:
+      revert with 0, 'DESTINATION_CANNT_BE_0_ADDRESS'
+  if not token:
+      revert with 0, 'TOKEN_MUST_NOT_BE_0'
+  mem[100] = this.address
+  require ext_code.size(token)
+  static call token.balanceOf(address account) with:
+          gas gas_remaining wei
+         args this.address
+  mem[96] = ext_call.return_data[0]
+  if not ext_call.success:
+      revert with ext_call.return_data[0 len return_data.size]
+  require return_data.size >=′ 32
+  if ext_call.return_data[0] < amount:
+      revert with 0, 'AMOUNT_CANNT_MORE_THAN_BALANCE'
+  mem[ceil32(return_data.size) + 96] = 68
+  mem[ceil32(return_data.size) + 132 len 28] = address(recipient) << 64
+  mem[ceil32(return_data.size) + 128 len 4] = transfer(address recipient, uint256 amount)
+  mem[ceil32(return_data.size) + 196 len 96] = transfer(address recipient, uint256 amount), address(recipient) << 64, 0, amount, mem[ceil32(return_data.size) + 196 len 28]
+  call token.mem[ceil32(return_data.size) + 196 len 4] with:
+       gas gas_remaining wei
+      args mem[ceil32(return_data.size) + 200 len 64]
+  if not return_data.size:
+      if not ext_call.success:
+          revert with 0, 'TransferHelper: TRANSFER_FAILED'
+      if ext_call.return_data[0]:
+          require ext_call.return_data[0] >=′ 32
+          require uint32(this.address), mem[132 len 28] == bool(uint32(this.address), mem[132 len 28])
+          if not uint32(this.address), mem[132 len 28]:
+              revert with 0, 'TransferHelper: TRANSFER_FAILED'
+  else:
+      mem[ceil32(return_data.size) + 228 len return_data.size] = ext_call.return_data[0 len return_data.size]
+      if not ext_call.success:
+          revert with 0, 'TransferHelper: TRANSFER_FAILED'
+      if return_data.size:
+          require return_data.size >=′ 32
+          require mem[ceil32(return_data.size) + 228] == bool(mem[ceil32(return_data.size) + 228])
+          if not mem[ceil32(return_data.size) + 228]:
+              revert with 0, 'TransferHelper: TRANSFER_FAILED'
+  log Withdtraw(
+        address token=address(token),
+        uint256 balance=amount)
+
+def swapEth(string toToken, string destination, uint256 minReturnAmount) payable: 
+  require calldata.size - 4 >=′ 96
+  require toToken <= LOCK8605463013()
+  require toToken + 35 <′ calldata.size
+  if toToken.length > LOCK8605463013():
+      revert with 0, 65
+  if ceil32(ceil32(toToken.length)) + 97 < 96 or ceil32(ceil32(toToken.length)) + 97 > LOCK8605463013():
+      revert with 0, 65
+  require toToken + toToken.length + 36 <= calldata.size
+  require destination <= LOCK8605463013()
+  require destination + 35 <′ calldata.size
+  if destination.length > LOCK8605463013():
+      revert with 0, 65
+  if ceil32(ceil32(destination.length)) + 98 < 97 or ceil32(ceil32(toToken.length)) + ceil32(ceil32(destination.length)) + 98 > LOCK8605463013():
+      revert with 0, 65
+  require destination + destination.length + 36 <= calldata.size
+  if stor0 == 2:
+      revert with 0, 'ReentrancyGuard: reentrant call'
+  stor0 = 2
+  if not call.value:
+      revert with 0, 'ETH_AMOUNT_MUST_BE_MORE_THAN_0'
+  if ceil32(toToken.length) <= toToken.length:
+      log SwapEth(
+            string toToken=Array(len=toToken.length, data=Mask(8 * ceil32(toToken.length), -(8 * ceil32(toToken.length)) + 256, toToken[all], Mask(8 * ceil32(toToken.length) - toToken.length, -(8 * ceil32(toToken.length) + -ceil32(ceil32(toToken.length)) + 31) + 256, destination.length) >> -(8 * ceil32(toToken.length) + -ceil32(ceil32(toToken.length)) + 31) + 256) << (8 * ceil32(toToken.length)) - 256, destination.length, Mask(8 * ceil32(destination.length), -(8 * ceil32(destination.length)) + 256, destination[all], Mask(8 * ceil32(destination.length) - destination.length, -(8 * ceil32(destination.length) + -ceil32(ceil32(destination.length)) + 31) + 256, 160) >> -(8 * ceil32(destination.length) + -ceil32(ceil32(destination.length)) + 31) + 256) << (8 * ceil32(destination.length)) - 256),
+            address sender=caller,
+            string destination=ceil32(toToken.length) + 192,
+            uint256 fromAmount=call.value,
+            uint256 minReturnAmount=minReturnAmount)
+  else:
+      mem[ceil32(toToken.length) + ceil32(ceil32(toToken.length)) + ceil32(ceil32(destination.length)) + 290] = destination.length
+      mem[ceil32(toToken.length) + ceil32(ceil32(toToken.length)) + ceil32(ceil32(destination.length)) + 322 len ceil32(destination.length)] = destination[all], Mask(8 * ceil32(destination.length) - destination.length, -(8 * ceil32(destination.length) + -ceil32(ceil32(destination.length)) + 31) + 256, 160) >> -(8 * ceil32(destination.length) + -ceil32(ceil32(destination.length)) + 31) + 256
+      if ceil32(destination.length) > destination.length:
+          mem[ceil32(toToken.length) + ceil32(ceil32(toToken.length)) + ceil32(ceil32(destination.length)) + destination.length + 322] = 0
+      log SwapEth(
+            string toToken=Array(len=toToken.length, data=Mask(8 * ceil32(toToken.length), -(8 * ceil32(toToken.length)) + 256, toToken[all], Mask(8 * ceil32(toToken.length) - toToken.length, -(8 * ceil32(toToken.length) + -ceil32(ceil32(toToken.length)) + 31) + 256, destination.length) >> -(8 * ceil32(toToken.length) + -ceil32(ceil32(toToken.length)) + 31) + 256) << (8 * ceil32(toToken.length)) - 256, Mask(8 * -ceil32(toToken.length) + toToken.length + 32, 0, 0), mem[ceil32(ceil32(toToken.length)) + ceil32(ceil32(destination.length)) + toToken.length + 322 len ceil32(destination.length) - toToken.length + ceil32(toToken.length)]),
+            address sender=caller,
+            string destination=ceil32(toToken.length) + 192,
+            uint256 fromAmount=call.value,
+            uint256 minReturnAmount=minReturnAmount)
+  stor0 = 1
+
+def name(): # not payable
+  if bool(stor2.length):
+      if bool(stor2.length) == uint255(stor2.length) * 0.5 < 32:
+          revert with 0, 34
+      if bool(stor2.length):
+          if bool(stor2.length) == uint255(stor2.length) * 0.5 < 32:
+              revert with 0, 34
+          if Mask(256, -1, stor2.length):
+              if 31 < uint255(stor2.length) * 0.5:
+                  mem[128] = uint256(stor2.field_0)
+                  idx = 128
+                  s = 0
+                  while (uint255(stor2.length) * 0.5) + 96 > idx:
+                      mem[idx + 32] = stor2[s].field_256
+                      idx = idx + 32
+                      s = s + 1
+                      continue 
+                  return Array(len=2 * Mask(256, -1, stor2.length), data=mem[128 len ceil32(uint255(stor2.length) * 0.5)])
+              mem[128] = 256 * stor2.length.field_8
+      else:
+          if bool(stor2.length) == stor2.length.field_1 < 32:
+              revert with 0, 34
+          if stor2.length.field_1:
+              if 31 < stor2.length.field_1:
+                  mem[128] = uint256(stor2.field_0)
+                  idx = 128
+                  s = 0
+                  while stor2.length.field_1 + 96 > idx:
+                      mem[idx + 32] = stor2[s].field_256
+                      idx = idx + 32
+                      s = s + 1
+                      continue 
+                  return Array(len=2 * Mask(256, -1, stor2.length), data=mem[128 len ceil32(uint255(stor2.length) * 0.5)])
+              mem[128] = 256 * stor2.length.field_8
+      mem[ceil32(uint255(stor2.length) * 0.5) + 192 len ceil32(uint255(stor2.length) * 0.5)] = mem[128 len ceil32(uint255(stor2.length) * 0.5)]
+      if ceil32(uint255(stor2.length) * 0.5) > uint255(stor2.length) * 0.5:
+          mem[ceil32(uint255(stor2.length) * 0.5) + (uint255(stor2.length) * 0.5) + 192] = 0
+      return Array(len=2 * Mask(256, -1, stor2.length), data=mem[128 len ceil32(uint255(stor2.length) * 0.5)], mem[(2 * ceil32(uint255(stor2.length) * 0.5)) + 192 len 2 * ceil32(uint255(stor2.length) * 0.5)]), 
+  if bool(stor2.length) == stor2.length.field_1 < 32:
+      revert with 0, 34
+  if bool(stor2.length):
+      if bool(stor2.length) == uint255(stor2.length) * 0.5 < 32:
+          revert with 0, 34
+      if Mask(256, -1, stor2.length):
+          if 31 < uint255(stor2.length) * 0.5:
+              mem[128] = uint256(stor2.field_0)
+              idx = 128
+              s = 0
+              while (uint255(stor2.length) * 0.5) + 96 > idx:
+                  mem[idx + 32] = stor2[s].field_256
+                  idx = idx + 32
+                  s = s + 1
+                  continue 
+              return Array(len=stor2.length % 128, data=mem[128 len ceil32(stor2.length.field_1)])
+          mem[128] = 256 * stor2.length.field_8
+  else:
+      if bool(stor2.length) == stor2.length.field_1 < 32:
+          revert with 0, 34
+      if stor2.length.field_1:
+          if 31 < stor2.length.field_1:
+              mem[128] = uint256(stor2.field_0)
+              idx = 128
+              s = 0
+              while stor2.length.field_1 + 96 > idx:
+                  mem[idx + 32] = stor2[s].field_256
+                  idx = idx + 32
+                  s = s + 1
+                  continue 
+              return Array(len=stor2.length % 128, data=mem[128 len ceil32(stor2.length.field_1)])
+          mem[128] = 256 * stor2.length.field_8
+  mem[ceil32(stor2.length.field_1) + 192 len ceil32(stor2.length.field_1)] = mem[128 len ceil32(stor2.length.field_1)]
+  if ceil32(stor2.length.field_1) > stor2.length.field_1:
+      mem[ceil32(stor2.length.field_1) + stor2.length.field_1 + 192] = 0
+  return Array(len=stor2.length % 128, data=mem[128 len ceil32(stor2.length.field_1)], mem[(2 * ceil32(stor2.length.field_1)) + 192 len 2 * ceil32(stor2.length.field_1)]), 
+
+def symbol(): # not payable
+  if bool(stor3.length):
+      if bool(stor3.length) == uint255(stor3.length) * 0.5 < 32:
+          revert with 0, 34
+      if bool(stor3.length):
+          if bool(stor3.length) == uint255(stor3.length) * 0.5 < 32:
+              revert with 0, 34
+          if Mask(256, -1, stor3.length):
+              if 31 < uint255(stor3.length) * 0.5:
+                  mem[128] = uint256(stor3.field_0)
+                  idx = 128
+                  s = 0
+                  while (uint255(stor3.length) * 0.5) + 96 > idx:
+                      mem[idx + 32] = stor3[s].field_256
+                      idx = idx + 32
+                      s = s + 1
+                      continue 
+                  return Array(len=2 * Mask(256, -1, stor3.length), data=mem[128 len ceil32(uint255(stor3.length) * 0.5)])
+              mem[128] = 256 * stor3.length.field_8
+      else:
+          if bool(stor3.length) == stor3.length.field_1 < 32:
+              revert with 0, 34
+          if stor3.length.field_1:
+              if 31 < stor3.length.field_1:
+                  mem[128] = uint256(stor3.field_0)
+                  idx = 128
+                  s = 0
+                  while stor3.length.field_1 + 96 > idx:
+                      mem[idx + 32] = stor3[s].field_256
+                      idx = idx + 32
+                      s = s + 1
+                      continue 
+                  return Array(len=2 * Mask(256, -1, stor3.length), data=mem[128 len ceil32(uint255(stor3.length) * 0.5)])
+              mem[128] = 256 * stor3.length.field_8
+      mem[ceil32(uint255(stor3.length) * 0.5) + 192 len ceil32(uint255(stor3.length) * 0.5)] = mem[128 len ceil32(uint255(stor3.length) * 0.5)]
+      if ceil32(uint255(stor3.length) * 0.5) > uint255(stor3.length) * 0.5:
+          mem[ceil32(uint255(stor3.length) * 0.5) + (uint255(stor3.length) * 0.5) + 192] = 0
+      return Array(len=2 * Mask(256, -1, stor3.length), data=mem[128 len ceil32(uint255(stor3.length) * 0.5)], mem[(2 * ceil32(uint255(stor3.length) * 0.5)) + 192 len 2 * ceil32(uint255(stor3.length) * 0.5)]), 
+  if bool(stor3.length) == stor3.length.field_1 < 32:
+      revert with 0, 34
+  if bool(stor3.length):
+      if bool(stor3.length) == uint255(stor3.length) * 0.5 < 32:
+          revert with 0, 34
+      if Mask(256, -1, stor3.length):
+          if 31 < uint255(stor3.length) * 0.5:
+              mem[128] = uint256(stor3.field_0)
+              idx = 128
+              s = 0
+              while (uint255(stor3.length) * 0.5) + 96 > idx:
+                  mem[idx + 32] = stor3[s].field_256
+                  idx = idx + 32
+                  s = s + 1
+                  continue 
+              return Array(len=stor3.length % 128, data=mem[128 len ceil32(stor3.length.field_1)])
+          mem[128] = 256 * stor3.length.field_8
+  else:
+      if bool(stor3.length) == stor3.length.field_1 < 32:
+          revert with 0, 34
+      if stor3.length.field_1:
+          if 31 < stor3.length.field_1:
+              mem[128] = uint256(stor3.field_0)
+              idx = 128
+              s = 0
+              while stor3.length.field_1 + 96 > idx:
+                  mem[idx + 32] = stor3[s].field_256
+                  idx = idx + 32
+                  s = s + 1
+                  continue 
+              return Array(len=stor3.length % 128, data=mem[128 len ceil32(stor3.length.field_1)])
+          mem[128] = 256 * stor3.length.field_8
+  mem[ceil32(stor3.length.field_1) + 192 len ceil32(stor3.length.field_1)] = mem[128 len ceil32(stor3.length.field_1)]
+  if ceil32(stor3.length.field_1) > stor3.length.field_1:
+      mem[ceil32(stor3.length.field_1) + stor3.length.field_1 + 192] = 0
+  return Array(len=stor3.length % 128, data=mem[128 len ceil32(stor3.length.field_1)], mem[(2 * ceil32(stor3.length.field_1)) + 192 len 2 * ceil32(stor3.length.field_1)]), 
+
+def _fallback(?) payable: # default function
+  if calldata.size < 4:
+      require not calldata.size
+  else:
+      if owner() > uint32(call.func_hash) >> 224:
+          if name() == uint32(call.func_hash) >> 224:
+              require not call.value
+              if bool(stor2.length):
+                  if bool(stor2.length) == uint255(stor2.length) * 0.5 < 32:
+                      revert with 0, 34
+                  if bool(stor2.length):
+                      if bool(stor2.length) == uint255(stor2.length) * 0.5 < 32:
+                          revert with 0, 34
+                      if not Mask(256, -1, stor2.length):
+                          mem[0 + ceil32(uint255(stor2.length) * 0.5) + 224 len ceil32(uint255(stor2.length) * 0.5)] = mem[0 + 160 len ceil32(uint255(stor2.length) * 0.5)]
+                          var22001 = ceil32(uint255(stor2.length) * 0.5)
+                          if ceil32(uint255(stor2.length) * 0.5) > uint255(stor2.length) * 0.5:
+                              mem[ceil32(uint255(stor2.length) * 0.5) + (uint255(stor2.length) * 0.5) + 224] = 0
+                          return 32, 2 * Mask(256, -1, stor2.length), 
+                                 mem[160 len ceil32(uint255(stor2.length) * 0.5)],
+                                 mem[(2 * ceil32(uint255(stor2.length) * 0.5)) + 224 len 2 * ceil32(uint255(stor2.length) * 0.5)]
+                      if 31 >= uint255(stor2.length) * 0.5:
+                          mem[160] = 256 * stor2.length.field_8
+                          mem[0 + ceil32(uint255(stor2.length) * 0.5) + 224 len ceil32(uint255(stor2.length) * 0.5)] = mem[0 + 160 len ceil32(uint255(stor2.length) * 0.5)]
+                          var24001 = ceil32(uint255(stor2.length) * 0.5)
+                          if ceil32(uint255(stor2.length) * 0.5) > uint255(stor2.length) * 0.5:
+                              mem[ceil32(uint255(stor2.length) * 0.5) + (uint255(stor2.length) * 0.5) + 224] = 0
+                          return 32, 2 * Mask(256, -1, stor2.length), 
+                                 mem[160 len ceil32(uint255(stor2.length) * 0.5)],
+                                 mem[(2 * ceil32(uint255(stor2.length) * 0.5)) + 224 len 2 * ceil32(uint255(stor2.length) * 0.5)]
+                      mem[160] = uint256(stor2.field_0)
+                      idx = 160
+                      s = 0
+                      while (uint255(stor2.length) * 0.5) + 128 > idx:
+                          mem[idx + 32] = stor2[s].field_256
+                          idx = idx + 32
+                          s = s + 1
+                          continue 
+                      _462 = ceil32(uint255(stor2.length) * 0.5) + 160
+                      mem[ceil32(uint255(stor2.length) * 0.5) + 160] = 32
+                      _474 = uint255(stor2.length) * 0.5
+                      mem[ceil32(uint255(stor2.length) * 0.5) + 192] = uint255(stor2.length) * 0.5
+                      mem[0 + _462 + 64 len ceil32(uint255(stor2.length) * 0.5)] = mem[0 + 160 len ceil32(uint255(stor2.length) * 0.5)]
+                      var27001 = ceil32(uint255(stor2.length) * 0.5)
+                      if ceil32(uint255(stor2.length) * 0.5) > uint255(stor2.length) * 0.5:
+                          mem[_462 + (uint255(stor2.length) * 0.5) + 64] = 0
+                      return memory
+                        from ceil32(uint255(stor2.length) * 0.5) + 160
+                         len _462 - 96
+                  if bool(stor2.length) == stor2.length.field_1 < 32:
+                      revert with 0, 34
+                  if not stor2.length.field_1:
+                      mem[0 + ceil32(uint255(stor2.length) * 0.5) + 224 len ceil32(uint255(stor2.length) * 0.5)] = mem[0 + 160 len ceil32(uint255(stor2.length) * 0.5)]
+                      var23001 = ceil32(uint255(stor2.length) * 0.5)
+                      if ceil32(uint255(stor2.length) * 0.5) > uint255(stor2.length) * 0.5:
+                          mem[ceil32(uint255(stor2.length) * 0.5) + (uint255(stor2.length) * 0.5) + 224] = 0
+                      return 32, 2 * Mask(256, -1, stor2.length), 
+                             mem[160 len ceil32(uint255(stor2.length) * 0.5)],
+                             mem[(2 * ceil32(uint255(stor2.length) * 0.5)) + 224 len 2 * ceil32(uint255(stor2.length) * 0.5)]
+                  if 31 >= stor2.length.field_1:
+                      mem[160] = 256 * stor2.length.field_8
+                      mem[0 + ceil32(uint255(stor2.length) * 0.5) + 224 len ceil32(uint255(stor2.length) * 0.5)] = mem[0 + 160 len ceil32(uint255(stor2.length) * 0.5)]
+                      var25001 = ceil32(uint255(stor2.length) * 0.5)
+                      if ceil32(uint255(stor2.length) * 0.5) > uint255(stor2.length) * 0.5:
+                          mem[ceil32(uint255(stor2.length) * 0.5) + (uint255(stor2.length) * 0.5) + 224] = 0
+                      return 32, 2 * Mask(256, -1, stor2.length), 
+                             mem[160 len ceil32(uint255(stor2.length) * 0.5)],
+                             mem[(2 * ceil32(uint255(stor2.length) * 0.5)) + 224 len 2 * ceil32(uint255(stor2.length) * 0.5)]
+                  mem[160] = uint256(stor2.field_0)
+                  idx = 160
+                  s = 0
+                  while stor2.length.field_1 + 128 > idx:
+                      mem[idx + 32] = stor2[s].field_256
+                      idx = idx + 32
+                      s = s + 1
+                      continue 
+                  _463 = ceil32(uint255(stor2.length) * 0.5) + 160
+                  mem[ceil32(uint255(stor2.length) * 0.5) + 160] = 32
+                  _477 = uint255(stor2.length) * 0.5
+                  mem[ceil32(uint255(stor2.length) * 0.5) + 192] = uint255(stor2.length) * 0.5
+                  mem[0 + _463 + 64 len ceil32(uint255(stor2.length) * 0.5)] = mem[0 + 160 len ceil32(uint255(stor2.length) * 0.5)]
+                  var28001 = ceil32(uint255(stor2.length) * 0.5)
+                  if ceil32(uint255(stor2.length) * 0.5) > uint255(stor2.length) * 0.5:
+                      mem[_463 + (uint255(stor2.length) * 0.5) + 64] = 0
+                  return memory
+                    from ceil32(uint255(stor2.length) * 0.5) + 160
+                     len _463 - 96
+              if bool(stor2.length) == stor2.length.field_1 < 32:
+                  revert with 0, 34
+              if bool(stor2.length):
+                  if bool(stor2.length) == uint255(stor2.length) * 0.5 < 32:
+                      revert with 0, 34
+                  if not Mask(256, -1, stor2.length):
+                      mem[0 + ceil32(stor2.length.field_1) + 224 len ceil32(stor2.length.field_1)] = mem[0 + 160 len ceil32(stor2.length.field_1)]
+                      var23001 = ceil32(stor2.length.field_1)
+                      if ceil32(stor2.length.field_1) > stor2.length.field_1:
+                          mem[ceil32(stor2.length.field_1) + stor2.length.field_1 + 224] = 0
+                      return 32, stor2.length % 128, 
+                             mem[160 len ceil32(stor2.length.field_1)],
+                             mem[(2 * ceil32(stor2.length.field_1)) + 224 len 2 * ceil32(stor2.length.field_1)]
+                  if 31 >= uint255(stor2.length) * 0.5:
+                      mem[160] = 256 * stor2.length.field_8
+                      mem[0 + ceil32(stor2.length.field_1) + 224 len ceil32(stor2.length.field_1)] = mem[0 + 160 len ceil32(stor2.length.field_1)]
+                      var25001 = ceil32(stor2.length.field_1)
+                      if ceil32(stor2.length.field_1) > stor2.length.field_1:
+                          mem[ceil32(stor2.length.field_1) + stor2.length.field_1 + 224] = 0
+                      return 32, stor2.length % 128, 
+                             mem[160 len ceil32(stor2.length.field_1)],
+                             mem[(2 * ceil32(stor2.length.field_1)) + 224 len 2 * ceil32(stor2.length.field_1)]
+                  mem[160] = uint256(stor2.field_0)
+                  idx = 160
+                  s = 0
+                  while (uint255(stor2.length) * 0.5) + 128 > idx:
+                      mem[idx + 32] = stor2[s].field_256
+                      idx = idx + 32
+                      s = s + 1
+                      continue 
+                  _464 = ceil32(stor2.length.field_1) + 160
+                  mem[ceil32(stor2.length.field_1) + 160] = 32
+                  _480 = stor2.length.field_1
+                  mem[ceil32(stor2.length.field_1) + 192] = stor2.length.field_1
+                  mem[0 + _464 + 64 len ceil32(stor2.length.field_1)] = mem[0 + 160 len ceil32(stor2.length.field_1)]
+                  var28001 = ceil32(stor2.length.field_1)
+                  if ceil32(stor2.length.field_1) > stor2.length.field_1:
+                      mem[_464 + stor2.length.field_1 + 64] = 0
+                  return memory
+                    from ceil32(stor2.length.field_1) + 160
+                     len _464 - 96
+              if bool(stor2.length) == stor2.length.field_1 < 32:
+                  revert with 0, 34
+              if not stor2.length.field_1:
+                  mem[0 + ceil32(stor2.length.field_1) + 224 len ceil32(stor2.length.field_1)] = mem[0 + 160 len ceil32(stor2.length.field_1)]
+                  var24001 = ceil32(stor2.length.field_1)
+                  if ceil32(stor2.length.field_1) > stor2.length.field_1:
+                      mem[ceil32(stor2.length.field_1) + stor2.length.field_1 + 224] = 0
+                  return 32, stor2.length % 128, 
+                         mem[160 len ceil32(stor2.length.field_1)],
+                         mem[(2 * ceil32(stor2.length.field_1)) + 224 len 2 * ceil32(stor2.length.field_1)]
+              if 31 >= stor2.length.field_1:
+                  mem[160] = 256 * stor2.length.field_8
+                  mem[0 + ceil32(stor2.length.field_1) + 224 len ceil32(stor2.length.field_1)] = mem[0 + 160 len ceil32(stor2.length.field_1)]
+                  var26001 = ceil32(stor2.length.field_1)
+                  if ceil32(stor2.length.field_1) > stor2.length.field_1:
+                      mem[ceil32(stor2.length.field_1) + stor2.length.field_1 + 224] = 0
+                  return 32, stor2.length % 128, 
+                         mem[160 len ceil32(stor2.length.field_1)],
+                         mem[(2 * ceil32(stor2.length.field_1)) + 224 len 2 * ceil32(stor2.length.field_1)]
+              mem[160] = uint256(stor2.field_0)
+              idx = 160
+              s = 0
+              while stor2.length.field_1 + 128 > idx:
+                  mem[idx + 32] = stor2[s].field_256
+                  idx = idx + 32
+                  s = s + 1
+                  continue 
+              _465 = ceil32(stor2.length.field_1) + 160
+              mem[ceil32(stor2.length.field_1) + 160] = 32
+              _483 = stor2.length.field_1
+              mem[ceil32(stor2.length.field_1) + 192] = stor2.length.field_1
+              mem[0 + _465 + 64 len ceil32(stor2.length.field_1)] = mem[0 + 160 len ceil32(stor2.length.field_1)]
+              var29001 = ceil32(stor2.length.field_1)
+              if ceil32(stor2.length.field_1) > stor2.length.field_1:
+                  mem[_465 + stor2.length.field_1 + 64] = 0
+              return memory
+                from ceil32(stor2.length.field_1) + 160
+                 len _465 - 96
+          if uint32(call.func_hash) >> 224 != swapEth(string toToken, string destination, uint256 minReturnAmount):
+              if uint32(call.func_hash) >> 224 != withdrawETH(address to, uint256 amountOut):
+                  require renounceOwnership() == uint32(call.func_hash) >> 224
+                  require not call.value
+                  if owner != caller:
+                      revert with 0, 'Ownable: caller is not the owner'
+                  owner = 0
+                  log OwnershipTransferred(
+                        address previousOwner=owner,
+                        address newOwner=0)
+                  stop
+              require not call.value
+              require calldata.size - 4 >=′ 64
+              require _param1 == address(_param1)
+              if owner != caller:
+                  revert with 0, 'Ownable: caller is not the owner'
+              if not address(_param1):
+                  revert with 0, 'DESTINATION_CANNT_BE_0_ADDRESS'
+              if eth.balance(this.address) < _param2:
+                  revert with 0, 'AMOUNT_CANNT_MORE_THAN_BALANCE'
+              mem[64] = 160
+              mem[160 len 0] = None
+              var23001 = 0
+              call address(_param1) with:
+                 value _param2 wei
+                   gas gas_remaining wei
+              if not return_data.size:
+                  if ext_call.success:
+                      _535 = 160
+                      log WithdrawETH(uint256 amount=_param2)
+                      stop
+                  _524 = 160
+                  mem[160] = 0x8c379a000000000000000000000000000000000000000000000000000000000
+                  mem[164] = 32
+                  mem[_524 + 36] = 35
+                  mem[_524 + 68] = 'TransferHelper: ETH_TRANSFER_FAI'
+                  mem[_524 + 100] = 0x4c45440000000000000000000000000000000000000000000000000000000000
+                  revert with memory
+                    from 160
+                     len _524 - 28
+              _486 = 160
+              mem[64] = ceil32(return_data.size) + 161
+              mem[_486] = return_data.size
+              mem[_486 + 32 len return_data.size] = ext_call.return_data[0 len return_data.size]
+              if ext_call.success:
+                  _538 = ceil32(return_data.size) + 161
+                  log WithdrawETH(uint256 amount=_param2)
+                  stop
+              _525 = ceil32(return_data.size) + 161
+              mem[ceil32(return_data.size) + 161] = 0x8c379a000000000000000000000000000000000000000000000000000000000
+              mem[ceil32(return_data.size) + 165] = 32
+              mem[_525 + 36] = 35
+              mem[_525 + 68] = 'TransferHelper: ETH_TRANSFER_FAI'
+              mem[_525 + 100] = 0x4c45440000000000000000000000000000000000000000000000000000000000
+              revert with memory
+                from ceil32(return_data.size) + 161
+                 len _525 + -ceil32(return_data.size) - 29
+          require calldata.size - 4 >=′ 96
+          require _param1 <= LOCK8605463013()
+          require _param1 + 35 <′ calldata.size
+          if _param1.length > LOCK8605463013():
+              revert with 0, 65
+          if ceil32(ceil32(_param1.length)) + 129 < 128 or ceil32(ceil32(_param1.length)) + 129 > LOCK8605463013():
+              revert with 0, 65
+          require _param1 + _param1.length + 36 <= calldata.size
+          require _param2 <= LOCK8605463013()
+          require _param2 + 35 <′ calldata.size
+          if _param2.length > LOCK8605463013():
+              revert with 0, 65
+          if ceil32(ceil32(_param2.length)) + 130 < 129 or ceil32(ceil32(_param1.length)) + ceil32(ceil32(_param2.length)) + 130 > LOCK8605463013():
+              revert with 0, 65
+          require _param2 + _param2.length + 36 <= calldata.size
+          if stor0 == 2:
+              revert with 0, 'ReentrancyGuard: reentrant call'
+          stor0 = 2
+          if not call.value:
+              revert with 0, 'ETH_AMOUNT_MUST_BE_MORE_THAN_0'
+          var31001 = ceil32(_param1.length)
+          if ceil32(_param1.length) <= _param1.length:
+              _485 = _param2.length
+              mem[ceil32(_param1.length) + ceil32(ceil32(_param1.length)) + ceil32(ceil32(_param2.length)) + 354 len ceil32(_param2.length)] = _param2[all], Mask(8 * ceil32(_param2.length) - _param2.length, -(8 * ceil32(_param2.length) + -ceil32(ceil32(_param2.length)) + 31) + 256, 160) >> -(8 * ceil32(_param2.length) + -ceil32(ceil32(_param2.length)) + 31) + 256
+              var39001 = ceil32(_param2.length)
+              if ceil32(_485) > _485:
+                  mem[ceil32(_param1.length) + ceil32(ceil32(_param1.length)) + ceil32(ceil32(_param2.length)) + _485 + 354] = 0
+              log SwapEth(string toToken, address sender, string destination, uint256 fromAmount, uint256 minReturnAmount):
+                          160,
+                          caller,
+                          ceil32(_param1.length) + 192,
+                          call.value,
+                          _param3,
+                          _param1.length,
+                          Mask(8 * ceil32(_param1.length), -(8 * ceil32(_param1.length)) + 256, _param1[all], Mask(8 * ceil32(_param1.length) - _param1.length, -(8 * ceil32(_param1.length) + -ceil32(ceil32(_param1.length)) + 31) + 256, _param2.length) >> -(8 * ceil32(_param1.length) + -ceil32(ceil32(_param1.length)) + 31) + 256) << (8 * ceil32(_param1.length)) - 256,
+                          _param2.length,
+                          mem[ceil32(ceil32(_param1.length)) + ceil32(ceil32(_param2.length)) + ceil32(_param1.length) + 354 len ceil32(_485)],
+          else:
+              _512 = _param2.length
+              mem[ceil32(_param1.length) + ceil32(ceil32(_param1.length)) + ceil32(ceil32(_param2.length)) + 322] = _param2.length
+              mem[ceil32(_param1.length) + ceil32(ceil32(_param1.length)) + ceil32(ceil32(_param2.length)) + 354 len ceil32(_param2.length)] = _param2[all], Mask(8 * ceil32(_param2.length) - _param2.length, -(8 * ceil32(_param2.length) + -ceil32(ceil32(_param2.length)) + 31) + 256, 160) >> -(8 * ceil32(_param2.length) + -ceil32(ceil32(_param2.length)) + 31) + 256
+              var40001 = ceil32(_param2.length)
+              if ceil32(_512) > _512:
+                  mem[ceil32(_param1.length) + ceil32(ceil32(_param1.length)) + ceil32(ceil32(_param2.length)) + _512 + 354] = 0
+              log SwapEth(string toToken, address sender, string destination, uint256 fromAmount, uint256 minReturnAmount):
+                          160,
+                          caller,
+                          ceil32(_param1.length) + 192,
+                          call.value,
+                          _param3,
+                          _param1.length,
+                          Mask(8 * ceil32(_param1.length), -(8 * ceil32(_param1.length)) + 256, _param1[all], Mask(8 * ceil32(_param1.length) - _param1.length, -(8 * ceil32(_param1.length) + -ceil32(ceil32(_param1.length)) + 31) + 256, _param2.length) >> -(8 * ceil32(_param1.length) + -ceil32(ceil32(_param1.length)) + 31) + 256) << (8 * ceil32(_param1.length)) - 256,
+                          Mask(8 * -ceil32(_param1.length) + _param1.length + 32, 0, 0),
+                          mem[ceil32(ceil32(_param1.length)) + ceil32(ceil32(_param2.length)) + _param1.length + 354 len ceil32(_512) - _param1.length + ceil32(_param1.length)],
+      else:
+          if owner() == uint32(call.func_hash) >> 224:
+              require not call.value
+              return owner
+          if symbol() == uint32(call.func_hash) >> 224:
+              require not call.value
+              if bool(stor3.length):
+                  if bool(stor3.length) == uint255(stor3.length) * 0.5 < 32:
+                      revert with 0, 34
+                  if bool(stor3.length):
+                      if bool(stor3.length) == uint255(stor3.length) * 0.5 < 32:
+                          revert with 0, 34
+                      if not Mask(256, -1, stor3.length):
+                          mem[0 + ceil32(uint255(stor3.length) * 0.5) + 224 len ceil32(uint255(stor3.length) * 0.5)] = mem[0 + 160 len ceil32(uint255(stor3.length) * 0.5)]
+                          var23001 = ceil32(uint255(stor3.length) * 0.5)
+                          if ceil32(uint255(stor3.length) * 0.5) > uint255(stor3.length) * 0.5:
+                              mem[ceil32(uint255(stor3.length) * 0.5) + (uint255(stor3.length) * 0.5) + 224] = 0
+                          return 32, 2 * Mask(256, -1, stor3.length), 
+                                 mem[160 len ceil32(uint255(stor3.length) * 0.5)],
+                                 mem[(2 * ceil32(uint255(stor3.length) * 0.5)) + 224 len 2 * ceil32(uint255(stor3.length) * 0.5)]
+                      if 31 >= uint255(stor3.length) * 0.5:
+                          mem[160] = 256 * stor3.length.field_8
+                          mem[0 + ceil32(uint255(stor3.length) * 0.5) + 224 len ceil32(uint255(stor3.length) * 0.5)] = mem[0 + 160 len ceil32(uint255(stor3.length) * 0.5)]
+                          var25001 = ceil32(uint255(stor3.length) * 0.5)
+                          if ceil32(uint255(stor3.length) * 0.5) > uint255(stor3.length) * 0.5:
+                              mem[ceil32(uint255(stor3.length) * 0.5) + (uint255(stor3.length) * 0.5) + 224] = 0
+                          return 32, 2 * Mask(256, -1, stor3.length), 
+                                 mem[160 len ceil32(uint255(stor3.length) * 0.5)],
+                                 mem[(2 * ceil32(uint255(stor3.length) * 0.5)) + 224 len 2 * ceil32(uint255(stor3.length) * 0.5)]
+                      mem[160] = uint256(stor3.field_0)
+                      idx = 160
+                      s = 0
+                      while (uint255(stor3.length) * 0.5) + 128 > idx:
+                          mem[idx + 32] = stor3[s].field_256
+                          idx = idx + 32
+                          s = s + 1
+                          continue 
+                      _466 = ceil32(uint255(stor3.length) * 0.5) + 160
+                      mem[ceil32(uint255(stor3.length) * 0.5) + 160] = 32
+                      _489 = uint255(stor3.length) * 0.5
+                      mem[ceil32(uint255(stor3.length) * 0.5) + 192] = uint255(stor3.length) * 0.5
+                      mem[0 + _466 + 64 len ceil32(uint255(stor3.length) * 0.5)] = mem[0 + 160 len ceil32(uint255(stor3.length) * 0.5)]
+                      var28001 = ceil32(uint255(stor3.length) * 0.5)
+                      if ceil32(uint255(stor3.length) * 0.5) > uint255(stor3.length) * 0.5:
+                          mem[_466 + (uint255(stor3.length) * 0.5) + 64] = 0
+                      return memory
+                        from ceil32(uint255(stor3.length) * 0.5) + 160
+                         len _466 - 96
+                  if bool(stor3.length) == stor3.length.field_1 < 32:
+                      revert with 0, 34
+                  if not stor3.length.field_1:
+                      mem[0 + ceil32(uint255(stor3.length) * 0.5) + 224 len ceil32(uint255(stor3.length) * 0.5)] = mem[0 + 160 len ceil32(uint255(stor3.length) * 0.5)]
+                      var24001 = ceil32(uint255(stor3.length) * 0.5)
+                      if ceil32(uint255(stor3.length) * 0.5) > uint255(stor3.length) * 0.5:
+                          mem[ceil32(uint255(stor3.length) * 0.5) + (uint255(stor3.length) * 0.5) + 224] = 0
+                      return 32, 2 * Mask(256, -1, stor3.length), 
+                             mem[160 len ceil32(uint255(stor3.length) * 0.5)],
+                             mem[(2 * ceil32(uint255(stor3.length) * 0.5)) + 224 len 2 * ceil32(uint255(stor3.length) * 0.5)]
+                  if 31 >= stor3.length.field_1:
+                      mem[160] = 256 * stor3.length.field_8
+                      mem[0 + ceil32(uint255(stor3.length) * 0.5) + 224 len ceil32(uint255(stor3.length) * 0.5)] = mem[0 + 160 len ceil32(uint255(stor3.length) * 0.5)]
+                      var26001 = ceil32(uint255(stor3.length) * 0.5)
+                      if ceil32(uint255(stor3.length) * 0.5) > uint255(stor3.length) * 0.5:
+                          mem[ceil32(uint255(stor3.length) * 0.5) + (uint255(stor3.length) * 0.5) + 224] = 0
+                      return 32, 2 * Mask(256, -1, stor3.length), 
+                             mem[160 len ceil32(uint255(stor3.length) * 0.5)],
+                             mem[(2 * ceil32(uint255(stor3.length) * 0.5)) + 224 len 2 * ceil32(uint255(stor3.length) * 0.5)]
+                  mem[160] = uint256(stor3.field_0)
+                  idx = 160
+                  s = 0
+                  while stor3.length.field_1 + 128 > idx:
+                      mem[idx + 32] = stor3[s].field_256
+                      idx = idx + 32
+                      s = s + 1
+                      continue 
+                  _467 = ceil32(uint255(stor3.length) * 0.5) + 160
+                  mem[ceil32(uint255(stor3.length) * 0.5) + 160] = 32
+                  _492 = uint255(stor3.length) * 0.5
+                  mem[ceil32(uint255(stor3.length) * 0.5) + 192] = uint255(stor3.length) * 0.5
+                  mem[0 + _467 + 64 len ceil32(uint255(stor3.length) * 0.5)] = mem[0 + 160 len ceil32(uint255(stor3.length) * 0.5)]
+                  var29001 = ceil32(uint255(stor3.length) * 0.5)
+                  if ceil32(uint255(stor3.length) * 0.5) > uint255(stor3.length) * 0.5:
+                      mem[_467 + (uint255(stor3.length) * 0.5) + 64] = 0
+                  return memory
+                    from ceil32(uint255(stor3.length) * 0.5) + 160
+                     len _467 - 96
+              if bool(stor3.length) == stor3.length.field_1 < 32:
+                  revert with 0, 34
+              if bool(stor3.length):
+                  if bool(stor3.length) == uint255(stor3.length) * 0.5 < 32:
+                      revert with 0, 34
+                  if not Mask(256, -1, stor3.length):
+                      mem[0 + ceil32(stor3.length.field_1) + 224 len ceil32(stor3.length.field_1)] = mem[0 + 160 len ceil32(stor3.length.field_1)]
+                      var24001 = ceil32(stor3.length.field_1)
+                      if ceil32(stor3.length.field_1) > stor3.length.field_1:
+                          mem[ceil32(stor3.length.field_1) + stor3.length.field_1 + 224] = 0
+                      return 32, stor3.length % 128, 
+                             mem[160 len ceil32(stor3.length.field_1)],
+                             mem[(2 * ceil32(stor3.length.field_1)) + 224 len 2 * ceil32(stor3.length.field_1)]
+                  if 31 >= uint255(stor3.length) * 0.5:
+                      mem[160] = 256 * stor3.length.field_8
+                      mem[0 + ceil32(stor3.length.field_1) + 224 len ceil32(stor3.length.field_1)] = mem[0 + 160 len ceil32(stor3.length.field_1)]
+                      var26001 = ceil32(stor3.length.field_1)
+                      if ceil32(stor3.length.field_1) > stor3.length.field_1:
+                          mem[ceil32(stor3.length.field_1) + stor3.length.field_1 + 224] = 0
+                      return 32, stor3.length % 128, 
+                             mem[160 len ceil32(stor3.length.field_1)],
+                             mem[(2 * ceil32(stor3.length.field_1)) + 224 len 2 * ceil32(stor3.length.field_1)]
+                  mem[160] = uint256(stor3.field_0)
+                  idx = 160
+                  s = 0
+                  while (uint255(stor3.length) * 0.5) + 128 > idx:
+                      mem[idx + 32] = stor3[s].field_256
+                      idx = idx + 32
+                      s = s + 1
+                      continue 
+                  _468 = ceil32(stor3.length.field_1) + 160
+                  mem[ceil32(stor3.length.field_1) + 160] = 32
+                  _495 = stor3.length.field_1
+                  mem[ceil32(stor3.length.field_1) + 192] = stor3.length.field_1
+                  mem[0 + _468 + 64 len ceil32(stor3.length.field_1)] = mem[0 + 160 len ceil32(stor3.length.field_1)]
+                  var29001 = ceil32(stor3.length.field_1)
+                  if ceil32(stor3.length.field_1) > stor3.length.field_1:
+                      mem[_468 + stor3.length.field_1 + 64] = 0
+                  return memory
+                    from ceil32(stor3.length.field_1) + 160
+                     len _468 - 96
+              if bool(stor3.length) == stor3.length.field_1 < 32:
+                  revert with 0, 34
+              if not stor3.length.field_1:
+                  mem[0 + ceil32(stor3.length.field_1) + 224 len ceil32(stor3.length.field_1)] = mem[0 + 160 len ceil32(stor3.length.field_1)]
+                  var25001 = ceil32(stor3.length.field_1)
+                  if ceil32(stor3.length.field_1) > stor3.length.field_1:
+                      mem[ceil32(stor3.length.field_1) + stor3.length.field_1 + 224] = 0
+                  return 32, stor3.length % 128, 
+                         mem[160 len ceil32(stor3.length.field_1)],
+                         mem[(2 * ceil32(stor3.length.field_1)) + 224 len 2 * ceil32(stor3.length.field_1)]
+              if 31 >= stor3.length.field_1:
+                  mem[160] = 256 * stor3.length.field_8
+                  mem[0 + ceil32(stor3.length.field_1) + 224 len ceil32(stor3.length.field_1)] = mem[0 + 160 len ceil32(stor3.length.field_1)]
+                  var27001 = ceil32(stor3.length.field_1)
+                  if ceil32(stor3.length.field_1) > stor3.length.field_1:
+                      mem[ceil32(stor3.length.field_1) + stor3.length.field_1 + 224] = 0
+                  return 32, stor3.length % 128, 
+                         mem[160 len ceil32(stor3.length.field_1)],
+                         mem[(2 * ceil32(stor3.length.field_1)) + 224 len 2 * ceil32(stor3.length.field_1)]
+              mem[160] = uint256(stor3.field_0)
+              idx = 160
+              s = 0
+              while stor3.length.field_1 + 128 > idx:
+                  mem[idx + 32] = stor3[s].field_256
+                  idx = idx + 32
+                  s = s + 1
+                  continue 
+              _469 = ceil32(stor3.length.field_1) + 160
+              mem[ceil32(stor3.length.field_1) + 160] = 32
+              _498 = stor3.length.field_1
+              mem[ceil32(stor3.length.field_1) + 192] = stor3.length.field_1
+              mem[0 + _469 + 64 len ceil32(stor3.length.field_1)] = mem[0 + 160 len ceil32(stor3.length.field_1)]
+              var30001 = ceil32(stor3.length.field_1)
+              if ceil32(stor3.length.field_1) > stor3.length.field_1:
+                  mem[_469 + stor3.length.field_1 + 64] = 0
+              return memory
+                from ceil32(stor3.length.field_1) + 160
+                 len _469 - 96
+          if uint32(call.func_hash) >> 224 != swap(address fromToken, string toToken, string destination, uint256 fromAmount, uint256 minReturnAmount):
+              if uint32(call.func_hash) >> 224 != withdraw(address token, address recipient, uint256 amount):
+                  require transferOwnership(address newOwner) == uint32(call.func_hash) >> 224
+                  require not call.value
+                  require calldata.size - 4 >=′ 32
+                  require _param1 == address(_param1)
+                  if owner != caller:
+                      revert with 0, 'Ownable: caller is not the owner'
+                  if not address(_param1):
+                      revert with 0, 'Ownable: new owner is the zero address'
+                  owner = address(_param1)
+                  log OwnershipTransferred(
+                        address previousOwner=owner,
+                        address newOwner=address(_param1))
+                  stop
+              require not call.value
+              require calldata.size - 4 >=′ 96
+              require _param1 == address(_param1)
+              require _param2 == address(_param2)
+              if owner != caller:
+                  revert with 0, 'Ownable: caller is not the owner'
+              if not address(_param2):
+                  revert with 0, 'DESTINATION_CANNT_BE_0_ADDRESS'
+              if not address(_param1):
+                  revert with 0, 'TOKEN_MUST_NOT_BE_0'
+              mem[132] = this.address
+              require ext_code.size(address(_param1))
+              static call address(_param1).balanceOf(address account) with:
+                      gas gas_remaining wei
+                     args this.address
+              mem[128] = ext_call.return_data[0]
+              if not ext_call.success:
+                  revert with ext_call.return_data[0 len return_data.size]
+              require return_data.size >=′ 32
+              if ext_call.return_data[0] < _param3:
+                  revert with 0, 'AMOUNT_CANNT_MORE_THAN_BALANCE'
+              mem[ceil32(return_data.size) + 164] = address(_param2)
+              mem[ceil32(return_data.size) + 196] = _param3
+              mem[ceil32(return_data.size) + 128] = 68
+              mem[64] = ceil32(return_data.size) + 228
+              mem[ceil32(return_data.size) + 164 len 28] = address(_param2) << 64
+              mem[ceil32(return_data.size) + 160 len 4] = transfer(address recipient, uint256 amount)
+              mem[ceil32(return_data.size) + 228 len 96] = transfer(address recipient, uint256 amount), address(_param2) << 64, 0, _param3, mem[ceil32(return_data.size) + 228 len 28]
+              var33001 = 96
+              mem[ceil32(return_data.size) + 296] = 0
+              call address(_param1).mem[ceil32(return_data.size) + 228 len 4] with:
+                   gas gas_remaining wei
+                  args mem[ceil32(return_data.size) + 232 len 64]
+              if not return_data.size:
+                  if not ext_call.success:
+                      _574 = ceil32(return_data.size) + 228
+                      mem[ceil32(return_data.size) + 228] = 0x8c379a000000000000000000000000000000000000000000000000000000000
+                      mem[ceil32(return_data.size) + 232] = 32
+                      mem[_574 + 36] = 31
+                      mem[_574 + 68] = 'TransferHelper: TRANSFER_FAILED'
+                      revert with memory
+                        from ceil32(return_data.size) + 228
+                         len _574 + -ceil32(return_data.size) - 128
+                  if not mem[96]:
+                      _600 = ceil32(return_data.size) + 228
+                      mem[ceil32(return_data.size) + 228] = address(_param1)
+                      mem[ceil32(return_data.size) + 260] = _param3
+                      log Withdtraw(address token, uint256 balance):
+                                    mem[ceil32(return_data.size) + 228 len _600 + -ceil32(return_data.size) - 164],
+                      stop
+                  require mem[96] >=′ 32
+                  require ext_call.return_data[0] == bool(ext_call.return_data[0])
+                  if ext_call.return_data[0]:
+                      _660 = ceil32(return_data.size) + 228
+                      mem[ceil32(return_data.size) + 228] = address(_param1)
+                      mem[ceil32(return_data.size) + 260] = _param3
+                      log Withdtraw(address token, uint256 balance):
+                                    mem[ceil32(return_data.size) + 228 len _660 + -ceil32(return_data.size) - 164],
+                      stop
+                  _650 = ceil32(return_data.size) + 228
+                  mem[ceil32(return_data.size) + 228] = 0x8c379a000000000000000000000000000000000000000000000000000000000
+                  mem[ceil32(return_data.size) + 232] = 32
+                  mem[_650 + 36] = 31
+                  mem[_650 + 68] = 'TransferHelper: TRANSFER_FAILED'
+                  revert with memory
+                    from ceil32(return_data.size) + 228
+                     len _650 + -ceil32(return_data.size) - 128
+              _523 = ceil32(return_data.size) + 228
+              mem[64] = ceil32(return_data.size) + ceil32(return_data.size) + 229
+              mem[_523] = return_data.size
+              mem[_523 + 32 len return_data.size] = ext_call.return_data[0 len return_data.size]
+              if not ext_call.success:
+                  _576 = ceil32(return_data.size) + ceil32(return_data.size) + 229
+                  mem[ceil32(return_data.size) + ceil32(return_data.size) + 229] = 0x8c379a000000000000000000000000000000000000000000000000000000000
+                  mem[ceil32(return_data.size) + ceil32(return_data.size) + 233] = 32
+                  mem[_576 + 36] = 31
+                  mem[_576 + 68] = 'TransferHelper: TRANSFER_FAILED'
+                  revert with memory
+                    from ceil32(return_data.size) + ceil32(return_data.size) + 229
+                     len _576 + -ceil32(return_data.size) + -ceil32(return_data.size) - 129
+              if not return_data.size:
+                  _603 = ceil32(return_data.size) + ceil32(return_data.size) + 229
+                  mem[ceil32(return_data.size) + ceil32(return_data.size) + 229] = address(_param1)
+                  mem[ceil32(return_data.size) + ceil32(return_data.size) + 261] = _param3
+                  log Withdtraw(address token, uint256 balance):
+                                mem[ceil32(return_data.size) + ceil32(return_data.size) + 229 len _603 + -ceil32(return_data.size) + -ceil32(return_data.size) - 165],
+                  stop
+              require return_data.size >=′ 32
+              require mem[_523 + 32] == bool(mem[_523 + 32])
+              if mem[_523 + 32]:
+                  _663 = ceil32(return_data.size) + ceil32(return_data.size) + 229
+                  mem[ceil32(return_data.size) + ceil32(return_data.size) + 229] = address(_param1)
+                  mem[ceil32(return_data.size) + ceil32(return_data.size) + 261] = _param3
+                  log Withdtraw(address token, uint256 balance):
+                                mem[ceil32(return_data.size) + ceil32(return_data.size) + 229 len _663 + -ceil32(return_data.size) + -ceil32(return_data.size) - 165],
+                  stop
+              _651 = ceil32(return_data.size) + ceil32(return_data.size) + 229
+              mem[ceil32(return_data.size) + ceil32(return_data.size) + 229] = 0x8c379a000000000000000000000000000000000000000000000000000000000
+              mem[ceil32(return_data.size) + ceil32(return_data.size) + 233] = 32
+              mem[_651 + 36] = 31
+              mem[_651 + 68] = 'TransferHelper: TRANSFER_FAILED'
+              revert with memory
+                from ceil32(return_data.size) + ceil32(return_data.size) + 229
+                 len _651 + -ceil32(return_data.size) + -ceil32(return_data.size) - 129
+          require not call.value
+          require calldata.size - 4 >=′ 160
+          require _param1 == address(_param1)
+          require _param2 <= LOCK8605463013()
+          require _param2 + 35 <′ calldata.size
+          if _param2.length > LOCK8605463013():
+              revert with 0, 65
+          if ceil32(ceil32(_param2.length)) + 129 < 128 or ceil32(ceil32(_param2.length)) + 129 > LOCK8605463013():
+              revert with 0, 65
+          mem[128] = _param2.length
+          require _param2 + _param2.length + 36 <= calldata.size
+          mem[160 len _param2.length] = _param2[all]
+          mem[_param2.length + 160] = 0
+          require _param3 <= LOCK8605463013()
+          require _param3 + 35 <′ calldata.size
+          if _param3.length > LOCK8605463013():
+              revert with 0, 65
+          if ceil32(ceil32(_param3.length)) + 130 < 129 or ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + 130 > LOCK8605463013():
+              revert with 0, 65
+          mem[ceil32(ceil32(_param2.length)) + 129] = _param3.length
+          require _param3 + _param3.length + 36 <= calldata.size
+          mem[ceil32(ceil32(_param2.length)) + 161 len _param3.length] = _param3[all]
+          mem[ceil32(ceil32(_param2.length)) + _param3.length + 161] = 0
+          if stor0 == 2:
+              revert with 0, 'ReentrancyGuard: reentrant call'
+          stor0 = 2
+          if not address(_param1):
+              revert with 0, 'FROMTOKEN_CANT_T_BE_0'
+          if _param4 <= 0:
+              revert with 0, 'FROM_TOKEN_AMOUNT_MUST_BE_MORE_THAN_0'
+          mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + 134] = this.address
+          require ext_code.size(address(_param1))
+          static call address(_param1).balanceOf(address account) with:
+                  gas gas_remaining wei
+                 args this.address
+          mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + 130] = ext_call.return_data[0]
+          if not ext_call.success:
+              revert with ext_call.return_data[0 len return_data.size]
+          require return_data.size >=′ 32
+          _213 = ext_call.return_data[0]
+          mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + ceil32(return_data.size) + 166] = caller
+          mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + ceil32(return_data.size) + 198] = this.address
+          mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + ceil32(return_data.size) + 230] = _param4
+          mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + ceil32(return_data.size) + 130] = 100
+          mem[64] = ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + ceil32(return_data.size) + 262
+          mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + ceil32(return_data.size) + 166 len 28] = Mask(224, 32, caller) >> 32
+          mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + ceil32(return_data.size) + 162 len 4] = transferFrom(address sender, address recipient, uint256 amount)
+          mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + ceil32(return_data.size) + 262 len 128] = transferFrom(address sender, address recipient, uint256 amount), caller, address(this.address), _param4, mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + ceil32(return_data.size) + 262 len 28]
+          var42001 = 128
+          mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + ceil32(return_data.size) + 362] = 0
+          call address(_param1).mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + ceil32(return_data.size) + 262 len 4] with:
+               gas gas_remaining wei
+              args mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + ceil32(return_data.size) + 266 len 96]
+          if not return_data.size:
+              if not ext_call.success:
+                  _568 = ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + ceil32(return_data.size) + 262
+                  mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + ceil32(return_data.size) + 262] = 0x8c379a000000000000000000000000000000000000000000000000000000000
+                  mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + ceil32(return_data.size) + 266] = 32
+                  mem[_568 + 36] = 36
+                  mem[_568 + 68] = 'TransferHelper: TRANSFER_FROM_FA'
+                  mem[_568 + 100] = 0x494c454400000000000000000000000000000000000000000000000000000000
+                  revert with memory
+                    from ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + ceil32(return_data.size) + 262
+                     len _568 + -ceil32(ceil32(_param2.length)) + -ceil32(ceil32(_param3.length)) + -ceil32(return_data.size) - 130
+              if not mem[96]:
+                  _594 = ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + ceil32(return_data.size) + 262
+                  mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + ceil32(return_data.size) + 266] = this.address
+                  require ext_code.size(address(_param1))
+                  static call address(_param1).balanceOf(address account) with:
+                          gas gas_remaining wei
+                         args mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + ceil32(return_data.size) + 266 len _594 + -ceil32(ceil32(_param2.length)) + -ceil32(ceil32(_param3.length)) + -ceil32(return_data.size) - 230]
+                  mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + ceil32(return_data.size) + 262] = ext_call.return_data[0]
+                  if not ext_call.success:
+                      revert with ext_call.return_data[0 len return_data.size]
+                  _629 = ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + ceil32(return_data.size) + 262
+                  mem[64] = ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + (2 * ceil32(return_data.size)) + 262
+                  require return_data.size >=′ 32
+                  if mem[_629] < _213:
+                      revert with 0, 17
+                  if mem[_629] - _213 <= 0:
+                      _681 = ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + (2 * ceil32(return_data.size)) + 262
+                      mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + (2 * ceil32(return_data.size)) + 262] = 0x8c379a000000000000000000000000000000000000000000000000000000000
+                      mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + (2 * ceil32(return_data.size)) + 266] = 32
+                      mem[_681 + 36] = 39
+                      mem[_681 + 68] = 'NO_FROM_TOKEN_TRANSFER_TO_THIS_C'
+                      mem[_681 + 100] = 0x4f4e545241435400000000000000000000000000000000000000000000000000
+                      revert with memory
+                        from ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + (2 * ceil32(return_data.size)) + 262
+                         len _681 + -ceil32(ceil32(_param2.length)) + -ceil32(ceil32(_param3.length)) + -(2 * ceil32(return_data.size)) - 130
+                  _680 = ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + (2 * ceil32(return_data.size)) + 262
+                  mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + (2 * ceil32(return_data.size)) + 262] = address(_param1)
+                  mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + (2 * ceil32(return_data.size)) + 294] = 192
+                  _688 = _param2.length
+                  mem[_680 + 192] = _param2.length
+                  mem[_680 + 224 len ceil32(_param2.length)] = _param2[all], Mask(8 * ceil32(_param2.length) - _param2.length, -(8 * ceil32(_param2.length) + -ceil32(ceil32(_param2.length)) + 31) + 256, _param3.length) >> -(8 * ceil32(_param2.length) + -ceil32(ceil32(_param2.length)) + 31) + 256
+                  var69001 = ceil32(_param2.length)
+                  if ceil32(_param2.length) <= _param2.length:
+                      mem[_680 + 64] = caller
+                      mem[_680 + 96] = ceil32(_688) + 224
+                      _810 = _param3.length
+                      mem[ceil32(_688) + _680 + 224] = _param3.length
+                      mem[0 + ceil32(_688) + _680 + 256 len ceil32(_810)] = mem[0 + ceil32(ceil32(_param2.length)) + 161 len ceil32(_810)]
+                      var77001 = ceil32(_810)
+                      if ceil32(_810) > _810:
+                          mem[ceil32(_688) + _680 + _810 + 256] = 0
+                      mem[_680 + 128] = _param4
+                      mem[_680 + 160] = _param5
+                      log Swap(address fromToken, string toToken, address sender, string destination, uint256 fromAmount, uint256 minReturnAmount):
+                               mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + (2 * ceil32(return_data.size)) + 262 len ceil32(_810) + ceil32(_688) + _680 + -ceil32(ceil32(_param2.length)) + -ceil32(ceil32(_param3.length)) + -(2 * ceil32(return_data.size)) - 6],
+                  else:
+                      mem[_680 + _param2.length + 224] = 0
+                      mem[_680 + 64] = caller
+                      mem[_680 + 96] = ceil32(_688) + 224
+                      _828 = _param3.length
+                      mem[ceil32(_688) + _680 + 224] = _param3.length
+                      mem[0 + ceil32(_688) + _680 + 256 len ceil32(_828)] = mem[0 + ceil32(ceil32(_param2.length)) + 161 len ceil32(_828)]
+                      var78001 = ceil32(_828)
+                      if ceil32(_828) > _828:
+                          mem[ceil32(_688) + _680 + _828 + 256] = 0
+                      mem[_680 + 128] = _param4
+                      mem[_680 + 160] = _param5
+                      log Swap(address fromToken, string toToken, address sender, string destination, uint256 fromAmount, uint256 minReturnAmount):
+                               mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + (2 * ceil32(return_data.size)) + 262 len ceil32(_828) + ceil32(_688) + _680 + -ceil32(ceil32(_param2.length)) + -ceil32(ceil32(_param3.length)) + -(2 * ceil32(return_data.size)) - 6],
+              else:
+                  require mem[96] >=′ 32
+                  require _param2.length == bool(_param2.length)
+                  if not _param2.length:
+                      _642 = ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + ceil32(return_data.size) + 262
+                      mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + ceil32(return_data.size) + 262] = 0x8c379a000000000000000000000000000000000000000000000000000000000
+                      mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + ceil32(return_data.size) + 266] = 32
+                      mem[_642 + 36] = 36
+                      mem[_642 + 68] = 'TransferHelper: TRANSFER_FROM_FA'
+                      mem[_642 + 100] = 0x494c454400000000000000000000000000000000000000000000000000000000
+                      revert with memory
+                        from ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + ceil32(return_data.size) + 262
+                         len _642 + -ceil32(ceil32(_param2.length)) + -ceil32(ceil32(_param3.length)) + -ceil32(return_data.size) - 130
+                  _653 = ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + ceil32(return_data.size) + 262
+                  mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + ceil32(return_data.size) + 266] = this.address
+                  require ext_code.size(address(_param1))
+                  static call address(_param1).balanceOf(address account) with:
+                          gas gas_remaining wei
+                         args mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + ceil32(return_data.size) + 266 len _653 + -ceil32(ceil32(_param2.length)) + -ceil32(ceil32(_param3.length)) + -ceil32(return_data.size) - 230]
+                  mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + ceil32(return_data.size) + 262] = ext_call.return_data[0]
+                  if not ext_call.success:
+                      revert with ext_call.return_data[0 len return_data.size]
+                  _668 = ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + ceil32(return_data.size) + 262
+                  mem[64] = ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + (2 * ceil32(return_data.size)) + 262
+                  require return_data.size >=′ 32
+                  if mem[_668] < _213:
+                      revert with 0, 17
+                  if mem[_668] - _213 <= 0:
+                      _699 = ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + (2 * ceil32(return_data.size)) + 262
+                      mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + (2 * ceil32(return_data.size)) + 262] = 0x8c379a000000000000000000000000000000000000000000000000000000000
+                      mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + (2 * ceil32(return_data.size)) + 266] = 32
+                      mem[_699 + 36] = 39
+                      mem[_699 + 68] = 'NO_FROM_TOKEN_TRANSFER_TO_THIS_C'
+                      mem[_699 + 100] = 0x4f4e545241435400000000000000000000000000000000000000000000000000
+                      revert with memory
+                        from ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + (2 * ceil32(return_data.size)) + 262
+                         len _699 + -ceil32(ceil32(_param2.length)) + -ceil32(ceil32(_param3.length)) + -(2 * ceil32(return_data.size)) - 130
+                  _698 = ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + (2 * ceil32(return_data.size)) + 262
+                  mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + (2 * ceil32(return_data.size)) + 262] = address(_param1)
+                  mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + (2 * ceil32(return_data.size)) + 294] = 192
+                  _708 = _param2.length
+                  mem[_698 + 192] = _param2.length
+                  mem[_698 + 224 len ceil32(_param2.length)] = _param2[all], Mask(8 * ceil32(_param2.length) - _param2.length, -(8 * ceil32(_param2.length) + -ceil32(ceil32(_param2.length)) + 31) + 256, _param3.length) >> -(8 * ceil32(_param2.length) + -ceil32(ceil32(_param2.length)) + 31) + 256
+                  var73001 = ceil32(_param2.length)
+                  if ceil32(_param2.length) <= _param2.length:
+                      mem[_698 + 64] = caller
+                      mem[_698 + 96] = ceil32(_708) + 224
+                      _811 = _param3.length
+                      mem[ceil32(_708) + _698 + 224] = _param3.length
+                      mem[0 + ceil32(_708) + _698 + 256 len ceil32(_811)] = mem[0 + ceil32(ceil32(_param2.length)) + 161 len ceil32(_811)]
+                      var81001 = ceil32(_811)
+                      if ceil32(_811) > _811:
+                          mem[ceil32(_708) + _698 + _811 + 256] = 0
+                      mem[_698 + 128] = _param4
+                      mem[_698 + 160] = _param5
+                      log Swap(address fromToken, string toToken, address sender, string destination, uint256 fromAmount, uint256 minReturnAmount):
+                               mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + (2 * ceil32(return_data.size)) + 262 len ceil32(_811) + ceil32(_708) + _698 + -ceil32(ceil32(_param2.length)) + -ceil32(ceil32(_param3.length)) + -(2 * ceil32(return_data.size)) - 6],
+                  else:
+                      mem[_698 + _param2.length + 224] = 0
+                      mem[_698 + 64] = caller
+                      mem[_698 + 96] = ceil32(_708) + 224
+                      _829 = _param3.length
+                      mem[ceil32(_708) + _698 + 224] = _param3.length
+                      mem[0 + ceil32(_708) + _698 + 256 len ceil32(_829)] = mem[0 + ceil32(ceil32(_param2.length)) + 161 len ceil32(_829)]
+                      var82001 = ceil32(_829)
+                      if ceil32(_829) > _829:
+                          mem[ceil32(_708) + _698 + _829 + 256] = 0
+                      mem[_698 + 128] = _param4
+                      mem[_698 + 160] = _param5
+                      log Swap(address fromToken, string toToken, address sender, string destination, uint256 fromAmount, uint256 minReturnAmount):
+                               mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + (2 * ceil32(return_data.size)) + 262 len ceil32(_829) + ceil32(_708) + _698 + -ceil32(ceil32(_param2.length)) + -ceil32(ceil32(_param3.length)) + -(2 * ceil32(return_data.size)) - 6],
+          else:
+              _522 = ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + ceil32(return_data.size) + 262
+              mem[64] = ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + ceil32(return_data.size) + ceil32(return_data.size) + 263
+              mem[_522] = return_data.size
+              mem[_522 + 32 len return_data.size] = ext_call.return_data[0 len return_data.size]
+              if not ext_call.success:
+                  _570 = ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + ceil32(return_data.size) + ceil32(return_data.size) + 263
+                  mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + ceil32(return_data.size) + ceil32(return_data.size) + 263] = 0x8c379a000000000000000000000000000000000000000000000000000000000
+                  mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + ceil32(return_data.size) + ceil32(return_data.size) + 267] = 32
+                  mem[_570 + 36] = 36
+                  mem[_570 + 68] = 'TransferHelper: TRANSFER_FROM_FA'
+                  mem[_570 + 100] = 0x494c454400000000000000000000000000000000000000000000000000000000
+                  revert with memory
+                    from ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + ceil32(return_data.size) + ceil32(return_data.size) + 263
+                     len _570 + -ceil32(ceil32(_param2.length)) + -ceil32(ceil32(_param3.length)) + -ceil32(return_data.size) + -ceil32(return_data.size) - 131
+              if not return_data.size:
+                  _597 = ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + ceil32(return_data.size) + ceil32(return_data.size) + 263
+                  mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + ceil32(return_data.size) + ceil32(return_data.size) + 267] = this.address
+                  require ext_code.size(address(_param1))
+                  static call address(_param1).balanceOf(address account) with:
+                          gas gas_remaining wei
+                         args mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + ceil32(return_data.size) + ceil32(return_data.size) + 267 len _597 + -ceil32(ceil32(_param2.length)) + -ceil32(ceil32(_param3.length)) + -ceil32(return_data.size) + -ceil32(return_data.size) - 231]
+                  mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + ceil32(return_data.size) + ceil32(return_data.size) + 263] = ext_call.return_data[0]
+                  if not ext_call.success:
+                      revert with ext_call.return_data[0 len return_data.size]
+                  _630 = ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + ceil32(return_data.size) + ceil32(return_data.size) + 263
+                  mem[64] = ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + (2 * ceil32(return_data.size)) + ceil32(return_data.size) + 263
+                  require return_data.size >=′ 32
+                  if mem[_630] < _213:
+                      revert with 0, 17
+                  if mem[_630] - _213 <= 0:
+                      _683 = ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + (2 * ceil32(return_data.size)) + ceil32(return_data.size) + 263
+                      mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + (2 * ceil32(return_data.size)) + ceil32(return_data.size) + 263] = 0x8c379a000000000000000000000000000000000000000000000000000000000
+                      mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + (2 * ceil32(return_data.size)) + ceil32(return_data.size) + 267] = 32
+                      mem[_683 + 36] = 39
+                      mem[_683 + 68] = 'NO_FROM_TOKEN_TRANSFER_TO_THIS_C'
+                      mem[_683 + 100] = 0x4f4e545241435400000000000000000000000000000000000000000000000000
+                      revert with memory
+                        from ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + (2 * ceil32(return_data.size)) + ceil32(return_data.size) + 263
+                         len _683 + -ceil32(ceil32(_param2.length)) + -ceil32(ceil32(_param3.length)) + -(2 * ceil32(return_data.size)) + -ceil32(return_data.size) - 131
+                  _682 = ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + (2 * ceil32(return_data.size)) + ceil32(return_data.size) + 263
+                  mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + (2 * ceil32(return_data.size)) + ceil32(return_data.size) + 263] = address(_param1)
+                  mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + (2 * ceil32(return_data.size)) + ceil32(return_data.size) + 295] = 192
+                  _689 = _param2.length
+                  mem[_682 + 192] = _param2.length
+                  mem[_682 + 224 len ceil32(_param2.length)] = _param2[all], Mask(8 * ceil32(_param2.length) - _param2.length, -(8 * ceil32(_param2.length) + -ceil32(ceil32(_param2.length)) + 31) + 256, _param3.length) >> -(8 * ceil32(_param2.length) + -ceil32(ceil32(_param2.length)) + 31) + 256
+                  var69001 = ceil32(_param2.length)
+                  if ceil32(_param2.length) <= _param2.length:
+                      mem[_682 + 64] = caller
+                      mem[_682 + 96] = ceil32(_689) + 224
+                      _812 = _param3.length
+                      mem[ceil32(_689) + _682 + 224] = _param3.length
+                      mem[0 + ceil32(_689) + _682 + 256 len ceil32(_812)] = mem[0 + ceil32(ceil32(_param2.length)) + 161 len ceil32(_812)]
+                      var77001 = ceil32(_812)
+                      if ceil32(_812) > _812:
+                          mem[ceil32(_689) + _682 + _812 + 256] = 0
+                      mem[_682 + 128] = _param4
+                      mem[_682 + 160] = _param5
+                      log Swap(address fromToken, string toToken, address sender, string destination, uint256 fromAmount, uint256 minReturnAmount):
+                               mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + (2 * ceil32(return_data.size)) + ceil32(return_data.size) + 263 len ceil32(_812) + ceil32(_689) + _682 + -ceil32(ceil32(_param2.length)) + -ceil32(ceil32(_param3.length)) + -(2 * ceil32(return_data.size)) + -ceil32(return_data.size) - 7],
+                  else:
+                      mem[_682 + _param2.length + 224] = 0
+                      mem[_682 + 64] = caller
+                      mem[_682 + 96] = ceil32(_689) + 224
+                      _830 = _param3.length
+                      mem[ceil32(_689) + _682 + 224] = _param3.length
+                      mem[0 + ceil32(_689) + _682 + 256 len ceil32(_830)] = mem[0 + ceil32(ceil32(_param2.length)) + 161 len ceil32(_830)]
+                      var78001 = ceil32(_830)
+                      if ceil32(_830) > _830:
+                          mem[ceil32(_689) + _682 + _830 + 256] = 0
+                      mem[_682 + 128] = _param4
+                      mem[_682 + 160] = _param5
+                      log Swap(address fromToken, string toToken, address sender, string destination, uint256 fromAmount, uint256 minReturnAmount):
+                               mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + (2 * ceil32(return_data.size)) + ceil32(return_data.size) + 263 len ceil32(_830) + ceil32(_689) + _682 + -ceil32(ceil32(_param2.length)) + -ceil32(ceil32(_param3.length)) + -(2 * ceil32(return_data.size)) + -ceil32(return_data.size) - 7],
+              else:
+                  require return_data.size >=′ 32
+                  require mem[_522 + 32] == bool(mem[_522 + 32])
+                  if not mem[_522 + 32]:
+                      _643 = ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + ceil32(return_data.size) + ceil32(return_data.size) + 263
+                      mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + ceil32(return_data.size) + ceil32(return_data.size) + 263] = 0x8c379a000000000000000000000000000000000000000000000000000000000
+                      mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + ceil32(return_data.size) + ceil32(return_data.size) + 267] = 32
+                      mem[_643 + 36] = 36
+                      mem[_643 + 68] = 'TransferHelper: TRANSFER_FROM_FA'
+                      mem[_643 + 100] = 0x494c454400000000000000000000000000000000000000000000000000000000
+                      revert with memory
+                        from ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + ceil32(return_data.size) + ceil32(return_data.size) + 263
+                         len _643 + -ceil32(ceil32(_param2.length)) + -ceil32(ceil32(_param3.length)) + -ceil32(return_data.size) + -ceil32(return_data.size) - 131
+                  _657 = ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + ceil32(return_data.size) + ceil32(return_data.size) + 263
+                  mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + ceil32(return_data.size) + ceil32(return_data.size) + 267] = this.address
+                  require ext_code.size(address(_param1))
+                  static call address(_param1).balanceOf(address account) with:
+                          gas gas_remaining wei
+                         args mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + ceil32(return_data.size) + ceil32(return_data.size) + 267 len _657 + -ceil32(ceil32(_param2.length)) + -ceil32(ceil32(_param3.length)) + -ceil32(return_data.size) + -ceil32(return_data.size) - 231]
+                  mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + ceil32(return_data.size) + ceil32(return_data.size) + 263] = ext_call.return_data[0]
+                  if not ext_call.success:
+                      revert with ext_call.return_data[0 len return_data.size]
+                  _669 = ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + ceil32(return_data.size) + ceil32(return_data.size) + 263
+                  mem[64] = ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + (2 * ceil32(return_data.size)) + ceil32(return_data.size) + 263
+                  require return_data.size >=′ 32
+                  if mem[_669] < _213:
+                      revert with 0, 17
+                  if mem[_669] - _213 <= 0:
+                      _701 = ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + (2 * ceil32(return_data.size)) + ceil32(return_data.size) + 263
+                      mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + (2 * ceil32(return_data.size)) + ceil32(return_data.size) + 263] = 0x8c379a000000000000000000000000000000000000000000000000000000000
+                      mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + (2 * ceil32(return_data.size)) + ceil32(return_data.size) + 267] = 32
+                      mem[_701 + 36] = 39
+                      mem[_701 + 68] = 'NO_FROM_TOKEN_TRANSFER_TO_THIS_C'
+                      mem[_701 + 100] = 0x4f4e545241435400000000000000000000000000000000000000000000000000
+                      revert with memory
+                        from ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + (2 * ceil32(return_data.size)) + ceil32(return_data.size) + 263
+                         len _701 + -ceil32(ceil32(_param2.length)) + -ceil32(ceil32(_param3.length)) + -(2 * ceil32(return_data.size)) + -ceil32(return_data.size) - 131
+                  _700 = ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + (2 * ceil32(return_data.size)) + ceil32(return_data.size) + 263
+                  mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + (2 * ceil32(return_data.size)) + ceil32(return_data.size) + 263] = address(_param1)
+                  mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + (2 * ceil32(return_data.size)) + ceil32(return_data.size) + 295] = 192
+                  _709 = _param2.length
+                  mem[_700 + 192] = _param2.length
+                  mem[_700 + 224 len ceil32(_param2.length)] = _param2[all], Mask(8 * ceil32(_param2.length) - _param2.length, -(8 * ceil32(_param2.length) + -ceil32(ceil32(_param2.length)) + 31) + 256, _param3.length) >> -(8 * ceil32(_param2.length) + -ceil32(ceil32(_param2.length)) + 31) + 256
+                  var73001 = ceil32(_param2.length)
+                  if ceil32(_param2.length) <= _param2.length:
+                      mem[_700 + 64] = caller
+                      mem[_700 + 96] = ceil32(_709) + 224
+                      _813 = _param3.length
+                      mem[ceil32(_709) + _700 + 224] = _param3.length
+                      mem[0 + ceil32(_709) + _700 + 256 len ceil32(_813)] = mem[0 + ceil32(ceil32(_param2.length)) + 161 len ceil32(_813)]
+                      var81001 = ceil32(_813)
+                      if ceil32(_813) > _813:
+                          mem[ceil32(_709) + _700 + _813 + 256] = 0
+                      mem[_700 + 128] = _param4
+                      mem[_700 + 160] = _param5
+                      log Swap(address fromToken, string toToken, address sender, string destination, uint256 fromAmount, uint256 minReturnAmount):
+                               mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + (2 * ceil32(return_data.size)) + ceil32(return_data.size) + 263 len ceil32(_813) + ceil32(_709) + _700 + -ceil32(ceil32(_param2.length)) + -ceil32(ceil32(_param3.length)) + -(2 * ceil32(return_data.size)) + -ceil32(return_data.size) - 7],
+                  else:
+                      mem[_700 + _param2.length + 224] = 0
+                      mem[_700 + 64] = caller
+                      mem[_700 + 96] = ceil32(_709) + 224
+                      _831 = _param3.length
+                      mem[ceil32(_709) + _700 + 224] = _param3.length
+                      mem[0 + ceil32(_709) + _700 + 256 len ceil32(_831)] = mem[0 + ceil32(ceil32(_param2.length)) + 161 len ceil32(_831)]
+                      var82001 = ceil32(_831)
+                      if ceil32(_831) > _831:
+                          mem[ceil32(_709) + _700 + _831 + 256] = 0
+                      mem[_700 + 128] = _param4
+                      mem[_700 + 160] = _param5
+                      log Swap(address fromToken, string toToken, address sender, string destination, uint256 fromAmount, uint256 minReturnAmount):
+                               mem[ceil32(ceil32(_param2.length)) + ceil32(ceil32(_param3.length)) + (2 * ceil32(return_data.size)) + ceil32(return_data.size) + 263 len ceil32(_831) + ceil32(_709) + _700 + -ceil32(ceil32(_param2.length)) + -ceil32(ceil32(_param3.length)) + -(2 * ceil32(return_data.size)) + -ceil32(return_data.size) - 7],
+      stor0 = 1
+
+

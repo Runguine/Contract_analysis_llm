@@ -1,0 +1,157 @@
+# Palkeoramix decompiler. 
+
+const name = 'BLOCKv Token'
+const decimals = 18
+const amountOfTokensPoolA = 0x41fa4ca054a28d9156cf368
+const amountOfTokensPoolB = 911567810300063801255851777
+const symbol = 'VEE'
+const amountOfTokensPoolC = 911567810300063801255851777
+const totalAmountOfTokens = 0xbc81ff80f1d06fe865bdc04
+const amountOfTokensPoolD = 546940686180038280753511066
+
+def storage:
+  totalSupply is uint256 at storage 0
+  balanceOf is mapping of uint256 at storage 1
+  allowance is mapping of uint256 at storage 2
+  paused is uint8 at storage 3
+  owner is address at storage 3 offset 8
+  poolBLockAddress is address at storage 4
+  poolCLockAddress is address at storage 5
+  poolDLockAddress is address at storage 6
+  migrationMasterAddress is address at storage 7
+  migrationAgentAddress is address at storage 8
+  totalMigrated is uint256 at storage 9
+
+def totalSupply(): # not payable
+  return totalSupply
+
+def poolDLock(): # not payable
+  return poolDLockAddress
+
+def poolBLock(): # not payable
+  return poolBLockAddress
+
+def paused(): # not payable
+  return bool(paused)
+
+def migrationMaster(): # not payable
+  return migrationMasterAddress
+
+def poolCLock(): # not payable
+  return poolCLockAddress
+
+def balanceOf(address account): # not payable
+  return balanceOf[address(account)]
+
+def migrationAgent(): # not payable
+  return migrationAgentAddress
+
+def owner(): # not payable
+  return owner
+
+def totalMigrated(): # not payable
+  return totalMigrated
+
+def allowance(address owner, address spender): # not payable
+  return allowance[address(owner)][address(spender)]
+
+#
+#  Regular functions
+#
+
+def _fallback(?) payable: # default function
+  revert
+
+def unpause(): # not payable
+  require owner == caller
+  require paused
+  paused = 0
+  log Unpause()
+  return 1
+
+def pause(): # not payable
+  require owner == caller
+  require not paused
+  paused = 1
+  log Pause()
+  return 1
+
+def setMigrationMaster(address _master): # not payable
+  require _master
+  require migrationMasterAddress == caller
+  migrationMasterAddress = _master
+
+def setMigrationAgent(address _agent): # not payable
+  require _agent
+  require not migrationAgentAddress
+  require migrationMasterAddress == caller
+  migrationAgentAddress = _agent
+
+def approve(address spender, uint256 amount): # not payable
+  require not paused
+  require spender
+  require spender != this.address
+  require 68 == calldata.size
+  if amount:
+      require not allowance[caller][address(spender)]
+  allowance[caller][address(spender)] = amount
+  log Approval(
+        address owner=amount,
+        address spender=caller,
+        uint256 value=spender)
+  return 1
+
+def transfer(address recipient, uint256 amount): # not payable
+  require not paused
+  require recipient
+  require recipient != this.address
+  require 68 == calldata.size
+  require amount <= balanceOf[caller]
+  balanceOf[caller] -= amount
+  require amount + balanceOf[recipient] >= balanceOf[recipient]
+  balanceOf[address(recipient)] = amount + balanceOf[recipient]
+  log Transfer(
+        address from=amount,
+        address to=caller,
+        uint256 value=recipient)
+  return 1
+
+def migrate(uint256 _pid): # not payable
+  require migrationAgentAddress
+  require _pid
+  require _pid <= balanceOf[caller]
+  require _pid <= balanceOf[caller]
+  balanceOf[caller] -= _pid
+  require _pid <= totalSupply
+  totalSupply -= _pid
+  require _pid + totalMigrated >= totalMigrated
+  totalMigrated += _pid
+  require ext_code.size(migrationAgentAddress)
+  call migrationAgentAddress.migrateFrom(address _from, uint256 _value) with:
+       gas gas_remaining - 710 wei
+      args caller, _pid
+  require ext_call.success
+  log Migrate(
+        address _from=_pid,
+        address _to=caller,
+        uint256 _value=migrationAgentAddress)
+
+def transferFrom(address sender, address recipient, uint256 amount): # not payable
+  require not paused
+  require recipient
+  require recipient != sender
+  require recipient != this.address
+  require 100 == calldata.size
+  require amount + balanceOf[address(recipient)] >= balanceOf[address(recipient)]
+  balanceOf[address(recipient)] += amount
+  require amount <= balanceOf[sender]
+  balanceOf[address(sender)] = balanceOf[sender] - amount
+  require amount <= allowance[address(sender)][caller]
+  allowance[address(sender)][caller] -= amount
+  log Transfer(
+        address from=amount,
+        address to=sender,
+        uint256 value=recipient)
+  return 1
+
+

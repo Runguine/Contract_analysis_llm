@@ -1,0 +1,1226 @@
+# Palkeoramix decompiler. 
+#
+#  I failed with these: 
+#  - unknown1ef38174(?)
+#  All the rest is below.
+#
+
+const unknown06285c69 = 5009297550715157269, 4411394078118774322, 0xea8112530ca10945c2aa976f8f615582af9b70fa, 0x411de17f12d1a34ecc7f45f49844626267c75e81
+const typeAndVersion = 'CommitStore 1.5.0', 0
+const latestConfigDigestAndEpoch = 1, 0, 0
+
+def storage:
+  owner is address at storage 0
+  stor1 is address at storage 1
+  stor2 is uint256 at storage 2
+  stor3 is uint8 at storage 3
+  stor4 is uint32 at storage 4
+  stor5 is mapping of struct at storage 5
+  stor7 is array of struct at storage 7
+  unknown7437ff9fAddress is address at storage 8
+  paused is uint8 at storage 9 offset 104
+  stor9 is uint64 at storage 9
+  unknown10c374ed is uint64 at storage 9 offset 64
+  unknown4120fccd is uint64 at storage 9
+  merkleRoot is mapping of uint256 at storage 10
+
+def unknown10c374ed() payable: 
+  return unknown10c374ed
+
+def unknown4120fccd() payable: 
+  return unknown4120fccd
+
+def paused() payable: 
+  return bool(paused)
+
+def unknown7437ff9f() payable: 
+  return unknown7437ff9fAddress
+
+def owner() payable: 
+  return owner
+
+def getMerkleRoot(bytes32 saleId) payable: 
+  require calldata.size - 4 >=′ 32
+  return merkleRoot[saleId]
+
+#
+#  Regular functions
+#
+
+def _fallback(?) payable: # default function
+  revert
+
+def latestConfigDetails() payable: 
+  return stor4, stor4, stor2
+
+def pause() payable: 
+  if owner != caller:
+      revert with 0, 'Only callable by owner'
+  paused = 1
+  log Paused(address account=caller)
+
+def unpause() payable: 
+  if owner != caller:
+      revert with 0, 'Only callable by owner'
+  paused = 0
+  log Unpaused(address account=caller)
+
+def acceptOwnership() payable: 
+  if stor1 != caller:
+      revert with 0, 'Must be proposed owner'
+  owner = caller
+  stor1 = 0
+  log OwnershipTransferred(
+        address previousOwner=owner,
+        address newOwner=caller)
+
+def unknown29b980e4(uint256 _param1) payable: 
+  require calldata.size - 4 >=′ 32
+  require _param1 == _param1 % unknown10000000()
+  if owner != caller:
+      revert with 0, 'Only callable by owner'
+  unknown10c374ed = _param1 % unknown10000000()
+  log 0xf0d557bf: stor9, _param1 % unknown10000000()
+
+def unknownad7a22f8(uint256 _param1) payable: 
+  require calldata.size - 4 >=′ 32
+  require _param1 == uint64(_param1)
+  if owner != caller:
+      revert with 0, 'Only callable by owner'
+  unknown4120fccd = uint64(_param1)
+  log 0xea59e802: unknown4120fccd, uint64(_param1)
+
+def transferOwnership(address newOwner) payable: 
+  require calldata.size - 4 >=′ 32
+  require newOwner == newOwner
+  if owner != caller:
+      revert with 0, 'Only callable by owner'
+  if not newOwner - caller:
+      revert with 0, 'Cannot transfer to self'
+  stor1 = newOwner
+  log OwnershipTransferRequested(
+        address from=owner,
+        address to=newOwner)
+
+def isBlessed(bytes32 seed) payable: 
+  require calldata.size - 4 >=′ 32
+  static call 0x411de17f12d1a34ecc7f45f49844626267c75e81.'Magq' with:
+          gas gas_remaining wei
+         args address(this.address), seed
+  if not ext_call.success:
+      revert with ext_call.return_data[0 len return_data.size]
+  require return_data.size >=′ 32
+  require ext_call.return_data[0] == bool(ext_call.return_data[0])
+  return bool(ext_call.return_data[0])
+
+def unknowne89d039f() payable: 
+  static call 0x411de17f12d1a34ecc7f45f49844626267c75e81.0x2cbc26bb with:
+          gas gas_remaining wei
+         args 0x3d386b8a9e88063200000000000000000000000000000000
+  if not ext_call.success:
+      revert with ext_call.return_data[0 len return_data.size]
+  require return_data.size >=′ 32
+  require ext_call.return_data[0] == bool(ext_call.return_data[0])
+  if ext_call.return_data[0]:
+      return not bool(ext_call.return_data[0])
+  return not bool(paused)
+
+def unknownf47a8690() payable: 
+  mem[64] = 96
+  require calldata.size - 4 >=′ 32
+  require cd[4] <= LOCK8605463013()
+  require cd[4] + 35 <′ calldata.size
+  require ('cd', 4).length <= LOCK8605463013()
+  require cd[4] + (32 * ('cd', 4).length) + 36 <= calldata.size
+  if owner != caller:
+      revert with 0, 'Only callable by owner'
+  idx = 0
+  while idx < ('cd', 4).length:
+      _13 = mem[64]
+      mem[64] = mem[64] + 64
+      mem[_13] = this.address
+      mem[_13 + 32] = cd[((32 * idx) + cd[4] + 36)]
+      mem[mem[64] + 4] = this.address
+      mem[mem[64] + 36] = cd[((32 * idx) + cd[4] + 36)]
+      static call 0x411de17f12d1a34ecc7f45f49844626267c75e81.'Magq' with:
+              gas gas_remaining wei
+             args address(this.address), cd[((32 * idx) + cd[4] + 36)]
+      mem[mem[64]] = ext_call.return_data[0]
+      if not ext_call.success:
+          revert with ext_call.return_data[0 len return_data.size]
+      _18 = mem[64]
+      mem[64] = mem[64] + ceil32(return_data.size)
+      require return_data.size >=′ 32
+      require mem[_18] == bool(mem[_18])
+      if not mem[_18]:
+          mem[0] = cd[((32 * idx) + cd[4] + 36)]
+          mem[32] = 10
+          merkleRoot[cd[((32 * idx) + cd[4] + 36)]] = 0
+          mem[mem[64]] = cd[((32 * idx) + cd[4] + 36)]
+          log 0x202f1139: cd[((32 * idx) + cd[4] + 36)]
+      idx = idx + 1
+      continue 
+
+def getTransmitters() payable: 
+  mem[64] = (32 * stor7.length) + 128
+  mem[96] = stor7.length
+  if not stor7.length:
+      mem[(32 * stor7.length) + 128] = 32
+      mem[(32 * stor7.length) + 160] = stor7.length
+      idx = 0
+      s = 128
+      t = (32 * stor7.length) + 192
+      while idx < stor7.length:
+          mem[t] = mem[s + 12 len 20]
+          idx = idx + 1
+          s = s + 32
+          t = t + 32
+          continue 
+      return memory
+        from (32 * stor7.length) + 128
+         len (96 * stor7.length) + 64
+  mem[128] = address(stor7.field_0)
+  idx = 128
+  s = 0
+  while (32 * stor7.length) + 96 > idx:
+      mem[idx + 32] = stor7[s].field_256
+      idx = idx + 32
+      s = s + 1
+      continue 
+  mem[(32 * stor7.length) + 128] = 32
+  mem[(32 * stor7.length) + 160] = stor7.length
+  idx = 0
+  s = 128
+  t = mem[64] + 64
+  while idx < stor7.length:
+      mem[t] = mem[s + 12 len 20]
+      idx = idx + 1
+      s = s + 32
+      t = t + 32
+      continue 
+  return memory
+    from mem[64]
+     len (64 * stor7.length) + -mem[64] + 192
+
+def unknown32048875(array _param1, array _param2, uint256 _param3) payable: 
+  require calldata.size - 4 >=′ 96
+  require _param1 <= LOCK8605463013()
+  require _param1 + 35 <′ calldata.size
+  require _param1.length <= LOCK8605463013()
+  require _param1 + (32 * _param1.length) + 36 <= calldata.size
+  require _param2 <= LOCK8605463013()
+  require _param2 + 35 <′ calldata.size
+  require _param2.length <= LOCK8605463013()
+  require _param2 + (32 * _param2.length) + 36 <= calldata.size
+  if paused:
+      revert with PausedError()
+  mem[96] = _param1.length
+  mem[128 len 32 * _param1.length] = call.data[_param1 + 36 len 32 * _param1.length]
+  mem[(32 * _param1.length) + 128] = _param2.length
+  mem[(32 * _param1.length) + 160 len 32 * _param2.length] = call.data[_param2 + 36 len 32 * _param2.length]
+  if not -_param1.length:
+      revert with 296137316
+  if _param1.length > 257:
+      revert with InvalidProof()
+  if _param2.length > 257:
+      revert with InvalidProof()
+  if _param2.length + _param1.length - 1 > 256:
+      revert with InvalidProof()
+  if not -_param2.length + -_param1.length - 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff:
+      if 0 >= _param1.length:
+          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+      static call 0x411de17f12d1a34ecc7f45f49844626267c75e81.'Magq' with:
+              gas gas_remaining wei
+             args address(this.address), mem[128]
+      if not ext_call.success:
+          revert with ext_call.return_data[0 len return_data.size]
+      require return_data.size >=′ 32
+      require ext_call.return_data[0] == bool(ext_call.return_data[0])
+      if ext_call.return_data[0]:
+          return merkleRoot[mem[128]]
+  else:
+      if _param2.length + _param1.length - 1 > LOCK8605463013():
+          revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+      mem[(32 * _param2.length) + (32 * _param1.length) + 160] = _param2.length + _param1.length - 1
+      mem[64] = (32 * _param2.length) + (32 * _param1.length) + (32 * _param2.length + _param1.length - 1) + 192
+      if not _param2.length + _param1.length - 1:
+          idx = 0
+          s = 0
+          while idx < _param2.length + _param1.length - 1:
+              if (1 << idx and _param3) - (1 << idx):
+                  if 0 >= mem[(32 * _param1.length) + 128]:
+                      revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                  _164 = mem[(32 * _param1.length) + 160]
+                  if s >= _param1.length:
+                      if 0 >= mem[(32 * _param2.length) + (32 * _param1.length) + 160]:
+                          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                      _189 = mem[(32 * _param2.length) + (32 * _param1.length) + 192]
+                      if 1 > idx:
+                          revert with InvalidProof()
+                      mem[mem[64] + 32] = 1
+                      if mem[(32 * _param1.length) + 160] < mem[(32 * _param2.length) + (32 * _param1.length) + 192]:
+                          mem[mem[64] + 64] = _164
+                          mem[mem[64] + 96] = _189
+                          _244 = mem[64]
+                          mem[mem[64]] = 96
+                          mem[64] = mem[64] + 128
+                          if idx >= mem[(32 * _param2.length) + (32 * _param1.length) + 160]:
+                              revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                          mem[(32 * idx) + (32 * _param2.length) + (32 * _param1.length) + 192] = sha3(mem[_244 + 32 len mem[_244]])
+                      else:
+                          mem[mem[64] + 64] = _189
+                          mem[mem[64] + 96] = _164
+                          _248 = mem[64]
+                          mem[mem[64]] = 96
+                          mem[64] = mem[64] + 128
+                          if idx >= mem[(32 * _param2.length) + (32 * _param1.length) + 160]:
+                              revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                          mem[(32 * idx) + (32 * _param2.length) + (32 * _param1.length) + 192] = sha3(mem[_248 + 32 len mem[_248]])
+                      idx = idx + 1
+                      s = s
+                      continue 
+                  if s >= mem[96]:
+                      revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                  _190 = mem[(32 * s) + 128]
+                  if 0 > idx:
+                      revert with InvalidProof()
+                  mem[mem[64] + 32] = 1
+                  if mem[(32 * _param1.length) + 160] < mem[(32 * s) + 128]:
+                      mem[mem[64] + 64] = _164
+                      mem[mem[64] + 96] = _190
+                      _252 = mem[64]
+                      mem[mem[64]] = 96
+                      mem[64] = mem[64] + 128
+                      if idx >= mem[(32 * _param2.length) + (32 * _param1.length) + 160]:
+                          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                      mem[(32 * idx) + (32 * _param2.length) + (32 * _param1.length) + 192] = sha3(mem[_252 + 32 len mem[_252]])
+                  else:
+                      mem[mem[64] + 64] = _190
+                      mem[mem[64] + 96] = _164
+                      _256 = mem[64]
+                      mem[mem[64]] = 96
+                      mem[64] = mem[64] + 128
+                      if idx >= mem[(32 * _param2.length) + (32 * _param1.length) + 160]:
+                          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                      mem[(32 * idx) + (32 * _param2.length) + (32 * _param1.length) + 192] = sha3(mem[_256 + 32 len mem[_256]])
+                  idx = idx + 1
+                  s = s + 1
+                  continue 
+              if s >= _param1.length:
+                  if 0 >= mem[(32 * _param2.length) + (32 * _param1.length) + 160]:
+                      revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                  _172 = mem[(32 * _param2.length) + (32 * _param1.length) + 192]
+                  if s >= _param1.length:
+                      if 1 >= mem[(32 * _param2.length) + (32 * _param1.length) + 160]:
+                          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                      _205 = mem[(32 * _param2.length) + (32 * _param1.length) + 224]
+                      if 2 > idx:
+                          revert with InvalidProof()
+                      mem[mem[64] + 32] = 1
+                      if mem[(32 * _param2.length) + (32 * _param1.length) + 192] < mem[(32 * _param2.length) + (32 * _param1.length) + 224]:
+                          mem[mem[64] + 64] = _172
+                          mem[mem[64] + 96] = _205
+                          _282 = mem[64]
+                          mem[mem[64]] = 96
+                          mem[64] = mem[64] + 128
+                          if idx >= mem[(32 * _param2.length) + (32 * _param1.length) + 160]:
+                              revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                          mem[(32 * idx) + (32 * _param2.length) + (32 * _param1.length) + 192] = sha3(mem[_282 + 32 len mem[_282]])
+                      else:
+                          mem[mem[64] + 64] = _205
+                          mem[mem[64] + 96] = _172
+                          _286 = mem[64]
+                          mem[mem[64]] = 96
+                          mem[64] = mem[64] + 128
+                          if idx >= mem[(32 * _param2.length) + (32 * _param1.length) + 160]:
+                              revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                          mem[(32 * idx) + (32 * _param2.length) + (32 * _param1.length) + 192] = sha3(mem[_286 + 32 len mem[_286]])
+                      idx = idx + 1
+                      s = s
+                      continue 
+                  if s >= mem[96]:
+                      revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                  _206 = mem[(32 * s) + 128]
+                  if 1 > idx:
+                      revert with InvalidProof()
+                  mem[mem[64] + 32] = 1
+                  if mem[(32 * _param2.length) + (32 * _param1.length) + 192] < mem[(32 * s) + 128]:
+                      mem[mem[64] + 64] = _172
+                      mem[mem[64] + 96] = _206
+                      _290 = mem[64]
+                      mem[mem[64]] = 96
+                      mem[64] = mem[64] + 128
+                      if idx >= mem[(32 * _param2.length) + (32 * _param1.length) + 160]:
+                          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                      mem[(32 * idx) + (32 * _param2.length) + (32 * _param1.length) + 192] = sha3(mem[_290 + 32 len mem[_290]])
+                  else:
+                      mem[mem[64] + 64] = _206
+                      mem[mem[64] + 96] = _172
+                      _294 = mem[64]
+                      mem[mem[64]] = 96
+                      mem[64] = mem[64] + 128
+                      if idx >= mem[(32 * _param2.length) + (32 * _param1.length) + 160]:
+                          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                      mem[(32 * idx) + (32 * _param2.length) + (32 * _param1.length) + 192] = sha3(mem[_294 + 32 len mem[_294]])
+                  idx = idx + 1
+                  s = s + 1
+                  continue 
+              if s >= mem[96]:
+                  revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+              _173 = mem[(32 * s) + 128]
+              if s + 1 >= _param1.length:
+                  if 0 >= mem[(32 * _param2.length) + (32 * _param1.length) + 160]:
+                      revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                  _207 = mem[(32 * _param2.length) + (32 * _param1.length) + 192]
+                  if 1 > idx:
+                      revert with InvalidProof()
+                  mem[mem[64] + 32] = 1
+                  if mem[(32 * s) + 128] < mem[(32 * _param2.length) + (32 * _param1.length) + 192]:
+                      mem[mem[64] + 64] = _173
+                      mem[mem[64] + 96] = _207
+                      _298 = mem[64]
+                      mem[mem[64]] = 96
+                      mem[64] = mem[64] + 128
+                      if idx >= mem[(32 * _param2.length) + (32 * _param1.length) + 160]:
+                          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                      mem[(32 * idx) + (32 * _param2.length) + (32 * _param1.length) + 192] = sha3(mem[_298 + 32 len mem[_298]])
+                  else:
+                      mem[mem[64] + 64] = _207
+                      mem[mem[64] + 96] = _173
+                      _302 = mem[64]
+                      mem[mem[64]] = 96
+                      mem[64] = mem[64] + 128
+                      if idx >= mem[(32 * _param2.length) + (32 * _param1.length) + 160]:
+                          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                      mem[(32 * idx) + (32 * _param2.length) + (32 * _param1.length) + 192] = sha3(mem[_302 + 32 len mem[_302]])
+                  idx = idx + 1
+                  s = s + 1
+                  continue 
+              if s + 1 >= mem[96]:
+                  revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+              _208 = mem[(32 * s + 1) + 128]
+              if 0 > idx:
+                  revert with InvalidProof()
+              mem[mem[64] + 32] = 1
+              if mem[(32 * s) + 128] < mem[(32 * s + 1) + 128]:
+                  mem[mem[64] + 64] = _173
+                  mem[mem[64] + 96] = _208
+                  _306 = mem[64]
+                  mem[mem[64]] = 96
+                  mem[64] = mem[64] + 128
+                  if idx >= mem[(32 * _param2.length) + (32 * _param1.length) + 160]:
+                      revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                  mem[(32 * idx) + (32 * _param2.length) + (32 * _param1.length) + 192] = sha3(mem[_306 + 32 len mem[_306]])
+              else:
+                  mem[mem[64] + 64] = _208
+                  mem[mem[64] + 96] = _173
+                  _310 = mem[64]
+                  mem[mem[64]] = 96
+                  mem[64] = mem[64] + 128
+                  if idx >= mem[(32 * _param2.length) + (32 * _param1.length) + 160]:
+                      revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                  mem[(32 * idx) + (32 * _param2.length) + (32 * _param1.length) + 192] = sha3(mem[_310 + 32 len mem[_310]])
+              idx = idx + 1
+              s = s + 2
+              continue 
+          if _param2.length + _param1.length - 2:
+              revert with InvalidProof()
+          if s != _param1.length:
+              revert with InvalidProof()
+          if _param2.length:
+              revert with InvalidProof()
+          if _param2.length + _param1.length - 2 >= mem[(32 * _param2.length) + (32 * _param1.length) + 160]:
+              revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+          _204 = mem[(32 * _param2.length + _param1.length - 2) + (32 * _param2.length) + (32 * _param1.length) + 192]
+          _238 = mem[64]
+          mem[64] = mem[64] + 64
+          mem[_238] = this.address
+          mem[_238 + 32] = _204
+          mem[mem[64] + 4] = this.address
+          mem[mem[64] + 36] = _204
+          static call 0x411de17f12d1a34ecc7f45f49844626267c75e81.'Magq' with:
+                  gas gas_remaining wei
+                 args address(this.address), _204
+          mem[mem[64]] = ext_call.return_data[0]
+          if not ext_call.success:
+              revert with ext_call.return_data[0 len return_data.size]
+          _280 = mem[64]
+          mem[64] = mem[64] + ceil32(return_data.size)
+          require return_data.size >=′ 32
+          require mem[_280] == bool(mem[_280])
+          if mem[_280]:
+              return merkleRoot[_204]
+      else:
+          mem[(32 * _param2.length) + (32 * _param1.length) + 192 len 32 * _param2.length + _param1.length - 1] = call.data[calldata.size len 32 * _param2.length + _param1.length - 1]
+          idx = 0
+          s = 0
+          while idx < _param2.length + _param1.length - 1:
+              if (1 << idx and _param3) - (1 << idx):
+                  if 0 >= mem[(32 * _param1.length) + 128]:
+                      revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                  _167 = mem[(32 * _param1.length) + 160]
+                  if s >= _param1.length:
+                      if 0 >= mem[(32 * _param2.length) + (32 * _param1.length) + 160]:
+                          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                      _198 = mem[(32 * _param2.length) + (32 * _param1.length) + 192]
+                      if 1 > idx:
+                          revert with InvalidProof()
+                      mem[mem[64] + 32] = 1
+                      if mem[(32 * _param1.length) + 160] < mem[(32 * _param2.length) + (32 * _param1.length) + 192]:
+                          mem[mem[64] + 64] = _167
+                          mem[mem[64] + 96] = _198
+                          _265 = mem[64]
+                          mem[mem[64]] = 96
+                          mem[64] = mem[64] + 128
+                          if idx >= mem[(32 * _param2.length) + (32 * _param1.length) + 160]:
+                              revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                          mem[(32 * idx) + (32 * _param2.length) + (32 * _param1.length) + 192] = sha3(mem[_265 + 32 len mem[_265]])
+                      else:
+                          mem[mem[64] + 64] = _198
+                          mem[mem[64] + 96] = _167
+                          _269 = mem[64]
+                          mem[mem[64]] = 96
+                          mem[64] = mem[64] + 128
+                          if idx >= mem[(32 * _param2.length) + (32 * _param1.length) + 160]:
+                              revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                          mem[(32 * idx) + (32 * _param2.length) + (32 * _param1.length) + 192] = sha3(mem[_269 + 32 len mem[_269]])
+                      idx = idx + 1
+                      s = s
+                      continue 
+                  if s >= mem[96]:
+                      revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                  _199 = mem[(32 * s) + 128]
+                  if 0 > idx:
+                      revert with InvalidProof()
+                  mem[mem[64] + 32] = 1
+                  if mem[(32 * _param1.length) + 160] < mem[(32 * s) + 128]:
+                      mem[mem[64] + 64] = _167
+                      mem[mem[64] + 96] = _199
+                      _273 = mem[64]
+                      mem[mem[64]] = 96
+                      mem[64] = mem[64] + 128
+                      if idx >= mem[(32 * _param2.length) + (32 * _param1.length) + 160]:
+                          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                      mem[(32 * idx) + (32 * _param2.length) + (32 * _param1.length) + 192] = sha3(mem[_273 + 32 len mem[_273]])
+                  else:
+                      mem[mem[64] + 64] = _199
+                      mem[mem[64] + 96] = _167
+                      _277 = mem[64]
+                      mem[mem[64]] = 96
+                      mem[64] = mem[64] + 128
+                      if idx >= mem[(32 * _param2.length) + (32 * _param1.length) + 160]:
+                          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                      mem[(32 * idx) + (32 * _param2.length) + (32 * _param1.length) + 192] = sha3(mem[_277 + 32 len mem[_277]])
+                  idx = idx + 1
+                  s = s + 1
+                  continue 
+              if s >= _param1.length:
+                  if 0 >= mem[(32 * _param2.length) + (32 * _param1.length) + 160]:
+                      revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                  _176 = mem[(32 * _param2.length) + (32 * _param1.length) + 192]
+                  if s >= _param1.length:
+                      if 1 >= mem[(32 * _param2.length) + (32 * _param1.length) + 160]:
+                          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                      _210 = mem[(32 * _param2.length) + (32 * _param1.length) + 224]
+                      if 2 > idx:
+                          revert with InvalidProof()
+                      mem[mem[64] + 32] = 1
+                      if mem[(32 * _param2.length) + (32 * _param1.length) + 192] < mem[(32 * _param2.length) + (32 * _param1.length) + 224]:
+                          mem[mem[64] + 64] = _176
+                          mem[mem[64] + 96] = _210
+                          _315 = mem[64]
+                          mem[mem[64]] = 96
+                          mem[64] = mem[64] + 128
+                          if idx >= mem[(32 * _param2.length) + (32 * _param1.length) + 160]:
+                              revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                          mem[(32 * idx) + (32 * _param2.length) + (32 * _param1.length) + 192] = sha3(mem[_315 + 32 len mem[_315]])
+                      else:
+                          mem[mem[64] + 64] = _210
+                          mem[mem[64] + 96] = _176
+                          _319 = mem[64]
+                          mem[mem[64]] = 96
+                          mem[64] = mem[64] + 128
+                          if idx >= mem[(32 * _param2.length) + (32 * _param1.length) + 160]:
+                              revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                          mem[(32 * idx) + (32 * _param2.length) + (32 * _param1.length) + 192] = sha3(mem[_319 + 32 len mem[_319]])
+                      idx = idx + 1
+                      s = s
+                      continue 
+                  if s >= mem[96]:
+                      revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                  _211 = mem[(32 * s) + 128]
+                  if 1 > idx:
+                      revert with InvalidProof()
+                  mem[mem[64] + 32] = 1
+                  if mem[(32 * _param2.length) + (32 * _param1.length) + 192] < mem[(32 * s) + 128]:
+                      mem[mem[64] + 64] = _176
+                      mem[mem[64] + 96] = _211
+                      _323 = mem[64]
+                      mem[mem[64]] = 96
+                      mem[64] = mem[64] + 128
+                      if idx >= mem[(32 * _param2.length) + (32 * _param1.length) + 160]:
+                          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                      mem[(32 * idx) + (32 * _param2.length) + (32 * _param1.length) + 192] = sha3(mem[_323 + 32 len mem[_323]])
+                  else:
+                      mem[mem[64] + 64] = _211
+                      mem[mem[64] + 96] = _176
+                      _327 = mem[64]
+                      mem[mem[64]] = 96
+                      mem[64] = mem[64] + 128
+                      if idx >= mem[(32 * _param2.length) + (32 * _param1.length) + 160]:
+                          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                      mem[(32 * idx) + (32 * _param2.length) + (32 * _param1.length) + 192] = sha3(mem[_327 + 32 len mem[_327]])
+                  idx = idx + 1
+                  s = s + 1
+                  continue 
+              if s >= mem[96]:
+                  revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+              _177 = mem[(32 * s) + 128]
+              if s + 1 >= _param1.length:
+                  if 0 >= mem[(32 * _param2.length) + (32 * _param1.length) + 160]:
+                      revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                  _212 = mem[(32 * _param2.length) + (32 * _param1.length) + 192]
+                  if 1 > idx:
+                      revert with InvalidProof()
+                  mem[mem[64] + 32] = 1
+                  if mem[(32 * s) + 128] < mem[(32 * _param2.length) + (32 * _param1.length) + 192]:
+                      mem[mem[64] + 64] = _177
+                      mem[mem[64] + 96] = _212
+                      _331 = mem[64]
+                      mem[mem[64]] = 96
+                      mem[64] = mem[64] + 128
+                      if idx >= mem[(32 * _param2.length) + (32 * _param1.length) + 160]:
+                          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                      mem[(32 * idx) + (32 * _param2.length) + (32 * _param1.length) + 192] = sha3(mem[_331 + 32 len mem[_331]])
+                  else:
+                      mem[mem[64] + 64] = _212
+                      mem[mem[64] + 96] = _177
+                      _335 = mem[64]
+                      mem[mem[64]] = 96
+                      mem[64] = mem[64] + 128
+                      if idx >= mem[(32 * _param2.length) + (32 * _param1.length) + 160]:
+                          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                      mem[(32 * idx) + (32 * _param2.length) + (32 * _param1.length) + 192] = sha3(mem[_335 + 32 len mem[_335]])
+                  idx = idx + 1
+                  s = s + 1
+                  continue 
+              if s + 1 >= mem[96]:
+                  revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+              _213 = mem[(32 * s + 1) + 128]
+              if 0 > idx:
+                  revert with InvalidProof()
+              mem[mem[64] + 32] = 1
+              if mem[(32 * s) + 128] < mem[(32 * s + 1) + 128]:
+                  mem[mem[64] + 64] = _177
+                  mem[mem[64] + 96] = _213
+                  _339 = mem[64]
+                  mem[mem[64]] = 96
+                  mem[64] = mem[64] + 128
+                  if idx >= mem[(32 * _param2.length) + (32 * _param1.length) + 160]:
+                      revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                  mem[(32 * idx) + (32 * _param2.length) + (32 * _param1.length) + 192] = sha3(mem[_339 + 32 len mem[_339]])
+              else:
+                  mem[mem[64] + 64] = _213
+                  mem[mem[64] + 96] = _177
+                  _343 = mem[64]
+                  mem[mem[64]] = 96
+                  mem[64] = mem[64] + 128
+                  if idx >= mem[(32 * _param2.length) + (32 * _param1.length) + 160]:
+                      revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                  mem[(32 * idx) + (32 * _param2.length) + (32 * _param1.length) + 192] = sha3(mem[_343 + 32 len mem[_343]])
+              idx = idx + 1
+              s = s + 2
+              continue 
+          if _param2.length + _param1.length - 2:
+              revert with InvalidProof()
+          if s != _param1.length:
+              revert with InvalidProof()
+          if _param2.length:
+              revert with InvalidProof()
+          if _param2.length + _param1.length - 2 >= mem[(32 * _param2.length) + (32 * _param1.length) + 160]:
+              revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+          _209 = mem[(32 * _param2.length + _param1.length - 2) + (32 * _param2.length) + (32 * _param1.length) + 192]
+          _259 = mem[64]
+          mem[64] = mem[64] + 64
+          mem[_259] = this.address
+          mem[_259 + 32] = _209
+          mem[mem[64] + 4] = this.address
+          mem[mem[64] + 36] = _209
+          static call 0x411de17f12d1a34ecc7f45f49844626267c75e81.'Magq' with:
+                  gas gas_remaining wei
+                 args address(this.address), _209
+          mem[mem[64]] = ext_call.return_data[0]
+          if not ext_call.success:
+              revert with ext_call.return_data[0 len return_data.size]
+          _313 = mem[64]
+          mem[64] = mem[64] + ceil32(return_data.size)
+          require return_data.size >=′ 32
+          require mem[_313] == bool(mem[_313])
+          if mem[_313]:
+              return merkleRoot[_209]
+  return 0
+
+def transmit(bytes32[3] _param1, bytes _param2, bytes32[] _param3, bytes32[] _param4, bytes32 _param5) payable: 
+  require calldata.size - 4 >=′ 224
+  require 100 <= calldata.size
+  require _param4 <= LOCK8605463013()
+  require _param4 + 35 <′ calldata.size
+  require _param4.length <= LOCK8605463013()
+  require _param4 + _param4.length + 36 <= calldata.size
+  require _param5 <= LOCK8605463013()
+  require _param5 + 35 <′ calldata.size
+  require _param5.length <= LOCK8605463013()
+  require _param5 + (32 * _param5.length) + 36 <= calldata.size
+  require cd[164] <= LOCK8605463013()
+  require cd[164] + 35 <′ calldata.size
+  require ('cd', 164).length <= LOCK8605463013()
+  require cd[164] + (32 * ('cd', 164).length) + 36 <= calldata.size
+  if paused:
+      revert with PausedError()
+  mem[100] = 0x3d386b8a9e88063200000000000000000000000000000000
+  static call 0x411de17f12d1a34ecc7f45f49844626267c75e81.0x2cbc26bb with:
+          gas gas_remaining wei
+         args 0x3d386b8a9e88063200000000000000000000000000000000
+  mem[96] = ext_call.return_data[0]
+  if not ext_call.success:
+      revert with ext_call.return_data[0 len return_data.size]
+  require return_data.size >=′ 32
+  require ext_call.return_data[0] == bool(ext_call.return_data[0])
+  if ext_call.return_data[0]:
+      revert with 1403851224
+  require _param4.length >=′ 32
+  require cd[(_param4 + 36)] <= LOCK8605463013()
+  require _param4.length - cd[(_param4 + 36)] >=′ 128
+  if not bool(ceil32(return_data.size) + 192 <= LOCK8605463013()):
+      revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+  require cd[(_param4 + cd[(_param4 + 36)] + 36)] <= LOCK8605463013()
+  require 64 <=′ _param4.length - cd[(_param4 + 36)] - cd[(_param4 + cd[(_param4 + 36)] + 36)]
+  if not bool(ceil32(return_data.size) + 256 <= LOCK8605463013()):
+      revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+  require cd[(_param4 + cd[(_param4 + 36)] + cd[(_param4 + cd[(_param4 + 36)] + 36)] + 36)] <= LOCK8605463013()
+  require _param4 + _param4.length + 36 >′ _param4 + cd[(_param4 + 36)] + cd[(_param4 + cd[(_param4 + 36)] + 36)] + cd[(_param4 + cd[(_param4 + 36)] + cd[(_param4 + cd[(_param4 + 36)] + 36)] + 36)] + 67
+  if cd[(_param4 + cd[(_param4 + 36)] + cd[(_param4 + cd[(_param4 + 36)] + 36)] + cd[(_param4 + cd[(_param4 + 36)] + cd[(_param4 + cd[(_param4 + 36)] + 36)] + 36)] + 36)] > LOCK8605463013():
+      revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+  if ceil32(32 * cd[(_param4 + cd[(_param4 + 36)] + cd[(_param4 + cd[(_param4 + 36)] + 36)] + cd[(_param4 + cd[(_param4 + 36)] + cd[(_param4 + cd[(_param4 + 36)] + 36)] + 36)] + 36)]) + 257 < 256 or ceil32(return_data.size) + ceil32(32 * cd[(_param4 + cd[(_param4 + 36)] + cd[(_param4 + cd[(_param4 + 36)] + 36)] + cd[(_param4 + cd[(_param4 + 36)] + cd[(_param4 + cd[(_param4 + 36)] + 36)] + 36)] + 36)]) + 257 > LOCK8605463013():
+      revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+  mem[64] = ceil32(return_data.size) + ceil32(32 * cd[(_param4 + cd[(_param4 + 36)] + cd[(_param4 + cd[(_param4 + 36)] + 36)] + cd[(_param4 + cd[(_param4 + 36)] + cd[(_param4 + cd[(_param4 + 36)] + 36)] + 36)] + 36)]) + 257
+  mem[ceil32(return_data.size) + 256] = cd[(_param4 + cd[(_param4 + 36)] + cd[(_param4 + cd[(_param4 + 36)] + 36)] + cd[(_param4 + cd[(_param4 + 36)] + cd[(_param4 + cd[(_param4 + 36)] + 36)] + 36)] + 36)]
+  require cd[(_param4 + 36)] + cd[(_param4 + cd[(_param4 + 36)] + 36)] + cd[(_param4 + cd[(_param4 + 36)] + cd[(_param4 + cd[(_param4 + 36)] + 36)] + 36)] + (64 * cd[(_param4 + cd[(_param4 + 36)] + cd[(_param4 + cd[(_param4 + 36)] + 36)] + cd[(_param4 + cd[(_param4 + 36)] + cd[(_param4 + cd[(_param4 + 36)] + 36)] + 36)] + 36)]) + 68 <= _param4.length + 36
+  s = ceil32(return_data.size) + 288
+  idx = _param4 + cd[(_param4 + 36)] + cd[(_param4 + cd[(_param4 + 36)] + 36)] + cd[(_param4 + cd[(_param4 + 36)] + cd[(_param4 + cd[(_param4 + 36)] + 36)] + 36)] + 68
+  while idx < _param4 + cd[(_param4 + 36)] + cd[(_param4 + cd[(_param4 + 36)] + 36)] + cd[(_param4 + cd[(_param4 + 36)] + cd[(_param4 + cd[(_param4 + 36)] + 36)] + 36)] + (64 * cd[(_param4 + cd[(_param4 + 36)] + cd[(_param4 + cd[(_param4 + 36)] + 36)] + cd[(_param4 + cd[(_param4 + 36)] + cd[(_param4 + cd[(_param4 + 36)] + 36)] + 36)] + 36)]) + 68:
+      require _param4 + _param4.length + -idx + 36 >=′ 64
+      _586 = mem[64]
+      if mem[64] + 64 < mem[64] or mem[64] + 64 > LOCK8605463013():
+          revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+      mem[64] = mem[64] + 64
+      require cd[idx] == address(cd[idx])
+      mem[_586] = cd[idx]
+      require cd[(idx + 32)] == Mask(224, 0, cd[(idx + 32)])
+      mem[_586 + 32] = cd[(idx + 32)]
+      mem[s] = _586
+      s = s + 32
+      idx = idx + 64
+      continue 
+  mem[ceil32(return_data.size) + 192] = ceil32(return_data.size) + 256
+  require cd[(_param4 + cd[(_param4 + 36)] + cd[(_param4 + cd[(_param4 + 36)] + 36)] + 68)] <= LOCK8605463013()
+  require _param4 + cd[(_param4 + 36)] + cd[(_param4 + cd[(_param4 + 36)] + 36)] + cd[(_param4 + cd[(_param4 + 36)] + cd[(_param4 + cd[(_param4 + 36)] + 36)] + 68)] + 67 <′ _param4 + _param4.length + 36
+  if cd[(_param4 + cd[(_param4 + 36)] + cd[(_param4 + cd[(_param4 + 36)] + 36)] + cd[(_param4 + cd[(_param4 + 36)] + cd[(_param4 + cd[(_param4 + 36)] + 36)] + 68)] + 36)] > LOCK8605463013():
+      revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+  _587 = mem[64]
+  if mem[64] + ceil32(32 * cd[(_param4 + cd[(_param4 + 36)] + cd[(_param4 + cd[(_param4 + 36)] + 36)] + cd[(_param4 + cd[(_param4 + 36)] + cd[(_param4 + cd[(_param4 + 36)] + 36)] + 68)] + 36)]) + 1 < mem[64] or mem[64] + ceil32(32 * cd[(_param4 + cd[(_param4 + 36)] + cd[(_param4 + cd[(_param4 + 36)] + 36)] + cd[(_param4 + cd[(_param4 + 36)] + cd[(_param4 + cd[(_param4 + 36)] + 36)] + 68)] + 36)]) + 1 > LOCK8605463013():
+      revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+  mem[64] = mem[64] + ceil32(32 * cd[(_param4 + cd[(_param4 + 36)] + cd[(_param4 + cd[(_param4 + 36)] + 36)] + cd[(_param4 + cd[(_param4 + 36)] + cd[(_param4 + cd[(_param4 + 36)] + 36)] + 68)] + 36)]) + 1
+  mem[_587] = cd[(_param4 + cd[(_param4 + 36)] + cd[(_param4 + cd[(_param4 + 36)] + 36)] + cd[(_param4 + cd[(_param4 + 36)] + cd[(_param4 + cd[(_param4 + 36)] + 36)] + 68)] + 36)]
+  require cd[(_param4 + 36)] + cd[(_param4 + cd[(_param4 + 36)] + 36)] + cd[(_param4 + cd[(_param4 + 36)] + cd[(_param4 + cd[(_param4 + 36)] + 36)] + 68)] + (64 * cd[(_param4 + cd[(_param4 + 36)] + cd[(_param4 + cd[(_param4 + 36)] + 36)] + cd[(_param4 + cd[(_param4 + 36)] + cd[(_param4 + cd[(_param4 + 36)] + 36)] + 68)] + 36)]) + 68 <= _param4.length + 36
+  idx = _param4 + cd[(_param4 + 36)] + cd[(_param4 + cd[(_param4 + 36)] + 36)] + cd[(_param4 + cd[(_param4 + 36)] + cd[(_param4 + cd[(_param4 + 36)] + 36)] + 68)] + 68
+  s = _587 + 32
+  while idx < _param4 + cd[(_param4 + 36)] + cd[(_param4 + cd[(_param4 + 36)] + 36)] + cd[(_param4 + cd[(_param4 + 36)] + cd[(_param4 + cd[(_param4 + 36)] + 36)] + 68)] + (64 * cd[(_param4 + cd[(_param4 + 36)] + cd[(_param4 + cd[(_param4 + 36)] + 36)] + cd[(_param4 + cd[(_param4 + 36)] + cd[(_param4 + cd[(_param4 + 36)] + 36)] + 68)] + 36)]) + 68:
+      require _param4 + _param4.length + -idx + 36 >=′ 64
+      _1160 = mem[64]
+      if mem[64] + 64 < mem[64] or mem[64] + 64 > LOCK8605463013():
+          revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+      mem[64] = mem[64] + 64
+      require cd[idx] == uint64(cd[idx])
+      mem[_1160] = cd[idx]
+      require cd[(idx + 32)] == Mask(224, 0, cd[(idx + 32)])
+      mem[_1160 + 32] = cd[(idx + 32)]
+      mem[s] = _1160
+      idx = idx + 64
+      s = s + 32
+      continue 
+  mem[ceil32(return_data.size) + 224] = _587
+  mem[ceil32(return_data.size) + 96] = ceil32(return_data.size) + 192
+  require _param4.length + -cd[(_param4 + 36)] - 32 >=′ 64
+  _1161 = mem[64]
+  if mem[64] + 64 < mem[64] or mem[64] + 64 > LOCK8605463013():
+      revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+  mem[64] = mem[64] + 64
+  require cd[(_param4 + cd[(_param4 + 36)] + 68)] == uint64(cd[(_param4 + cd[(_param4 + 36)] + 68)])
+  mem[_1161] = cd[(_param4 + cd[(_param4 + 36)] + 68)]
+  require cd[(_param4 + cd[(_param4 + 36)] + 100)] == uint64(cd[(_param4 + cd[(_param4 + 36)] + 100)])
+  mem[_1161 + 32] = cd[(_param4 + cd[(_param4 + 36)] + 100)]
+  mem[ceil32(return_data.size) + 128] = _1161
+  mem[ceil32(return_data.size) + 160] = cd[(_param4 + cd[(_param4 + 36)] + 132)]
+  if mem[mem[ceil32(return_data.size) + 192]]:
+      if unknown10c374ed < _param2 % unknown10000000():
+          unknown10c374ed = _param2 % unknown10000000()
+          _1170 = mem[64]
+          mem[mem[64]] = '970o'
+          mem[mem[64] + 4] = 32
+          _1186 = mem[ceil32(return_data.size) + 192]
+          mem[mem[64] + 36] = 64
+          _1187 = mem[_1186]
+          mem[mem[64] + 100] = mem[_1186]
+          idx = 0
+          s = mem[64] + 132
+          t = _1186 + 32
+          while idx < _1187:
+              _1739 = mem[t]
+              mem[s] = mem[mem[t] + 12 len 20]
+              mem[s + 32] = mem[_1739 + 36 len 28]
+              idx = idx + 1
+              s = s + 64
+              t = t + 32
+              continue 
+          _1737 = mem[ceil32(return_data.size) + 224]
+          mem[_1170 + 68] = (64 * _1187) + 96
+          _1738 = mem[_1737]
+          mem[_1170 + (64 * _1187) + 132] = mem[_1737]
+          s = _1170 + (64 * _1187) + 164
+          idx = 0
+          t = _1737 + 32
+          while idx < _1738:
+              _2195 = mem[t]
+              mem[s] = mem[mem[t] + 24 len 8]
+              mem[s + 32] = mem[_2195 + 36 len 28]
+              s = s + 64
+              idx = idx + 1
+              t = t + 32
+              continue 
+          require ext_code.size(unknown7437ff9fAddress)
+          call unknown7437ff9fAddress.mem[mem[64] len 4] with:
+               gas gas_remaining wei
+              args mem[mem[64] + 4 len _1170 + (64 * _1187) + (64 * _1738) + -mem[64] + 160]
+          if not ext_call.success:
+              revert with ext_call.return_data[0 len return_data.size]
+          if mem[ceil32(return_data.size) + 160]:
+              if mem[mem[ceil32(return_data.size) + 128] + 24 len 8] != unknown4120fccd:
+                  _2269 = mem[ceil32(return_data.size) + 128]
+                  mem[mem[64]] = 0xbb1ae18d00000000000000000000000000000000000000000000000000000000
+                  mem[mem[64] + 4] = mem[_2269 + 24 len 8]
+                  mem[mem[64] + 36] = mem[_2269 + 56 len 8]
+                  revert with 0, mem[mem[64] + 4 len 64]
+              if mem[mem[ceil32(return_data.size) + 128] + 24 len 8] > mem[mem[ceil32(return_data.size) + 128] + 56 len 8]:
+                  _2284 = mem[ceil32(return_data.size) + 128]
+                  mem[mem[64]] = 0xbb1ae18d00000000000000000000000000000000000000000000000000000000
+                  mem[mem[64] + 4] = mem[_2284 + 24 len 8]
+                  mem[mem[64] + 36] = mem[_2284 + 56 len 8]
+                  revert with 0, mem[mem[64] + 4 len 64]
+              if not mem[ceil32(return_data.size) + 160]:
+                  revert with InvalidRoot()
+              mem[32] = 10
+              if merkleRoot[mem[ceil32(return_data.size) + 160]]:
+                  revert with 2696733263
+              if mem[mem[ceil32(return_data.size) + 128] + 56 len 8] + 1 > LOCK8605463013():
+                  revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+              unknown4120fccd = uint64(mem[mem[ceil32(return_data.size) + 128] + 56 len 8] + 1)
+              merkleRoot[mem[ceil32(return_data.size) + 160]] = block.timestamp
+          else:
+              if _param1 != stor2:
+                  revert with 0, stor2, _param1
+              if chainid != 1:
+                  revert with 0, 1, chainid
+              log 0xb04e63db: _param1, uint32(_param2)
+              if stor3 + 1 > 255:
+                  revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+              if uint8(stor3 + 1) != _param5.length:
+                  revert with 'q%:%'
+              if ('cd', 164).length != _param5.length:
+                  revert with 2807924911
+              if stor5[caller].field_8 > 2:
+                  revert with Panic(33)  # If you convert a value that is too big or negative into an enum type.
+              if stor5[caller].field_8 > 2:
+                  revert with Panic(33)  # If you convert a value that is too big or negative into an enum type.
+              if stor5[caller].field_8 != 2:
+                  revert with 3658418408
+              if stor5[caller].field_0 >= stor7.length:
+                  revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+              if stor7[stor5[caller].field_0].field_0 != caller:
+                  revert with 3658418408
+              if ('cd', 164).length != Mask(251, 0, ('cd', 164).length):
+                  revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+              if _param5.length != Mask(251, 0, _param5.length):
+                  revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+              if 324 > _param4.length + 324:
+                  revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+              if 0 > 32 * _param5.length:
+                  revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+              if 0 > 32 * ('cd', 164).length:
+                  revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+              if (32 * ('cd', 164).length) + (32 * _param5.length) + _param4.length + 324 != calldata.size:
+                  revert with 0, (32 * ('cd', 164).length) + (32 * _param5.length) + _param4.length + 324, calldata.size
+      else:
+          if not cd[(_param4 + cd[(_param4 + 36)] + 132)]:
+              revert with 4160987850
+          if uint64(cd[(_param4 + cd[(_param4 + 36)] + 68)]) != unknown4120fccd:
+              revert with 0, cd[(_param4 + cd[(_param4 + 36)] + 68)] << 192, uint64(cd[(_param4 + cd[(_param4 + 36)] + 100)])
+          if uint64(cd[(_param4 + cd[(_param4 + 36)] + 68)]) > uint64(cd[(_param4 + cd[(_param4 + 36)] + 100)]):
+              revert with 0, cd[(_param4 + cd[(_param4 + 36)] + 68)] << 192, uint64(cd[(_param4 + cd[(_param4 + 36)] + 100)])
+          if not cd[(_param4 + cd[(_param4 + 36)] + 132)]:
+              revert with InvalidRoot()
+          if merkleRoot[cd[(_param4 + cd[(_param4 + 36)] + 132)]]:
+              revert with 2696733263
+          if uint64(cd[(_param4 + cd[(_param4 + 36)] + 100)]) + 1 > LOCK8605463013():
+              revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+          unknown4120fccd = uint64(uint64(cd[(_param4 + cd[(_param4 + 36)] + 100)]) + 1)
+          mem[0] = cd[(_param4 + cd[(_param4 + 36)] + 132)]
+          mem[32] = 10
+          merkleRoot[cd[(_param4 + cd[(_param4 + 36)] + 132)]] = block.timestamp
+          _1276 = mem[64]
+          mem[mem[64]] = 32
+          mem[mem[64] + 32] = 128
+          _1286 = mem[ceil32(return_data.size) + 192]
+          mem[mem[64] + 160] = 64
+          _1287 = mem[_1286]
+          mem[mem[64] + 224] = mem[_1286]
+          idx = 0
+          s = mem[64] + 256
+          t = _1286 + 32
+          while idx < _1287:
+              _1734 = mem[t]
+              mem[s] = mem[mem[t] + 12 len 20]
+              mem[s + 32] = mem[_1734 + 36 len 28]
+              idx = idx + 1
+              s = s + 64
+              t = t + 32
+              continue 
+          _1732 = mem[ceil32(return_data.size) + 224]
+          mem[_1276 + 192] = (64 * _1287) + 96
+          _1733 = mem[_1732]
+          mem[_1276 + (64 * _1287) + 256] = mem[_1732]
+          s = _1276 + (64 * _1287) + 288
+          idx = 0
+          t = _1732 + 32
+          while idx < _1733:
+              _2192 = mem[t]
+              mem[s] = mem[mem[t] + 24 len 8]
+              mem[s + 32] = mem[_2192 + 36 len 28]
+              s = s + 64
+              idx = idx + 1
+              t = t + 32
+              continue 
+          _2207 = mem[ceil32(return_data.size) + 128]
+          mem[_1276 + 64] = mem[mem[ceil32(return_data.size) + 128] + 24 len 8]
+          mem[_1276 + 96] = mem[_2207 + 56 len 8]
+          mem[_1276 + 128] = mem[ceil32(return_data.size) + 160]
+          log 0x291698c0: mem[mem[64] len _1276 + (64 * _1287) + (64 * _1733) + -mem[64] + 288]
+          if _param1 != stor2:
+              revert with 0, stor2, _param1
+          if chainid != 1:
+              revert with 0, 1, chainid
+          log 0xb04e63db: _param1, uint32(_param2)
+          if stor3 + 1 > 255:
+              revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+          if uint8(stor3 + 1) != _param5.length:
+              revert with 'q%:%'
+          if ('cd', 164).length != _param5.length:
+              revert with 2807924911
+          if stor5[caller].field_8 > 2:
+              revert with Panic(33)  # If you convert a value that is too big or negative into an enum type.
+          if stor5[caller].field_8 > 2:
+              revert with Panic(33)  # If you convert a value that is too big or negative into an enum type.
+          if stor5[caller].field_8 != 2:
+              revert with 3658418408
+          if stor5[caller].field_0 >= stor7.length:
+              revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+          if stor7[stor5[caller].field_0].field_0 != caller:
+              revert with 3658418408
+          if ('cd', 164).length != Mask(251, 0, ('cd', 164).length):
+              revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+          if _param5.length != Mask(251, 0, _param5.length):
+              revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+          if 324 > _param4.length + 324:
+              revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+          if 0 > 32 * _param5.length:
+              revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+          if 0 > 32 * ('cd', 164).length:
+              revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+          if (32 * ('cd', 164).length) + (32 * _param5.length) + _param4.length + 324 != calldata.size:
+              revert with 0, (32 * ('cd', 164).length) + (32 * _param5.length) + _param4.length + 324, calldata.size
+  else:
+      if not mem[_587]:
+          if uint64(cd[(_param4 + cd[(_param4 + 36)] + 68)]) != unknown4120fccd:
+              revert with 0, cd[(_param4 + cd[(_param4 + 36)] + 68)] << 192, uint64(cd[(_param4 + cd[(_param4 + 36)] + 100)])
+          if uint64(cd[(_param4 + cd[(_param4 + 36)] + 68)]) > uint64(cd[(_param4 + cd[(_param4 + 36)] + 100)]):
+              revert with 0, cd[(_param4 + cd[(_param4 + 36)] + 68)] << 192, uint64(cd[(_param4 + cd[(_param4 + 36)] + 100)])
+          if not cd[(_param4 + cd[(_param4 + 36)] + 132)]:
+              revert with InvalidRoot()
+          if merkleRoot[cd[(_param4 + cd[(_param4 + 36)] + 132)]]:
+              revert with 2696733263
+          if uint64(cd[(_param4 + cd[(_param4 + 36)] + 100)]) + 1 > LOCK8605463013():
+              revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+          unknown4120fccd = uint64(uint64(cd[(_param4 + cd[(_param4 + 36)] + 100)]) + 1)
+          mem[0] = cd[(_param4 + cd[(_param4 + 36)] + 132)]
+          mem[32] = 10
+          merkleRoot[cd[(_param4 + cd[(_param4 + 36)] + 132)]] = block.timestamp
+          _1272 = mem[64]
+          mem[mem[64]] = 32
+          mem[mem[64] + 32] = 128
+          _1281 = mem[ceil32(return_data.size) + 192]
+          mem[mem[64] + 160] = 64
+          _1282 = mem[_1281]
+          mem[mem[64] + 224] = mem[_1281]
+          idx = 0
+          s = mem[64] + 256
+          t = _1281 + 32
+          while idx < _1282:
+              _1744 = mem[t]
+              mem[s] = mem[mem[t] + 12 len 20]
+              mem[s + 32] = mem[_1744 + 36 len 28]
+              idx = idx + 1
+              s = s + 64
+              t = t + 32
+              continue 
+          _1742 = mem[ceil32(return_data.size) + 224]
+          mem[_1272 + 192] = (64 * _1282) + 96
+          _1743 = mem[_1742]
+          mem[_1272 + (64 * _1282) + 256] = mem[_1742]
+          s = _1272 + (64 * _1282) + 288
+          idx = 0
+          t = _1742 + 32
+          while idx < _1743:
+              _2198 = mem[t]
+              mem[s] = mem[mem[t] + 24 len 8]
+              mem[s + 32] = mem[_2198 + 36 len 28]
+              s = s + 64
+              idx = idx + 1
+              t = t + 32
+              continue 
+          _2210 = mem[ceil32(return_data.size) + 128]
+          mem[_1272 + 64] = mem[mem[ceil32(return_data.size) + 128] + 24 len 8]
+          mem[_1272 + 96] = mem[_2210 + 56 len 8]
+          mem[_1272 + 128] = mem[ceil32(return_data.size) + 160]
+          log 0x291698c0: mem[mem[64] len _1272 + (64 * _1282) + (64 * _1743) + -mem[64] + 288]
+          if _param1 != stor2:
+              revert with 0, stor2, _param1
+          if chainid != 1:
+              revert with 0, 1, chainid
+          log 0xb04e63db: _param1, uint32(_param2)
+          if stor3 + 1 > 255:
+              revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+          if uint8(stor3 + 1) != _param5.length:
+              revert with 'q%:%'
+          if ('cd', 164).length != _param5.length:
+              revert with 2807924911
+          if stor5[caller].field_8 > 2:
+              revert with Panic(33)  # If you convert a value that is too big or negative into an enum type.
+          if stor5[caller].field_8 > 2:
+              revert with Panic(33)  # If you convert a value that is too big or negative into an enum type.
+          if stor5[caller].field_8 != 2:
+              revert with 3658418408
+          if stor5[caller].field_0 >= stor7.length:
+              revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+          if stor7[stor5[caller].field_0].field_0 != caller:
+              revert with 3658418408
+          if ('cd', 164).length != Mask(251, 0, ('cd', 164).length):
+              revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+          if _param5.length != Mask(251, 0, _param5.length):
+              revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+          if 324 > _param4.length + 324:
+              revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+          if 0 > 32 * _param5.length:
+              revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+          if 0 > 32 * ('cd', 164).length:
+              revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+          if (32 * ('cd', 164).length) + (32 * _param5.length) + _param4.length + 324 != calldata.size:
+              revert with 0, (32 * ('cd', 164).length) + (32 * _param5.length) + _param4.length + 324, calldata.size
+      else:
+          if unknown10c374ed < _param2 % unknown10000000():
+              unknown10c374ed = _param2 % unknown10000000()
+              _1182 = mem[64]
+              mem[mem[64]] = '970o'
+              mem[mem[64] + 4] = 32
+              _1204 = mem[ceil32(return_data.size) + 192]
+              mem[mem[64] + 36] = 64
+              _1205 = mem[_1204]
+              mem[mem[64] + 100] = mem[_1204]
+              idx = 0
+              s = mem[64] + 132
+              t = _1204 + 32
+              while idx < _1205:
+                  _1754 = mem[t]
+                  mem[s] = mem[mem[t] + 12 len 20]
+                  mem[s + 32] = mem[_1754 + 36 len 28]
+                  idx = idx + 1
+                  s = s + 64
+                  t = t + 32
+                  continue 
+              _1752 = mem[ceil32(return_data.size) + 224]
+              mem[_1182 + 68] = (64 * _1205) + 96
+              _1753 = mem[_1752]
+              mem[_1182 + (64 * _1205) + 132] = mem[_1752]
+              s = _1182 + (64 * _1205) + 164
+              idx = 0
+              t = _1752 + 32
+              while idx < _1753:
+                  _2204 = mem[t]
+                  mem[s] = mem[mem[t] + 24 len 8]
+                  mem[s + 32] = mem[_2204 + 36 len 28]
+                  s = s + 64
+                  idx = idx + 1
+                  t = t + 32
+                  continue 
+              require ext_code.size(unknown7437ff9fAddress)
+              call unknown7437ff9fAddress.mem[mem[64] len 4] with:
+                   gas gas_remaining wei
+                  args mem[mem[64] + 4 len _1182 + (64 * _1205) + (64 * _1753) + -mem[64] + 160]
+              if not ext_call.success:
+                  revert with ext_call.return_data[0 len return_data.size]
+              if mem[ceil32(return_data.size) + 160]:
+                  if mem[mem[ceil32(return_data.size) + 128] + 24 len 8] != unknown4120fccd:
+                      _2275 = mem[ceil32(return_data.size) + 128]
+                      mem[mem[64]] = 0xbb1ae18d00000000000000000000000000000000000000000000000000000000
+                      mem[mem[64] + 4] = mem[_2275 + 24 len 8]
+                      mem[mem[64] + 36] = mem[_2275 + 56 len 8]
+                      revert with 0, mem[mem[64] + 4 len 64]
+                  if mem[mem[ceil32(return_data.size) + 128] + 24 len 8] > mem[mem[ceil32(return_data.size) + 128] + 56 len 8]:
+                      _2291 = mem[ceil32(return_data.size) + 128]
+                      mem[mem[64]] = 0xbb1ae18d00000000000000000000000000000000000000000000000000000000
+                      mem[mem[64] + 4] = mem[_2291 + 24 len 8]
+                      mem[mem[64] + 36] = mem[_2291 + 56 len 8]
+                      revert with 0, mem[mem[64] + 4 len 64]
+                  if not mem[ceil32(return_data.size) + 160]:
+                      revert with InvalidRoot()
+                  mem[32] = 10
+                  if merkleRoot[mem[ceil32(return_data.size) + 160]]:
+                      revert with 2696733263
+                  if mem[mem[ceil32(return_data.size) + 128] + 56 len 8] + 1 > LOCK8605463013():
+                      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+                  unknown4120fccd = uint64(mem[mem[ceil32(return_data.size) + 128] + 56 len 8] + 1)
+                  merkleRoot[mem[ceil32(return_data.size) + 160]] = block.timestamp
+              else:
+                  if _param1 != stor2:
+                      revert with 0, stor2, _param1
+                  if chainid != 1:
+                      revert with 0, 1, chainid
+                  log 0xb04e63db: _param1, uint32(_param2)
+                  if stor3 + 1 > 255:
+                      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+                  if uint8(stor3 + 1) != _param5.length:
+                      revert with 'q%:%'
+                  if ('cd', 164).length != _param5.length:
+                      revert with 2807924911
+                  if stor5[caller].field_8 > 2:
+                      revert with Panic(33)  # If you convert a value that is too big or negative into an enum type.
+                  if stor5[caller].field_8 > 2:
+                      revert with Panic(33)  # If you convert a value that is too big or negative into an enum type.
+                  if stor5[caller].field_8 != 2:
+                      revert with 3658418408
+                  if stor5[caller].field_0 >= stor7.length:
+                      revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+                  if stor7[stor5[caller].field_0].field_0 != caller:
+                      revert with 3658418408
+                  if ('cd', 164).length != Mask(251, 0, ('cd', 164).length):
+                      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+                  if _param5.length != Mask(251, 0, _param5.length):
+                      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+                  if 324 > _param4.length + 324:
+                      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+                  if 0 > 32 * _param5.length:
+                      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+                  if 0 > 32 * ('cd', 164).length:
+                      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+                  if (32 * ('cd', 164).length) + (32 * _param5.length) + _param4.length + 324 != calldata.size:
+                      revert with 0, (32 * ('cd', 164).length) + (32 * _param5.length) + _param4.length + 324, calldata.size
+          else:
+              if not cd[(_param4 + cd[(_param4 + 36)] + 132)]:
+                  revert with 4160987850
+              if uint64(cd[(_param4 + cd[(_param4 + 36)] + 68)]) != unknown4120fccd:
+                  revert with 0, cd[(_param4 + cd[(_param4 + 36)] + 68)] << 192, uint64(cd[(_param4 + cd[(_param4 + 36)] + 100)])
+              if uint64(cd[(_param4 + cd[(_param4 + 36)] + 68)]) > uint64(cd[(_param4 + cd[(_param4 + 36)] + 100)]):
+                  revert with 0, cd[(_param4 + cd[(_param4 + 36)] + 68)] << 192, uint64(cd[(_param4 + cd[(_param4 + 36)] + 100)])
+              if not cd[(_param4 + cd[(_param4 + 36)] + 132)]:
+                  revert with InvalidRoot()
+              if merkleRoot[cd[(_param4 + cd[(_param4 + 36)] + 132)]]:
+                  revert with 2696733263
+              if uint64(cd[(_param4 + cd[(_param4 + 36)] + 100)]) + 1 > LOCK8605463013():
+                  revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+              unknown4120fccd = uint64(uint64(cd[(_param4 + cd[(_param4 + 36)] + 100)]) + 1)
+              mem[0] = cd[(_param4 + cd[(_param4 + 36)] + 132)]
+              mem[32] = 10
+              merkleRoot[cd[(_param4 + cd[(_param4 + 36)] + 132)]] = block.timestamp
+              _1285 = mem[64]
+              mem[mem[64]] = 32
+              mem[mem[64] + 32] = 128
+              _1298 = mem[ceil32(return_data.size) + 192]
+              mem[mem[64] + 160] = 64
+              _1299 = mem[_1298]
+              mem[mem[64] + 224] = mem[_1298]
+              idx = 0
+              s = mem[64] + 256
+              t = _1298 + 32
+              while idx < _1299:
+                  _1749 = mem[t]
+                  mem[s] = mem[mem[t] + 12 len 20]
+                  mem[s + 32] = mem[_1749 + 36 len 28]
+                  idx = idx + 1
+                  s = s + 64
+                  t = t + 32
+                  continue 
+              _1747 = mem[ceil32(return_data.size) + 224]
+              mem[_1285 + 192] = (64 * _1299) + 96
+              _1748 = mem[_1747]
+              mem[_1285 + (64 * _1299) + 256] = mem[_1747]
+              s = _1285 + (64 * _1299) + 288
+              idx = 0
+              t = _1747 + 32
+              while idx < _1748:
+                  _2201 = mem[t]
+                  mem[s] = mem[mem[t] + 24 len 8]
+                  mem[s + 32] = mem[_2201 + 36 len 28]
+                  s = s + 64
+                  idx = idx + 1
+                  t = t + 32
+                  continue 
+              _2213 = mem[ceil32(return_data.size) + 128]
+              mem[_1285 + 64] = mem[mem[ceil32(return_data.size) + 128] + 24 len 8]
+              mem[_1285 + 96] = mem[_2213 + 56 len 8]
+              mem[_1285 + 128] = mem[ceil32(return_data.size) + 160]
+              log 0x291698c0: mem[mem[64] len _1285 + (64 * _1299) + (64 * _1748) + -mem[64] + 288]
+              if _param1 != stor2:
+                  revert with 0, stor2, _param1
+              if chainid != 1:
+                  revert with 0, 1, chainid
+              log 0xb04e63db: _param1, uint32(_param2)
+              if stor3 + 1 > 255:
+                  revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+              if uint8(stor3 + 1) != _param5.length:
+                  revert with 'q%:%'
+              if ('cd', 164).length != _param5.length:
+                  revert with 2807924911
+              if stor5[caller].field_8 > 2:
+                  revert with Panic(33)  # If you convert a value that is too big or negative into an enum type.
+              if stor5[caller].field_8 > 2:
+                  revert with Panic(33)  # If you convert a value that is too big or negative into an enum type.
+              if stor5[caller].field_8 != 2:
+                  revert with 3658418408
+              if stor5[caller].field_0 >= stor7.length:
+                  revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+              if stor7[stor5[caller].field_0].field_0 != caller:
+                  revert with 3658418408
+              if ('cd', 164).length != Mask(251, 0, ('cd', 164).length):
+                  revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+              if _param5.length != Mask(251, 0, _param5.length):
+                  revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+              if 324 > _param4.length + 324:
+                  revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+              if 0 > 32 * _param5.length:
+                  revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+              if 0 > 32 * ('cd', 164).length:
+                  revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+              if (32 * ('cd', 164).length) + (32 * _param5.length) + _param4.length + 324 != calldata.size:
+                  revert with 0, (32 * ('cd', 164).length) + (32 * _param5.length) + _param4.length + 324, calldata.size
+  ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+
+

@@ -1,0 +1,198 @@
+# Palkeoramix decompiler. 
+#
+#  I failed with these: 
+#  - _fallback(?)
+#  All the rest is below.
+#
+
+def storage:
+  stor0 is mapping of uint8 at storage 0
+  stor1 is mapping of struct at storage 1
+  stor2 is array of address at storage 2
+
+def removePool(address _pool): # not payable
+  require calldata.size - 4 >=′ 32
+  require _pool == _pool
+  require 0x1989c93890aed05a63d179b03424997075b6acf == caller
+  stor1[address(_pool)].field_0 = 0
+
+def unknowncfb2212c(uint256 _param1): # not payable
+  require calldata.size - 4 >=′ 32
+  require _param1 == address(_param1)
+  require 0x1989c93890aed05a63d179b03424997075b6acf == caller
+  stor0[address(_param1)] = 0
+
+def unknowne4579add(uint256 _param1): # not payable
+  require calldata.size - 4 >=′ 32
+  require _param1 == address(_param1)
+  require 0x1989c93890aed05a63d179b03424997075b6acf == caller
+  stor0[address(_param1)] = 1
+
+def addPool(address pool) payable: 
+  mem[64] = 96
+  require not call.value
+  require calldata.size - 4 >=′ 32
+  require pool == pool
+  require 0x1989c93890aed05a63d179b03424997075b6acf == caller
+  require var24001 < stor2.length
+  mem[0] = 2
+  mem[100] = pool
+  static call stor2[var24001].0xd9209289 with:
+          gas gas_remaining wei
+         args pool
+  mem[96] = ext_call.return_data[0]
+  if not ext_call.success:
+      var24001 = var24001 + 1
+      continue 
+  mem[64] = ceil32(return_data.size) + 96
+  require return_data.size >=′ 32
+  require ext_call.return_data[0] == bool(ext_call.return_data[0])
+  if not ext_call.return_data[0]:
+      var24001 = var24001 + 1
+      continue 
+  static call pool.token0() with:
+          gas gas_remaining wei
+  if not ext_call.success:
+      revert with ext_call.return_data[0 len return_data.size]
+  require return_data.size >=′ 32
+  require ext_call.return_data[0] == ext_call.return_data[12 len 20]
+  static call pool.token1() with:
+          gas gas_remaining wei
+  if not ext_call.success:
+      revert with ext_call.return_data[0 len return_data.size]
+  require return_data.size >=′ 32
+  require ext_call.return_data[0] == ext_call.return_data[12 len 20]
+  stor1[address(pool)].field_0 = 1
+  stor1[address(pool)].field_8 = address(ext_call.return_data[0])
+  stor1[address(pool)].field_168 = 0
+  stor1[address(pool)].field_256 = address(ext_call.return_data[0])
+
+def unknown23a69e75() payable: 
+  require calldata.size - 4 >=′ 96
+  require cd[68] <= LOCK8605463013()
+  require cd[68] + 35 <′ calldata.size
+  require ('cd', 68).length <= LOCK8605463013()
+  require cd[68] + ('cd', 68).length + 36 <= calldata.size
+  require stor0[tx.origin]
+  require caller
+  require stor1[caller].field_0
+  require ('cd', 68).length == 33
+  if 0 >= ('cd', 68).length:
+      revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+  require 33 <= ('cd', 68).length
+  if cd[4] <=′ 0:
+      if not cd[4] - 0x8000000000000000000000000000000000000000000000000000000000000000:
+          revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+      require -cd[4] > ('cd', 68)[0]
+      require ext_code.size(stor1[caller].field_8)
+      call stor1[caller].field_8.transferFrom(address sender, address recipient, uint256 amount) with:
+           gas gas_remaining wei
+          args 0x1989c93890aed05a63d179b03424997075b6acf, caller, cd[36]
+  else:
+      if not cd[36] - 0x8000000000000000000000000000000000000000000000000000000000000000:
+          revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+      require -cd[36] > ('cd', 68)[0]
+      require ext_code.size(stor1[caller].field_8)
+      call stor1[caller].field_8.transferFrom(address sender, address recipient, uint256 amount) with:
+           gas gas_remaining wei
+          args 0x1989c93890aed05a63d179b03424997075b6acf, caller, cd[4]
+  if not ext_call.success:
+      revert with ext_call.return_data[0 len return_data.size]
+
+def unknown2c8958f6() payable: 
+  require calldata.size - 4 >=′ 96
+  require cd[68] <= LOCK8605463013()
+  require cd[68] + 35 <′ calldata.size
+  require ('cd', 68).length <= LOCK8605463013()
+  require cd[68] + ('cd', 68).length + 36 <= calldata.size
+  require stor0[tx.origin]
+  require caller
+  require stor1[caller].field_0
+  require ('cd', 68).length == 33
+  if 0 >= ('cd', 68).length:
+      revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+  require 33 <= ('cd', 68).length
+  if cd[4] <=′ 0:
+      if not cd[4] - 0x8000000000000000000000000000000000000000000000000000000000000000:
+          revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+      require -cd[4] > ('cd', 68)[0]
+      require ext_code.size(stor1[caller].field_8)
+      call stor1[caller].field_8.transferFrom(address sender, address recipient, uint256 amount) with:
+           gas gas_remaining wei
+          args 0x1989c93890aed05a63d179b03424997075b6acf, caller, cd[36]
+  else:
+      if not cd[36] - 0x8000000000000000000000000000000000000000000000000000000000000000:
+          revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+      require -cd[36] > ('cd', 68)[0]
+      require ext_code.size(stor1[caller].field_8)
+      call stor1[caller].field_8.transferFrom(address sender, address recipient, uint256 amount) with:
+           gas gas_remaining wei
+          args 0x1989c93890aed05a63d179b03424997075b6acf, caller, cd[4]
+  if not ext_call.success:
+      revert with ext_call.return_data[0 len return_data.size]
+
+def unknown654b6487() payable: 
+  require calldata.size - 4 >=′ 96
+  require cd[68] <= LOCK8605463013()
+  require cd[68] + 35 <′ calldata.size
+  require ('cd', 68).length <= LOCK8605463013()
+  require cd[68] + ('cd', 68).length + 36 <= calldata.size
+  require stor0[tx.origin]
+  require caller
+  require stor1[caller].field_0
+  require ('cd', 68).length == 33
+  if 0 >= ('cd', 68).length:
+      revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+  require 33 <= ('cd', 68).length
+  if cd[4] <=′ 0:
+      if not cd[4] - 0x8000000000000000000000000000000000000000000000000000000000000000:
+          revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+      require -cd[4] > ('cd', 68)[0]
+      require ext_code.size(stor1[caller].field_8)
+      call stor1[caller].field_8.transferFrom(address sender, address recipient, uint256 amount) with:
+           gas gas_remaining wei
+          args 0x1989c93890aed05a63d179b03424997075b6acf, caller, cd[36]
+  else:
+      if not cd[36] - 0x8000000000000000000000000000000000000000000000000000000000000000:
+          revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+      require -cd[36] > ('cd', 68)[0]
+      require ext_code.size(stor1[caller].field_8)
+      call stor1[caller].field_8.transferFrom(address sender, address recipient, uint256 amount) with:
+           gas gas_remaining wei
+          args 0x1989c93890aed05a63d179b03424997075b6acf, caller, cd[4]
+  if not ext_call.success:
+      revert with ext_call.return_data[0 len return_data.size]
+
+def uniswapV3SwapCallback(int256 amount0Delta, int256 amount1Delta, bytes data) payable: 
+  require calldata.size - 4 >=′ 96
+  require data <= LOCK8605463013()
+  require data + 35 <′ calldata.size
+  require data.length <= LOCK8605463013()
+  require data + data.length + 36 <= calldata.size
+  require stor0[tx.origin]
+  require caller
+  require stor1[caller].field_0
+  require data.length == 33
+  if 0 >= data.length:
+      revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+  require 33 <= data.length
+  if amount0Delta <=′ 0:
+      if not amount0Delta - 0x8000000000000000000000000000000000000000000000000000000000000000:
+          revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+      require -amount0Delta > cd[(data + 37)]
+      require ext_code.size(stor1[caller].field_8)
+      call stor1[caller].field_8.transferFrom(address sender, address recipient, uint256 amount) with:
+           gas gas_remaining wei
+          args 0x1989c93890aed05a63d179b03424997075b6acf, caller, amount1Delta
+  else:
+      if not amount1Delta - 0x8000000000000000000000000000000000000000000000000000000000000000:
+          revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+      require -amount1Delta > cd[(data + 37)]
+      require ext_code.size(stor1[caller].field_8)
+      call stor1[caller].field_8.transferFrom(address sender, address recipient, uint256 amount) with:
+           gas gas_remaining wei
+          args 0x1989c93890aed05a63d179b03424997075b6acf, caller, amount0Delta
+  if not ext_call.success:
+      revert with ext_call.return_data[0 len return_data.size]
+
+

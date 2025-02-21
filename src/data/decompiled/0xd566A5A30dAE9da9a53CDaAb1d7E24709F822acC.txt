@@ -1,0 +1,285 @@
+# Palkeoramix decompiler. 
+
+def storage:
+  owner is address at storage 0
+  unknownc13ff08dAddress is address at storage 1
+  unknownb9cfe3b1 is mapping of uint256 at storage 2
+  unknown09d63662 is mapping of uint256 at storage 3
+  stor4 is mapping of uint8 at storage 4
+  stor5 is mapping of uint8 at storage 5
+  unknowna657aa4e is mapping of uint256 at storage 6
+  unknown9955be11 is mapping of uint256 at storage 7
+
+def unknown09d63662(uint256 _param1) payable: 
+  require calldata.size - 4 >=′ 32
+  return unknown09d63662[_param1]
+
+def unknown67284bf0(uint256 _param1) payable: 
+  require calldata.size - 4 >=′ 32
+  return bool(uint8(stor5[_param1]))
+
+def owner() payable: 
+  return owner
+
+def unknown9955be11(uint256 _param1) payable: 
+  require calldata.size - 4 >=′ 32
+  return unknown9955be11[_param1]
+
+def unknowna657aa4e(uint256 _param1, uint256 _param2) payable: 
+  require calldata.size - 4 >=′ 64
+  require _param1 == address(_param1)
+  return unknowna657aa4e[_param1][_param2]
+
+def unknownb9cfe3b1(uint256 _param1) payable: 
+  require calldata.size - 4 >=′ 32
+  return unknownb9cfe3b1[_param1]
+
+def unknownc13ff08d() payable: 
+  return unknownc13ff08dAddress
+
+def unknownccfd2e98(uint256 _param1) payable: 
+  require calldata.size - 4 >=′ 32
+  return bool(stor4[_param1])
+
+#
+#  Regular functions
+#
+
+def _fallback(?) payable: # default function
+  revert
+
+def renounceOwnership() payable: 
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  owner = 0
+  log OwnershipTransferred(
+        address previousOwner=owner,
+        address newOwner=0)
+
+def unknownb762db97(uint256 _param1, uint256 _param2) payable: 
+  require calldata.size - 4 >=′ 64
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  unknown09d63662[_param1] = _param2
+
+def unknownfcb35717(uint256 _param1, uint256 _param2) payable: 
+  require calldata.size - 4 >=′ 64
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  if stor4[_param1]:
+      revert with 0, 'already set root'
+  unknownb9cfe3b1[_param1] = _param2
+  stor4[_param1] = 1
+
+def setPause(uint256 _pause) payable: 
+  require calldata.size - 4 >=′ 32
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  uint256(stor5[_pause]) = not uint8(stor5[_pause]) or Mask(248, 8, uint256(stor5[_pause]))
+
+def transferOwnership(address newOwner) payable: 
+  require calldata.size - 4 >=′ 32
+  require newOwner == newOwner
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  if not newOwner:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'Ownable: new owner is the zero address'
+  owner = newOwner
+  log OwnershipTransferred(
+        address previousOwner=owner,
+        address newOwner=newOwner)
+
+def emergencyWithdraw(address token, uint256 value) payable: 
+  require calldata.size - 4 >=′ 64
+  require token == token
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  require ext_code.size(unknownc13ff08dAddress)
+  call unknownc13ff08dAddress.transfer(address recipient, uint256 amount) with:
+       gas gas_remaining wei
+      args address(token), value
+  if not ext_call.success:
+      revert with ext_call.return_data[0 len return_data.size]
+  require return_data.size >=′ 32
+  require ext_call.return_data[0] == bool(ext_call.return_data[0])
+
+def unknown0a33f434() payable: 
+  require calldata.size - 4 >=′ 64
+  require cd[4] <= LOCK8605463013()
+  require cd[4] + 35 <′ calldata.size
+  if ('cd', 4).length > LOCK8605463013():
+      revert with 0, 65
+  if ceil32(32 * ('cd', 4).length) + 97 < 96 or ceil32(32 * ('cd', 4).length) + 97 > LOCK8605463013():
+      revert with 0, 65
+  mem[96] = ('cd', 4).length
+  require cd[4] + (32 * ('cd', 4).length) + 36 <= calldata.size
+  idx = cd[4] + 36
+  s = 128
+  while idx < cd[4] + (32 * ('cd', 4).length) + 36:
+      mem[s] = cd[idx]
+      idx = idx + 32
+      s = s + 32
+      continue 
+  require cd[36] <= LOCK8605463013()
+  require cd[36] + 35 <′ calldata.size
+  if ('cd', 36).length > LOCK8605463013():
+      revert with 0, 65
+  if ceil32(32 * ('cd', 36).length) + 98 < 97 or ceil32(32 * ('cd', 4).length) + ceil32(32 * ('cd', 36).length) + 98 > LOCK8605463013():
+      revert with 0, 65
+  mem[ceil32(32 * ('cd', 4).length) + 97] = ('cd', 36).length
+  require cd[36] + (32 * ('cd', 36).length) + 36 <= calldata.size
+  idx = cd[36] + 36
+  s = ceil32(32 * ('cd', 4).length) + 129
+  while idx < cd[36] + (32 * ('cd', 36).length) + 36:
+      mem[s] = cd[idx]
+      idx = idx + 32
+      s = s + 32
+      continue 
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  idx = 0
+  while idx < ('cd', 4).length:
+      if idx >= ('cd', 36).length:
+          revert with 0, 50
+      if idx >= ('cd', 4).length:
+          revert with 0, 50
+      mem[0] = mem[(32 * idx) + 128]
+      mem[32] = 3
+      unknown09d63662[mem[(32 * idx) + 128]] = mem[(32 * idx) + ceil32(32 * ('cd', 4).length) + 129]
+      if idx == -1:
+          revert with 0, 17
+      idx = idx + 1
+      continue 
+
+def unknownd55e549d() payable: 
+  require calldata.size - 4 >=′ 64
+  require cd[4] <= LOCK8605463013()
+  require cd[4] + 35 <′ calldata.size
+  if ('cd', 4).length > LOCK8605463013():
+      revert with 0, 65
+  if ceil32(32 * ('cd', 4).length) + 97 < 96 or ceil32(32 * ('cd', 4).length) + 97 > LOCK8605463013():
+      revert with 0, 65
+  mem[96] = ('cd', 4).length
+  require cd[4] + (32 * ('cd', 4).length) + 36 <= calldata.size
+  idx = cd[4] + 36
+  s = 128
+  while idx < cd[4] + (32 * ('cd', 4).length) + 36:
+      mem[s] = cd[idx]
+      idx = idx + 32
+      s = s + 32
+      continue 
+  require cd[36] <= LOCK8605463013()
+  require calldata.size >′ cd[36] + 35
+  if ('cd', 36).length > LOCK8605463013():
+      revert with 0, 65
+  if ceil32(32 * ('cd', 36).length) + 98 < 97 or ceil32(32 * ('cd', 4).length) + ceil32(32 * ('cd', 36).length) + 98 > LOCK8605463013():
+      revert with 0, 65
+  mem[ceil32(32 * ('cd', 4).length) + 97] = ('cd', 36).length
+  require cd[36] + (32 * ('cd', 36).length) + 36 <= calldata.size
+  s = ceil32(32 * ('cd', 4).length) + 129
+  idx = cd[36] + 36
+  while idx < cd[36] + (32 * ('cd', 36).length) + 36:
+      mem[s] = cd[idx]
+      s = s + 32
+      idx = idx + 32
+      continue 
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  idx = 0
+  while idx < ('cd', 4).length:
+      if idx >= ('cd', 4).length:
+          revert with 0, 50
+      if stor4[mem[(32 * idx) + 128]]:
+          revert with 0, 'already set root'
+      if idx >= ('cd', 36).length:
+          revert with 0, 50
+      if idx >= ('cd', 4).length:
+          revert with 0, 50
+      unknownb9cfe3b1[mem[(32 * idx) + 128]] = mem[(32 * idx) + ceil32(32 * ('cd', 4).length) + 129]
+      if idx >= ('cd', 4).length:
+          revert with 0, 50
+      mem[0] = mem[(32 * idx) + 128]
+      mem[32] = 4
+      stor4[mem[(32 * idx) + 128]] = 1
+      if idx == -1:
+          revert with 0, 17
+      idx = idx + 1
+      continue 
+
+def claim(uint256 index, address account, uint256 amount, bytes32[] merkleProof) payable: 
+  require calldata.size - 4 >=′ 128
+  require account == account
+  require merkleProof <= LOCK8605463013()
+  require merkleProof + 35 <′ calldata.size
+  require merkleProof.length <= LOCK8605463013()
+  require merkleProof + (32 * merkleProof.length) + 36 <= calldata.size
+  if uint8(stor5[index]):
+      revert with 0, 'Pauseed'
+  if account != caller:
+      revert with 0, 'Invalid Account'
+  if block.timestamp < unknown09d63662[index]:
+      revert with 0, 'Invalid time'
+  if not unknown09d63662[index]:
+      revert with 0, 'Invalid time'
+  if unknowna657aa4e[address(account)][index]:
+      revert with 0, 'User alread Claim'
+  mem[212 len 32 * merkleProof.length] = call.data[merkleProof + 36 len 32 * merkleProof.length]
+  mem[(32 * merkleProof.length) + 212] = 0
+  idx = 0
+  s = 0
+  while idx < merkleProof.length:
+      if idx >= merkleProof.length:
+          revert with 0, 50
+      if s + sha3(account, amount) < mem[(32 * idx) + 212]:
+          mem[0] = s + sha3(account, amount)
+          mem[32] = mem[(32 * idx) + 212]
+          if idx == -1:
+              revert with 0, 17
+          idx = idx + 1
+          s = sha3(s, mem[(32 * idx) + 212])
+          continue 
+      mem[0] = mem[(32 * idx) + 212]
+      mem[32] = s + sha3(account, amount)
+      if idx == -1:
+          revert with 0, 17
+      idx = idx + 1
+      s = sha3(mem[(32 * idx) + 212], s)
+      continue 
+  if s != unknownb9cfe3b1[index]:
+      revert with 0, 'MerkleDistributor: Invalid proof.'
+  unknowna657aa4e[address(account)][index] = amount
+  if unknown9955be11[index] > !amount:
+      revert with 0, 17
+  unknown9955be11[index] += amount
+  if eth.balance(this.address) < 0:
+      revert with 0, 'Address: insufficient balance for call'
+  mem[(32 * merkleProof.length) + 376 len 96] = transfer(address recipient, uint256 amount), address(account) << 64, 0, amount, 0
+  call unknownc13ff08dAddress with:
+     funct Mask(32, 224, transfer(address recipient, uint256 amount), address(account) << 64, 0, amount, 0) >> 224
+       gas gas_remaining wei
+      args (Mask(512, -288, transfer(address recipient, uint256 amount), address(account) << 64, 0, amount, 0) << 288)
+  if not return_data.size:
+      if not ext_call.success:
+          revert with account, amount
+      require account, Mask(96, 160, amount) >> 160 == bool(account, Mask(96, 160, amount) >> 160)
+      if not account, Mask(96, 160, amount) >> 160:
+          revert with 0, 'SafeERC20: ERC20 operation did not succeed'
+  else:
+      mem[(32 * merkleProof.length) + 408 len return_data.size] = ext_call.return_data[0 len return_data.size]
+      if not ext_call.success:
+          if return_data.size:
+              revert with ext_call.return_data[0 len return_data.size]
+          revert with 0, 'SafeERC20: low-level call failed'
+      if not return_data.size:
+          if not ext_code.size(unknownc13ff08dAddress):
+              revert with 0, 'Address: call to non-contract'
+      if return_data.size:
+          require return_data.size >=′ 32
+          require mem[(32 * merkleProof.length) + 408] == bool(mem[(32 * merkleProof.length) + 408])
+          if not mem[(32 * merkleProof.length) + 408]:
+              revert with 0, 'SafeERC20: ERC20 operation did not succeed'
+  log Claimed(
+        address miner=address(account),
+        uint256 reward=amount)
+
+

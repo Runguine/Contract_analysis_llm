@@ -1,0 +1,200 @@
+# Palkeoramix decompiler. 
+
+def storage:
+  stor3608 is address at storage 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc
+  stor3608 is uint256 at storage 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc
+  storB531 is address at storage 0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103
+  storB531 is uint256 at storage 0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103
+
+def _fallback(?) payable: # default function
+  mem[132] = 0, mem[132 len 28]
+  mem[136] = 0
+  static call address(storB531).mem[132 len 4] with:
+          gas gas_remaining wei
+  if return_data.size:
+      mem[164 len return_data.size] = ext_call.return_data[0 len return_data.size]
+      if ext_call.success:
+          if 32 == return_data.size:
+              require return_data.size >=′ 32
+              if mem[164]:
+                  revert with 0, 'L1ChugSplashProxy: system is currently being upgraded'
+  if not address(stor3608):
+      revert with 0, 'L1ChugSplashProxy: implementation is not set yet'
+  delegate uint256(stor3608) with:
+     funct call.data[0 len 4]
+       gas gas_remaining wei
+      args call.data[4 len calldata.size - 4]
+  if not delegate.return_code:
+      revert with ext_call.return_data[0 len return_data.size]
+  return ext_call.return_data[0 len return_data.size]
+
+def getOwner(): # not payable
+  if caller == address(storB531):
+      return address(storB531)
+  if not caller:
+      return address(storB531)
+  mem[132] = 0, mem[132 len 28]
+  mem[136] = 0
+  static call address(storB531).mem[132 len 4] with:
+          gas gas_remaining wei
+  if return_data.size:
+      mem[164 len return_data.size] = ext_call.return_data[0 len return_data.size]
+      if ext_call.success:
+          if 32 == return_data.size:
+              require return_data.size >=′ 32
+              if mem[164]:
+                  revert with 0, 'L1ChugSplashProxy: system is currently being upgraded'
+  if not address(stor3608):
+      revert with 0, 'L1ChugSplashProxy: implementation is not set yet'
+  delegate uint256(stor3608) with:
+     funct call.data[0 len 4]
+       gas gas_remaining wei
+      args call.data[4 len calldata.size - 4]
+  if not delegate.return_code:
+      revert with ext_call.return_data[0 len return_data.size]
+  return ext_call.return_data[0 len return_data.size]
+
+def getImplementation(): # not payable
+  if caller == address(storB531):
+      return address(stor3608)
+  if not caller:
+      return address(stor3608)
+  mem[132] = 0, mem[132 len 28]
+  mem[136] = 0
+  static call address(storB531).mem[132 len 4] with:
+          gas gas_remaining wei
+  if return_data.size:
+      mem[164 len return_data.size] = ext_call.return_data[0 len return_data.size]
+      if ext_call.success:
+          if 32 == return_data.size:
+              require return_data.size >=′ 32
+              if mem[164]:
+                  revert with 0, 'L1ChugSplashProxy: system is currently being upgraded'
+  if not address(stor3608):
+      revert with 0, 'L1ChugSplashProxy: implementation is not set yet'
+  delegate uint256(stor3608) with:
+     funct call.data[0 len 4]
+       gas gas_remaining wei
+      args call.data[4 len calldata.size - 4]
+  if not delegate.return_code:
+      revert with ext_call.return_data[0 len return_data.size]
+  return ext_call.return_data[0 len return_data.size]
+
+def setStorage(bytes32 _key, bytes32 _value): # not payable
+  require calldata.size - 4 >=′ 64
+  if caller == address(storB531):
+      stor[_key] = _value
+      stop
+  if not caller:
+      stor[_key] = _value
+      stop
+  mem[132] = 0, mem[132 len 28]
+  mem[136] = 0
+  static call address(storB531).mem[132 len 4] with:
+          gas gas_remaining wei
+  if return_data.size:
+      mem[164 len return_data.size] = ext_call.return_data[0 len return_data.size]
+      if ext_call.success:
+          if 32 == return_data.size:
+              require return_data.size >=′ 32
+              if mem[164]:
+                  revert with 0, 'L1ChugSplashProxy: system is currently being upgraded'
+  if not address(stor3608):
+      revert with 0, 'L1ChugSplashProxy: implementation is not set yet'
+  delegate uint256(stor3608) with:
+     funct call.data[0 len 4]
+       gas gas_remaining wei
+      args call.data[4 len calldata.size - 4]
+  if not delegate.return_code:
+      revert with ext_call.return_data[0 len return_data.size]
+  return ext_call.return_data[0 len return_data.size]
+
+def setOwner(address _newOwner): # not payable
+  require calldata.size - 4 >=′ 32
+  require _newOwner == _newOwner
+  if caller == address(storB531):
+      uint256(storB531) = _newOwner
+      stop
+  if not caller:
+      uint256(storB531) = _newOwner
+      stop
+  mem[132] = 0, mem[132 len 28]
+  mem[136] = 0
+  static call address(storB531).mem[132 len 4] with:
+          gas gas_remaining wei
+  if return_data.size:
+      mem[164 len return_data.size] = ext_call.return_data[0 len return_data.size]
+      if ext_call.success:
+          if 32 == return_data.size:
+              require return_data.size >=′ 32
+              if mem[164]:
+                  revert with 0, 'L1ChugSplashProxy: system is currently being upgraded'
+  if not address(stor3608):
+      revert with 0, 'L1ChugSplashProxy: implementation is not set yet'
+  delegate uint256(stor3608) with:
+     funct call.data[0 len 4]
+       gas gas_remaining wei
+      args call.data[4 len calldata.size - 4]
+  if not delegate.return_code:
+      revert with ext_call.return_data[0 len return_data.size]
+  return ext_call.return_data[0 len return_data.size]
+
+def setCode(bytes _code): # not payable
+  require calldata.size - 4 >=′ 32
+  require _code <= LOCK8605463013()
+  require _code + 35 <′ calldata.size
+  if _code.length > LOCK8605463013():
+      revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+  if ceil32(ceil32(_code.length)) + 97 < 96 or ceil32(ceil32(_code.length)) + 97 > LOCK8605463013():
+      revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+  mem[96] = _code.length
+  require _code + _code.length + 36 <= calldata.size
+  mem[128 len _code.length] = _code[all]
+  mem[_code.length + 128] = 0
+  if caller == address(storB531):
+      if sha3(_code[all]) - ext_code.hash(uint256(stor3608)):
+          create contract with 0 wei
+                          code: 0, Mask(8 * _code.length, -(8 * _code.length) + 256, _code[all], mem[_code.length + 128 len ceil32(_code.length) - _code.length]) << (8 * _code.length) - 256
+          if ext_code.hash(create.new_address) != sha3(_code[all]):
+              revert with 0, 'L1ChugSplashProxy: code was not correctly deployed'
+          uint256(stor3608) = create.new_address
+      stop
+  if not caller:
+      if sha3(_code[all]) - ext_code.hash(uint256(stor3608)):
+          create contract with 0 wei
+                          code: 0, Mask(8 * _code.length, -(8 * _code.length) + 256, _code[all], mem[_code.length + 128 len ceil32(_code.length) - _code.length]) << (8 * _code.length) - 256
+          if ext_code.hash(create.new_address) != sha3(_code[all]):
+              revert with 0, 'L1ChugSplashProxy: code was not correctly deployed'
+          uint256(stor3608) = create.new_address
+      stop
+  mem[ceil32(ceil32(_code.length)) + 97] = 4
+  mem[ceil32(ceil32(_code.length)) + 133 len 28] = 0, mem[_code.length + 160 len -_code.length + ceil32(ceil32(_code.length)) + 1]
+  mem[ceil32(ceil32(_code.length)) + 129 len 4] = isUpgrading()
+  mem[ceil32(ceil32(_code.length)) + 133] = 0, mem[ceil32(ceil32(_code.length)) + 133 len 28]
+  mem[ceil32(ceil32(_code.length)) + 137] = 0
+  static call address(storB531).mem[ceil32(ceil32(_code.length)) + 133 len 4] with:
+          gas gas_remaining wei
+  if not return_data.size:
+      if ext_call.success:
+          if 32 == _code.length:
+              require _code.length >=′ 32
+              if mem[128]:
+                  revert with 0, 'L1ChugSplashProxy: system is currently being upgraded'
+  else:
+      mem[ceil32(ceil32(_code.length)) + 165 len return_data.size] = ext_call.return_data[0 len return_data.size]
+      if ext_call.success:
+          if 32 == return_data.size:
+              require return_data.size >=′ 32
+              if mem[ceil32(ceil32(_code.length)) + 165]:
+                  revert with 0, 'L1ChugSplashProxy: system is currently being upgraded'
+  if not address(stor3608):
+      revert with 0, 'L1ChugSplashProxy: implementation is not set yet'
+  delegate uint256(stor3608) with:
+     funct call.data[0 len 4]
+       gas gas_remaining wei
+      args call.data[4 len calldata.size - 4]
+  if not delegate.return_code:
+      revert with ext_call.return_data[0 len return_data.size]
+  return ext_call.return_data[0 len return_data.size]
+
+

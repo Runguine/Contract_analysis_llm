@@ -1,0 +1,1975 @@
+# Palkeoramix decompiler. 
+
+const name = 'Gearbox', 0
+const totalSupply = 10000000000 * 10^18
+const decimals = 18
+const symbol = 'GEAR', 0
+const DOMAIN_TYPEHASH = 0x8cad95687ba82c2ce50e74f7b754645e5117c3a5bec8151c0726d5857980a866
+const PERMIT_TYPEHASH = 0x6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9
+const DELEGATION_TYPEHASH = 0xe48329057bfd03d55e49b547132e39cffd9c1820ad7b9d4c5307691425d15adf
+
+def storage:
+  allowance is mapping of uint128 at storage 0
+  balanceOf is mapping of uint128 at storage 1
+  delegates is mapping of address at storage 2
+  checkpoints is mapping of struct at storage 3
+  numCheckpoints is mapping of uint32 at storage 4
+  nonces is mapping of uint256 at storage 5
+  transfersAllowed is uint8 at storage 6
+  managerAddress is address at storage 6 offset 8
+  minerAddress is address at storage 7
+
+def miner() payable: 
+  return minerAddress
+
+def manager() payable: 
+  return managerAddress
+
+def delegates(address delegator) payable: 
+  require calldata.size - 4 >=′ 32
+  require delegator == delegator
+  return delegates[delegator]
+
+def numCheckpoints(address _param1) payable: 
+  require calldata.size - 4 >=′ 32
+  require _param1 == _param1
+  return numCheckpoints[_param1]
+
+def balanceOf(address account) payable: 
+  require calldata.size - 4 >=′ 32
+  require account == account
+  return balanceOf[address(account)]
+
+def nonces(address _param1) payable: 
+  require calldata.size - 4 >=′ 32
+  require _param1 == _param1
+  return nonces[_param1]
+
+def transfersAllowed() payable: 
+  return bool(transfersAllowed)
+
+def allowance(address owner, address spender) payable: 
+  require calldata.size - 4 >=′ 64
+  require owner == owner
+  require spender == spender
+  return allowance[address(owner)][address(spender)]
+
+def checkpoints(address _param1, uint32 _param2) payable: 
+  require calldata.size - 4 >=′ 64
+  require _param1 == _param1
+  require _param2 == _param2
+  return checkpoints[_param1][_param2].field_0, checkpoints[_param1][_param2].field_32
+
+#
+#  Regular functions
+#
+
+def _fallback(?) payable: # default function
+  revert
+
+def allowTransfers() payable: 
+  if managerAddress != caller:
+      revert with 0, 'Gear::caller is not the manager'
+  transfersAllowed = 1
+  log TransferAllowed()
+
+def setMiner(address newMiner) payable: 
+  require calldata.size - 4 >=′ 32
+  require newMiner == newMiner
+  if managerAddress != caller:
+      revert with 0, 'Gear::caller is not the manager'
+  if not newMiner:
+      revert with 0, 'Zero address is not allowed'
+  minerAddress = newMiner
+  log MinerSet(address miner=minerAddress)
+
+def transferOwnership(address newOwner) payable: 
+  require calldata.size - 4 >=′ 32
+  require newOwner == newOwner
+  if managerAddress != caller:
+      revert with 0, 'Gear::caller is not the manager'
+  if not newOwner:
+      revert with 0, 'Zero address is not allowed'
+  log OwnershipTransferred(
+        address previousOwner=managerAddress,
+        address newOwner=newOwner)
+  managerAddress = newOwner
+
+def getCurrentVotes(address account) payable: 
+  require calldata.size - 4 >=′ 32
+  require account == account
+  if numCheckpoints[address(account)] > 0:
+      return checkpoints[address(account)][stor4[address(account)] - 1 << 224].field_32
+  else:
+      return 0
+
+def approve(address spender, uint256 amount) payable: 
+  require calldata.size - 4 >=′ 64
+  require spender == spender
+  require amount == amount
+  if amount == -1:
+      allowance[caller][address(spender)] = LOCK8605463013()
+      log Approval(
+            address owner=LOCK8605463013(),
+            address spender=caller,
+            uint256 value=spender)
+  else:
+      if amount >= unknown10000000():
+          revert with 0, 32, 37, 0xfe476561723a3a617070726f76653a20616d6f756e74206578636565647320393620626974, mem[165 len 27] >> 40, 0
+      allowance[caller][address(spender)] = Mask(96, 0, amount)
+      log Approval(
+            address owner=Mask(96, 0, amount),
+            address spender=caller,
+            uint256 value=spender)
+  return 1
+
+def permit(address owner, address spender, uint256 value, uint256 deadline, uint8 v, bytes32 r, bytes32 s) payable: 
+  require calldata.size - 4 >=′ 224
+  require owner == owner
+  require spender == spender
+  require value == value
+  require deadline == deadline
+  require v == v
+  require r == r
+  require s == s
+  if value == -1:
+      nonces[address(owner)]++
+      signer = erecover(sha3(0, sha3(0x8cad95687ba82c2ce50e74f7b754645e5117c3a5bec8151c0726d5857980a866, sha3('Gearbox'), chainid, this.address), sha3(0x6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9, address(owner), address(spender), value, nonces[address(owner)], deadline)), v << 248, r, s) # precompiled
+      if not erecover.result:
+          revert with ext_call.return_data[0 len return_data.size]
+      if not address(signer):
+          revert with 0, 'Gear::permit: invalid signature'
+      if address(signer) != owner:
+          revert with 0, 'Gear::permit: unauthorized'
+      if block.timestamp > deadline:
+          revert with 0, 'Gear::permit: signature expired'
+      allowance[address(owner)][address(spender)] = LOCK8605463013()
+      log Approval(
+            address owner=LOCK8605463013(),
+            address spender=owner,
+            uint256 value=spender)
+  else:
+      if value >= unknown10000000():
+          revert with 0, 32, 36, 0x73476561723a3a7065726d69743a20616d6f756e74206578636565647320393620626974, mem[164 len 28] >> 32, 0
+      nonces[address(owner)]++
+      signer = erecover(sha3(0, sha3(0x8cad95687ba82c2ce50e74f7b754645e5117c3a5bec8151c0726d5857980a866, sha3('Gearbox'), chainid, this.address), sha3(0x6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9, address(owner), address(spender), value, nonces[address(owner)], deadline)), v << 248, r, s) # precompiled
+      if not erecover.result:
+          revert with ext_call.return_data[0 len return_data.size]
+      if not address(signer):
+          revert with 0, 'Gear::permit: invalid signature'
+      if address(signer) != owner:
+          revert with 0, 'Gear::permit: unauthorized'
+      if block.timestamp > deadline:
+          revert with 0, 'Gear::permit: signature expired'
+      allowance[address(owner)][address(spender)] = Mask(96, 0, value)
+      log Approval(
+            address owner=Mask(96, 0, value),
+            address spender=owner,
+            uint256 value=spender)
+
+def getPriorVotes(address account, uint256 blockNumber) payable: 
+  mem[64] = 96
+  require calldata.size - 4 >=′ 64
+  require account == account
+  require blockNumber == blockNumber
+  if blockNumber >= block.number:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'Gear::getPriorVotes: not yet determined'
+  if not numCheckpoints[address(account)]:
+      return 0
+  if checkpoints[address(account)][stor4[address(account)] - 1 << 224].field_0 <= blockNumber:
+      return checkpoints[address(account)][stor4[address(account)] - 1 << 224].field_32
+  if checkpoints[address(account)][0].field_0 > blockNumber:
+      return 0
+  idx = 0
+  while uint32(numCheckpoints[address(account)] - 1) > uint32(idx):
+      mem[0] = uint32(numCheckpoints[address(account)] + -(uint32(numCheckpoints[address(account)] + -idx - 1) / 2) - 1)
+      mem[32] = sha3(address(account), 3)
+      _32 = mem[64]
+      mem[64] = mem[64] + 64
+      mem[_32] = checkpoints[address(account)][stor4[address(account)] + -(uint32(stor4[address(account)] + -idx - 1) / 2) - 1 << 224].field_0
+      mem[_32 + 32] = checkpoints[address(account)][stor4[address(account)] + -(uint32(stor4[address(account)] + -idx - 1) / 2) - 1 << 224].field_32
+      if checkpoints[address(account)][stor4[address(account)] + -(uint32(stor4[address(account)] + -idx - 1) / 2) - 1 << 224].field_0 == blockNumber:
+          return checkpoints[address(account)][stor4[address(account)] + -(uint32(stor4[address(account)] + -idx - 1) / 2) - 1 << 224].field_32
+      if checkpoints[address(account)][stor4[address(account)] + -(uint32(stor4[address(account)] + -idx - 1) / 2) - 1 << 224].field_0 >= blockNumber:
+          idx = idx
+          continue 
+      idx = numCheckpoints[address(account)] + -(uint32(numCheckpoints[address(account)] + -idx - 1) / 2) - 1
+      continue 
+  return checkpoints[address(account)][idx << 224].field_32
+
+def transfer(address recipient, uint256 amount) payable: 
+  require calldata.size - 4 >=′ 64
+  require recipient == recipient
+  require amount == amount
+  if amount < unknown10000000():
+      if not transfersAllowed:
+          if managerAddress != caller:
+              if minerAddress != caller:
+                  revert with 0, 'Gear::transfers are forbidden'
+      if not caller:
+          revert with 0, 'Gear::_transferTokens: cannot transfer from the zero address'
+      if not recipient:
+          revert with 0, 'Gear::_transferTokens: cannot transfer to the zero address'
+      if Mask(96, 0, amount) <= balanceOf[caller]:
+          balanceOf[caller] = Mask(96, 0, balanceOf[caller] - amount)
+          if Mask(96, 0, balanceOf[address(recipient)] + amount) >= balanceOf[address(recipient)]:
+              balanceOf[address(recipient)] = Mask(96, 0, balanceOf[address(recipient)] + amount)
+              log Transfer(
+                    address from=Mask(96, 0, amount),
+                    address to=caller,
+                    uint256 value=recipient)
+              if delegates[caller] == delegates[address(recipient)]:
+                  return 1
+              if Mask(96, 0, amount) <= 0:
+                  return 1
+              if not delegates[caller]:
+                  if delegates[address(recipient)]:
+                      if numCheckpoints[stor2[address(recipient)]] > 0:
+                          if Mask(96, 0, checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 + amount) < checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32:
+                              ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+                          if block.number >= unknown10000000():
+                              ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+                          if numCheckpoints[stor2[address(recipient)]] <= 0:
+                              checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_0 = uint32(block.number)
+                              checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_32 = Mask(96, 0, checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 + amount)
+                              numCheckpoints[stor2[address(recipient)]] = uint32(numCheckpoints[stor2[address(recipient)]] + 1)
+                          else:
+                              if checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_0 == uint32(block.number):
+                                  checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 = Mask(96, 0, checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 + amount)
+                              else:
+                                  checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_0 = uint32(block.number)
+                                  checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_32 = Mask(96, 0, checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 + amount)
+                                  numCheckpoints[stor2[address(recipient)]] = uint32(numCheckpoints[stor2[address(recipient)]] + 1)
+                          log DelegateVotesChanged(
+                                address delegate=checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_0,
+                                uint256 previousBalance=Mask(96, 0, checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 + amount),
+                                uint256 newBalance=delegates[address(recipient)])
+                      else:
+                          if Mask(96, 0, amount) < 0:
+                              ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+                          if block.number >= unknown10000000():
+                              ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+                          if numCheckpoints[stor2[address(recipient)]] <= 0:
+                              checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_0 = uint32(block.number)
+                              checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_32 = Mask(96, 0, amount)
+                              numCheckpoints[stor2[address(recipient)]] = uint32(numCheckpoints[stor2[address(recipient)]] + 1)
+                          else:
+                              if checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_0 == uint32(block.number):
+                                  checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 = Mask(96, 0, amount)
+                              else:
+                                  checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_0 = uint32(block.number)
+                                  checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_32 = Mask(96, 0, amount)
+                                  numCheckpoints[stor2[address(recipient)]] = uint32(numCheckpoints[stor2[address(recipient)]] + 1)
+                          log DelegateVotesChanged(
+                                address delegate=0,
+                                uint256 previousBalance=Mask(96, 0, amount),
+                                uint256 newBalance=delegates[address(recipient)])
+                  return 1
+              if numCheckpoints[stor2[caller]] > 0:
+                  if Mask(96, 0, amount) <= checkpoints[stor2[caller]][stor4[stor2[caller]] - 1 << 224].field_32:
+                      if block.number < unknown10000000():
+                          if numCheckpoints[stor2[caller]] <= 0:
+                              checkpoints[stor2[caller]][stor4[stor2[caller]]].field_0 = uint32(block.number)
+                              checkpoints[stor2[caller]][stor4[stor2[caller]]].field_32 = Mask(96, 0, checkpoints[stor2[caller]][stor4[stor2[caller]] - 1 << 224].field_32 - amount)
+                              numCheckpoints[stor2[caller]] = uint32(numCheckpoints[stor2[caller]] + 1)
+                          else:
+                              if checkpoints[stor2[caller]][stor4[stor2[caller]] - 1 << 224].field_0 == uint32(block.number):
+                                  checkpoints[stor2[caller]][stor4[stor2[caller]] - 1 << 224].field_32 = Mask(96, 0, checkpoints[stor2[caller]][stor4[stor2[caller]] - 1 << 224].field_32 - amount)
+                              else:
+                                  checkpoints[stor2[caller]][stor4[stor2[caller]]].field_0 = uint32(block.number)
+                                  checkpoints[stor2[caller]][stor4[stor2[caller]]].field_32 = Mask(96, 0, checkpoints[stor2[caller]][stor4[stor2[caller]] - 1 << 224].field_32 - amount)
+                                  numCheckpoints[stor2[caller]] = uint32(numCheckpoints[stor2[caller]] + 1)
+                          log DelegateVotesChanged(
+                                address delegate=checkpoints[stor2[caller]][stor4[stor2[caller]] - 1 << 224].field_0,
+                                uint256 previousBalance=Mask(96, 0, checkpoints[stor2[caller]][stor4[stor2[caller]] - 1 << 224].field_32 - amount),
+                                uint256 newBalance=delegates[caller])
+                          if not delegates[address(recipient)]:
+                              return 1
+                          if numCheckpoints[stor2[address(recipient)]] > 0:
+                              if Mask(96, 0, checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 + amount) >= checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32:
+                                  if block.number < unknown10000000():
+                                      if numCheckpoints[stor2[address(recipient)]] <= 0:
+                                          checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_0 = uint32(block.number)
+                                          checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_32 = Mask(96, 0, checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 + amount)
+                                          numCheckpoints[stor2[address(recipient)]] = uint32(numCheckpoints[stor2[address(recipient)]] + 1)
+                                      else:
+                                          if checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_0 == uint32(block.number):
+                                              checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 = Mask(96, 0, checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 + amount)
+                                          else:
+                                              checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_0 = uint32(block.number)
+                                              checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_32 = Mask(96, 0, checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 + amount)
+                                              numCheckpoints[stor2[address(recipient)]] = uint32(numCheckpoints[stor2[address(recipient)]] + 1)
+                          else:
+                              if Mask(96, 0, amount) >= 0:
+                                  if block.number < unknown10000000():
+                                      if numCheckpoints[stor2[address(recipient)]] <= 0:
+                                          checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_0 = uint32(block.number)
+                                          checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_32 = Mask(96, 0, amount)
+                                          numCheckpoints[stor2[address(recipient)]] = uint32(numCheckpoints[stor2[address(recipient)]] + 1)
+                                      else:
+                                          if checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_0 == uint32(block.number):
+                                              checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 = Mask(96, 0, amount)
+                                          else:
+                                              checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_0 = uint32(block.number)
+                                              checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_32 = Mask(96, 0, amount)
+                                              numCheckpoints[stor2[address(recipient)]] = uint32(numCheckpoints[stor2[address(recipient)]] + 1)
+              else:
+                  if Mask(96, 0, amount) <= 0:
+                      if block.number < unknown10000000():
+                          if numCheckpoints[stor2[caller]] <= 0:
+                              checkpoints[stor2[caller]][stor4[stor2[caller]]].field_0 = uint32(block.number)
+                              checkpoints[stor2[caller]][stor4[stor2[caller]]].field_32 = Mask(96, 0, -amount)
+                              numCheckpoints[stor2[caller]] = uint32(numCheckpoints[stor2[caller]] + 1)
+                          else:
+                              if checkpoints[stor2[caller]][stor4[stor2[caller]] - 1 << 224].field_0 == uint32(block.number):
+                                  checkpoints[stor2[caller]][stor4[stor2[caller]] - 1 << 224].field_32 = Mask(96, 0, -amount)
+                              else:
+                                  checkpoints[stor2[caller]][stor4[stor2[caller]]].field_0 = uint32(block.number)
+                                  checkpoints[stor2[caller]][stor4[stor2[caller]]].field_32 = Mask(96, 0, -amount)
+                                  numCheckpoints[stor2[caller]] = uint32(numCheckpoints[stor2[caller]] + 1)
+                          log DelegateVotesChanged(
+                                address delegate=0,
+                                uint256 previousBalance=Mask(96, 0, -amount),
+                                uint256 newBalance=delegates[caller])
+                          if not delegates[address(recipient)]:
+                              return 1
+                          if numCheckpoints[stor2[address(recipient)]] > 0:
+                              if Mask(96, 0, checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 + amount) >= checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32:
+                                  if block.number < unknown10000000():
+                                      if numCheckpoints[stor2[address(recipient)]] <= 0:
+                                          checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_0 = uint32(block.number)
+                                          checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_32 = Mask(96, 0, checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 + amount)
+                                          numCheckpoints[stor2[address(recipient)]] = uint32(numCheckpoints[stor2[address(recipient)]] + 1)
+                                      else:
+                                          if checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_0 == uint32(block.number):
+                                              checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 = Mask(96, 0, checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 + amount)
+                                          else:
+                                              checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_0 = uint32(block.number)
+                                              checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_32 = Mask(96, 0, checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 + amount)
+                                              numCheckpoints[stor2[address(recipient)]] = uint32(numCheckpoints[stor2[address(recipient)]] + 1)
+                          else:
+                              if Mask(96, 0, amount) >= 0:
+                                  if block.number < unknown10000000():
+                                      if numCheckpoints[stor2[address(recipient)]] <= 0:
+                                          checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_0 = uint32(block.number)
+                                          checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_32 = Mask(96, 0, amount)
+                                          numCheckpoints[stor2[address(recipient)]] = uint32(numCheckpoints[stor2[address(recipient)]] + 1)
+                                      else:
+                                          if checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_0 == uint32(block.number):
+                                              checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 = Mask(96, 0, amount)
+                                          else:
+                                              checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_0 = uint32(block.number)
+                                              checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_32 = Mask(96, 0, amount)
+                                              numCheckpoints[stor2[address(recipient)]] = uint32(numCheckpoints[stor2[address(recipient)]] + 1)
+  ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+
+def delegate(address delegatee) payable: 
+  require calldata.size - 4 >=′ 32
+  require delegatee == delegatee
+  delegates[caller] = delegatee
+  log DelegateChanged(
+        address delegator=caller,
+        address fromDelegate=delegates[caller],
+        address toDelegate=delegatee)
+  if delegates[caller] != delegatee:
+      if balanceOf[caller] > 0:
+          if not delegates[caller]:
+              if delegatee:
+                  if numCheckpoints[address(delegatee)] > 0:
+                      if Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[caller]) < checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32:
+                          revert with 0, 32, 39, 0x73476561723a3a5f6d6f7665566f7465733a20766f746520616d6f756e74206f766572666c6f77, mem[167 len 25] >> 56, 0
+                      if block.number >= unknown10000000():
+                          revert with 0, 
+                                      32,
+                                      52,
+                                      0x73476561723a3a5f7772697465436865636b706f696e743a20626c6f636b206e756d626572206578636565647320333220626974, mem[276 len 12] >> 160,
+                                      0
+                      if numCheckpoints[address(delegatee)] <= 0:
+                          checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                          checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[caller])
+                          numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                      else:
+                          if checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_0 == uint32(block.number):
+                              checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 = Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[caller])
+                          else:
+                              checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                              checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[caller])
+                              numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                      log DelegateVotesChanged(
+                            address delegate=checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_0,
+                            uint256 previousBalance=Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[caller]),
+                            uint256 newBalance=delegatee)
+                  else:
+                      if balanceOf[caller] < 0:
+                          revert with 0, 32, 39, 0x73476561723a3a5f6d6f7665566f7465733a20766f746520616d6f756e74206f766572666c6f77, mem[167 len 25] >> 56, 0
+                      if block.number >= unknown10000000():
+                          revert with 0, 
+                                      32,
+                                      52,
+                                      0x73476561723a3a5f7772697465436865636b706f696e743a20626c6f636b206e756d626572206578636565647320333220626974, mem[276 len 12] >> 160,
+                                      0
+                      if numCheckpoints[address(delegatee)] <= 0:
+                          checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                          checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = balanceOf[caller]
+                          checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = 0
+                          numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                      else:
+                          if checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_0 == uint32(block.number):
+                              checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 = balanceOf[caller]
+                          else:
+                              checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                              checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = balanceOf[caller]
+                              checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = 0
+                              numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                      log DelegateVotesChanged(
+                            address delegate=0,
+                            uint256 previousBalance=balanceOf[caller],
+                            uint256 newBalance=delegatee)
+          else:
+              if numCheckpoints[stor2[caller]] > 0:
+                  if balanceOf[caller] > checkpoints[stor2[caller]][stor4[stor2[caller]] - 1 << 224].field_32:
+                      revert with 0, 32, 40, 0x73476561723a3a5f6d6f7665566f7465733a20766f746520616d6f756e7420756e646572666c6f77, mem[168 len 24] >> 64, 0
+                  if block.number >= unknown10000000():
+                      revert with 0, 
+                                  32,
+                                  52,
+                                  0x73476561723a3a5f7772697465436865636b706f696e743a20626c6f636b206e756d626572206578636565647320333220626974, mem[276 len 12] >> 160,
+                                  0
+                  if numCheckpoints[stor2[caller]] <= 0:
+                      checkpoints[stor2[caller]][stor4[stor2[caller]]].field_0 = uint32(block.number)
+                      checkpoints[stor2[caller]][stor4[stor2[caller]]].field_32 = Mask(96, 0, checkpoints[stor2[caller]][stor4[stor2[caller]] - 1 << 224].field_32 - balanceOf[caller])
+                      numCheckpoints[stor2[caller]] = uint32(numCheckpoints[stor2[caller]] + 1)
+                      log DelegateVotesChanged(
+                            address delegate=checkpoints[stor2[caller]][stor4[stor2[caller]] - 1 << 224].field_0,
+                            uint256 previousBalance=Mask(96, 0, checkpoints[stor2[caller]][stor4[stor2[caller]] - 1 << 224].field_32 - balanceOf[caller]),
+                            uint256 newBalance=delegates[caller])
+                      if delegatee:
+                          if numCheckpoints[address(delegatee)] > 0:
+                              if Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[caller]) < checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32:
+                                  revert with 0, 32, 39, 0x73476561723a3a5f6d6f7665566f7465733a20766f746520616d6f756e74206f766572666c6f77, mem[423 len 25] >> 56, 0
+                              if block.number >= unknown10000000():
+                                  revert with 0, 
+                                              32,
+                                              52,
+                                              0x73476561723a3a5f7772697465436865636b706f696e743a20626c6f636b206e756d626572206578636565647320333220626974, mem[532 len 12] >> 160,
+                                              0
+                              if numCheckpoints[address(delegatee)] <= 0:
+                                  checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                                  checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[caller])
+                                  numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                              else:
+                                  if checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_0 == uint32(block.number):
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 = Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[caller])
+                                  else:
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[caller])
+                                      numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                              log DelegateVotesChanged(
+                                    address delegate=checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_0,
+                                    uint256 previousBalance=Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[caller]),
+                                    uint256 newBalance=delegatee)
+                          else:
+                              if balanceOf[caller] < 0:
+                                  revert with 0, 32, 39, 0x73476561723a3a5f6d6f7665566f7465733a20766f746520616d6f756e74206f766572666c6f77, mem[423 len 25] >> 56, 0
+                              if block.number >= unknown10000000():
+                                  revert with 0, 
+                                              32,
+                                              52,
+                                              0x73476561723a3a5f7772697465436865636b706f696e743a20626c6f636b206e756d626572206578636565647320333220626974, mem[532 len 12] >> 160,
+                                              0
+                              if numCheckpoints[address(delegatee)] <= 0:
+                                  checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                                  checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = balanceOf[caller]
+                                  checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = 0
+                                  numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                              else:
+                                  if checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_0 == uint32(block.number):
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 = balanceOf[caller]
+                                  else:
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = balanceOf[caller]
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = 0
+                                      numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                              log DelegateVotesChanged(
+                                    address delegate=0,
+                                    uint256 previousBalance=balanceOf[caller],
+                                    uint256 newBalance=delegatee)
+                  else:
+                      if checkpoints[stor2[caller]][stor4[stor2[caller]] - 1 << 224].field_0 == uint32(block.number):
+                          checkpoints[stor2[caller]][stor4[stor2[caller]] - 1 << 224].field_32 = Mask(96, 0, checkpoints[stor2[caller]][stor4[stor2[caller]] - 1 << 224].field_32 - balanceOf[caller])
+                          log DelegateVotesChanged(
+                                address delegate=checkpoints[stor2[caller]][stor4[stor2[caller]] - 1 << 224].field_0,
+                                uint256 previousBalance=Mask(96, 0, checkpoints[stor2[caller]][stor4[stor2[caller]] - 1 << 224].field_32 - balanceOf[caller]),
+                                uint256 newBalance=delegates[caller])
+                          if delegatee:
+                              if numCheckpoints[address(delegatee)] > 0:
+                                  if Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[caller]) < checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32:
+                                      revert with 0, 32, 39, 0x73476561723a3a5f6d6f7665566f7465733a20766f746520616d6f756e74206f766572666c6f77, mem[359 len 25] >> 56, 0
+                                  if block.number >= unknown10000000():
+                                      revert with 0, 
+                                                  32,
+                                                  52,
+                                                  0x73476561723a3a5f7772697465436865636b706f696e743a20626c6f636b206e756d626572206578636565647320333220626974, mem[468 len 12] >> 160,
+                                                  0
+                                  if numCheckpoints[address(delegatee)] <= 0:
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[caller])
+                                      numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                                  else:
+                                      if checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_0 == uint32(block.number):
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 = Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[caller])
+                                      else:
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[caller])
+                                          numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                                  log DelegateVotesChanged(
+                                        address delegate=checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_0,
+                                        uint256 previousBalance=Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[caller]),
+                                        uint256 newBalance=delegatee)
+                              else:
+                                  if balanceOf[caller] < 0:
+                                      revert with 0, 32, 39, 0x73476561723a3a5f6d6f7665566f7465733a20766f746520616d6f756e74206f766572666c6f77, mem[359 len 25] >> 56, 0
+                                  if block.number >= unknown10000000():
+                                      revert with 0, 
+                                                  32,
+                                                  52,
+                                                  0x73476561723a3a5f7772697465436865636b706f696e743a20626c6f636b206e756d626572206578636565647320333220626974, mem[468 len 12] >> 160,
+                                                  0
+                                  if numCheckpoints[address(delegatee)] <= 0:
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = balanceOf[caller]
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = 0
+                                      numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                                  else:
+                                      if checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_0 == uint32(block.number):
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 = balanceOf[caller]
+                                      else:
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = balanceOf[caller]
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = 0
+                                          numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                                  log DelegateVotesChanged(
+                                        address delegate=0,
+                                        uint256 previousBalance=balanceOf[caller],
+                                        uint256 newBalance=delegatee)
+                      else:
+                          checkpoints[stor2[caller]][stor4[stor2[caller]]].field_0 = uint32(block.number)
+                          checkpoints[stor2[caller]][stor4[stor2[caller]]].field_32 = Mask(96, 0, checkpoints[stor2[caller]][stor4[stor2[caller]] - 1 << 224].field_32 - balanceOf[caller])
+                          numCheckpoints[stor2[caller]] = uint32(numCheckpoints[stor2[caller]] + 1)
+                          log DelegateVotesChanged(
+                                address delegate=checkpoints[stor2[caller]][stor4[stor2[caller]] - 1 << 224].field_0,
+                                uint256 previousBalance=Mask(96, 0, checkpoints[stor2[caller]][stor4[stor2[caller]] - 1 << 224].field_32 - balanceOf[caller]),
+                                uint256 newBalance=delegates[caller])
+                          if delegatee:
+                              if numCheckpoints[address(delegatee)] > 0:
+                                  if Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[caller]) < checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32:
+                                      revert with 0, 32, 39, 0x73476561723a3a5f6d6f7665566f7465733a20766f746520616d6f756e74206f766572666c6f77, mem[423 len 25] >> 56, 0
+                                  if block.number >= unknown10000000():
+                                      revert with 0, 
+                                                  32,
+                                                  52,
+                                                  0x73476561723a3a5f7772697465436865636b706f696e743a20626c6f636b206e756d626572206578636565647320333220626974, mem[532 len 12] >> 160,
+                                                  0
+                                  if numCheckpoints[address(delegatee)] <= 0:
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[caller])
+                                      numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                                  else:
+                                      if checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_0 == uint32(block.number):
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 = Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[caller])
+                                      else:
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[caller])
+                                          numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                                  log DelegateVotesChanged(
+                                        address delegate=checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_0,
+                                        uint256 previousBalance=Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[caller]),
+                                        uint256 newBalance=delegatee)
+                              else:
+                                  if balanceOf[caller] < 0:
+                                      revert with 0, 32, 39, 0x73476561723a3a5f6d6f7665566f7465733a20766f746520616d6f756e74206f766572666c6f77, mem[423 len 25] >> 56, 0
+                                  if block.number >= unknown10000000():
+                                      revert with 0, 
+                                                  32,
+                                                  52,
+                                                  0x73476561723a3a5f7772697465436865636b706f696e743a20626c6f636b206e756d626572206578636565647320333220626974, mem[532 len 12] >> 160,
+                                                  0
+                                  if numCheckpoints[address(delegatee)] <= 0:
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = balanceOf[caller]
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = 0
+                                      numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                                  else:
+                                      if checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_0 == uint32(block.number):
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 = balanceOf[caller]
+                                      else:
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = balanceOf[caller]
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = 0
+                                          numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                                  log DelegateVotesChanged(
+                                        address delegate=0,
+                                        uint256 previousBalance=balanceOf[caller],
+                                        uint256 newBalance=delegatee)
+              else:
+                  if balanceOf[caller] > 0:
+                      revert with 0, 32, 40, 0x73476561723a3a5f6d6f7665566f7465733a20766f746520616d6f756e7420756e646572666c6f77, mem[168 len 24] >> 64, 0
+                  if block.number >= unknown10000000():
+                      revert with 0, 
+                                  32,
+                                  52,
+                                  0x73476561723a3a5f7772697465436865636b706f696e743a20626c6f636b206e756d626572206578636565647320333220626974, mem[276 len 12] >> 160,
+                                  0
+                  if numCheckpoints[stor2[caller]] <= 0:
+                      checkpoints[stor2[caller]][stor4[stor2[caller]]].field_0 = uint32(block.number)
+                      checkpoints[stor2[caller]][stor4[stor2[caller]]].field_32 = Mask(96, 0, -balanceOf[caller])
+                      numCheckpoints[stor2[caller]] = uint32(numCheckpoints[stor2[caller]] + 1)
+                      log DelegateVotesChanged(
+                            address delegate=0,
+                            uint256 previousBalance=Mask(96, 0, -balanceOf[caller]),
+                            uint256 newBalance=delegates[caller])
+                      if delegatee:
+                          if numCheckpoints[address(delegatee)] > 0:
+                              if Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[caller]) < checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32:
+                                  revert with 0, 32, 39, 0x73476561723a3a5f6d6f7665566f7465733a20766f746520616d6f756e74206f766572666c6f77, mem[423 len 25] >> 56, 0
+                              if block.number >= unknown10000000():
+                                  revert with 0, 
+                                              32,
+                                              52,
+                                              0x73476561723a3a5f7772697465436865636b706f696e743a20626c6f636b206e756d626572206578636565647320333220626974, mem[532 len 12] >> 160,
+                                              0
+                              if numCheckpoints[address(delegatee)] <= 0:
+                                  checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                                  checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[caller])
+                                  numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                              else:
+                                  if checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_0 == uint32(block.number):
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 = Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[caller])
+                                  else:
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[caller])
+                                      numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                              log DelegateVotesChanged(
+                                    address delegate=checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_0,
+                                    uint256 previousBalance=Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[caller]),
+                                    uint256 newBalance=delegatee)
+                          else:
+                              if balanceOf[caller] < 0:
+                                  revert with 0, 32, 39, 0x73476561723a3a5f6d6f7665566f7465733a20766f746520616d6f756e74206f766572666c6f77, mem[423 len 25] >> 56, 0
+                              if block.number >= unknown10000000():
+                                  revert with 0, 
+                                              32,
+                                              52,
+                                              0x73476561723a3a5f7772697465436865636b706f696e743a20626c6f636b206e756d626572206578636565647320333220626974, mem[532 len 12] >> 160,
+                                              0
+                              if numCheckpoints[address(delegatee)] <= 0:
+                                  checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                                  checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = balanceOf[caller]
+                                  checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = 0
+                                  numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                              else:
+                                  if checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_0 == uint32(block.number):
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 = balanceOf[caller]
+                                  else:
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = balanceOf[caller]
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = 0
+                                      numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                              log DelegateVotesChanged(
+                                    address delegate=0,
+                                    uint256 previousBalance=balanceOf[caller],
+                                    uint256 newBalance=delegatee)
+                  else:
+                      if checkpoints[stor2[caller]][stor4[stor2[caller]] - 1 << 224].field_0 == uint32(block.number):
+                          checkpoints[stor2[caller]][stor4[stor2[caller]] - 1 << 224].field_32 = Mask(96, 0, -balanceOf[caller])
+                          log DelegateVotesChanged(
+                                address delegate=0,
+                                uint256 previousBalance=Mask(96, 0, -balanceOf[caller]),
+                                uint256 newBalance=delegates[caller])
+                          if delegatee:
+                              if numCheckpoints[address(delegatee)] > 0:
+                                  if Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[caller]) < checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32:
+                                      revert with 0, 32, 39, 0x73476561723a3a5f6d6f7665566f7465733a20766f746520616d6f756e74206f766572666c6f77, mem[359 len 25] >> 56, 0
+                                  if block.number >= unknown10000000():
+                                      revert with 0, 
+                                                  32,
+                                                  52,
+                                                  0x73476561723a3a5f7772697465436865636b706f696e743a20626c6f636b206e756d626572206578636565647320333220626974, mem[468 len 12] >> 160,
+                                                  0
+                                  if numCheckpoints[address(delegatee)] <= 0:
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[caller])
+                                      numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                                  else:
+                                      if checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_0 == uint32(block.number):
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 = Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[caller])
+                                      else:
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[caller])
+                                          numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                                  log DelegateVotesChanged(
+                                        address delegate=checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_0,
+                                        uint256 previousBalance=Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[caller]),
+                                        uint256 newBalance=delegatee)
+                              else:
+                                  if balanceOf[caller] < 0:
+                                      revert with 0, 32, 39, 0x73476561723a3a5f6d6f7665566f7465733a20766f746520616d6f756e74206f766572666c6f77, mem[359 len 25] >> 56, 0
+                                  if block.number >= unknown10000000():
+                                      revert with 0, 
+                                                  32,
+                                                  52,
+                                                  0x73476561723a3a5f7772697465436865636b706f696e743a20626c6f636b206e756d626572206578636565647320333220626974, mem[468 len 12] >> 160,
+                                                  0
+                                  if numCheckpoints[address(delegatee)] <= 0:
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = balanceOf[caller]
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = 0
+                                      numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                                  else:
+                                      if checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_0 == uint32(block.number):
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 = balanceOf[caller]
+                                      else:
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = balanceOf[caller]
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = 0
+                                          numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                                  log DelegateVotesChanged(
+                                        address delegate=0,
+                                        uint256 previousBalance=balanceOf[caller],
+                                        uint256 newBalance=delegatee)
+                      else:
+                          checkpoints[stor2[caller]][stor4[stor2[caller]]].field_0 = uint32(block.number)
+                          checkpoints[stor2[caller]][stor4[stor2[caller]]].field_32 = Mask(96, 0, -balanceOf[caller])
+                          numCheckpoints[stor2[caller]] = uint32(numCheckpoints[stor2[caller]] + 1)
+                          log DelegateVotesChanged(
+                                address delegate=0,
+                                uint256 previousBalance=Mask(96, 0, -balanceOf[caller]),
+                                uint256 newBalance=delegates[caller])
+                          if delegatee:
+                              if numCheckpoints[address(delegatee)] > 0:
+                                  if Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[caller]) < checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32:
+                                      revert with 0, 32, 39, 0x73476561723a3a5f6d6f7665566f7465733a20766f746520616d6f756e74206f766572666c6f77, mem[423 len 25] >> 56, 0
+                                  if block.number >= unknown10000000():
+                                      revert with 0, 
+                                                  32,
+                                                  52,
+                                                  0x73476561723a3a5f7772697465436865636b706f696e743a20626c6f636b206e756d626572206578636565647320333220626974, mem[532 len 12] >> 160,
+                                                  0
+                                  if numCheckpoints[address(delegatee)] <= 0:
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[caller])
+                                      numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                                  else:
+                                      if checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_0 == uint32(block.number):
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 = Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[caller])
+                                      else:
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[caller])
+                                          numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                                  log DelegateVotesChanged(
+                                        address delegate=checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_0,
+                                        uint256 previousBalance=Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[caller]),
+                                        uint256 newBalance=delegatee)
+                              else:
+                                  if balanceOf[caller] < 0:
+                                      revert with 0, 32, 39, 0x73476561723a3a5f6d6f7665566f7465733a20766f746520616d6f756e74206f766572666c6f77, mem[423 len 25] >> 56, 0
+                                  if block.number >= unknown10000000():
+                                      revert with 0, 
+                                                  32,
+                                                  52,
+                                                  0x73476561723a3a5f7772697465436865636b706f696e743a20626c6f636b206e756d626572206578636565647320333220626974, mem[532 len 12] >> 160,
+                                                  0
+                                  if numCheckpoints[address(delegatee)] <= 0:
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = balanceOf[caller]
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = 0
+                                      numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                                  else:
+                                      if checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_0 == uint32(block.number):
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 = balanceOf[caller]
+                                      else:
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = balanceOf[caller]
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = 0
+                                          numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                                  log DelegateVotesChanged(
+                                        address delegate=0,
+                                        uint256 previousBalance=balanceOf[caller],
+                                        uint256 newBalance=delegatee)
+
+def delegateBySig(address delegatee, uint256 nonce, uint256 expiry, uint8 v, bytes32 r, bytes32 s) payable: 
+  require calldata.size - 4 >=′ 192
+  require delegatee == delegatee
+  require nonce == nonce
+  require expiry == expiry
+  require v == v
+  require r == r
+  require s == s
+  signer = erecover(sha3(0, sha3(0x8cad95687ba82c2ce50e74f7b754645e5117c3a5bec8151c0726d5857980a866, sha3('Gearbox'), chainid, this.address), sha3(0xe48329057bfd03d55e49b547132e39cffd9c1820ad7b9d4c5307691425d15adf, address(delegatee), nonce, expiry)), v << 248, r, s) # precompiled
+  if not erecover.result:
+      revert with ext_call.return_data[0 len return_data.size]
+  if not address(signer):
+      revert with 0, 'Gear::delegateBySig: invalid signature'
+  nonces[address(signer)]++
+  if nonce != nonces[address(signer)]:
+      revert with 0, 'Gear::delegateBySig: invalid nonce'
+  if block.timestamp > expiry:
+      revert with 0, 'Gear::delegateBySig: signature expired'
+  delegates[address(signer)] = delegatee
+  log DelegateChanged(
+        address delegator=address(signer),
+        address fromDelegate=delegates[address(signer)],
+        address toDelegate=delegatee)
+  if delegates[address(signer)] != delegatee:
+      if balanceOf[address(signer)] > 0:
+          if not delegates[address(signer)]:
+              if delegatee:
+                  if numCheckpoints[address(delegatee)] > 0:
+                      if Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[address(signer)]) < checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32:
+                          revert with 0, 32, 39, 0x73476561723a3a5f6d6f7665566f7465733a20766f746520616d6f756e74206f766572666c6f77, Mask(200, 0, r) >> 56, 0
+                      if block.number >= unknown10000000():
+                          revert with 0, 
+                                      32,
+                                      52,
+                                      0x73476561723a3a5f7772697465436865636b706f696e743a20626c6f636b206e756d626572206578636565647320333220626974, mem[790 len 12] >> 160,
+                                      0
+                      if numCheckpoints[address(delegatee)] <= 0:
+                          checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                          checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[address(signer)])
+                          numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                      else:
+                          if checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_0 == uint32(block.number):
+                              checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 = Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[address(signer)])
+                          else:
+                              checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                              checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[address(signer)])
+                              numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                      log DelegateVotesChanged(
+                            address delegate=checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_0,
+                            uint256 previousBalance=Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[address(signer)]),
+                            uint256 newBalance=delegatee)
+                  else:
+                      if balanceOf[address(signer)] < 0:
+                          revert with 0, 32, 39, 0x73476561723a3a5f6d6f7665566f7465733a20766f746520616d6f756e74206f766572666c6f77, Mask(200, 0, r) >> 56, 0
+                      if block.number >= unknown10000000():
+                          revert with 0, 
+                                      32,
+                                      52,
+                                      0x73476561723a3a5f7772697465436865636b706f696e743a20626c6f636b206e756d626572206578636565647320333220626974, mem[790 len 12] >> 160,
+                                      0
+                      if numCheckpoints[address(delegatee)] <= 0:
+                          checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                          checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = balanceOf[address(signer)]
+                          checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = 0
+                          numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                      else:
+                          if checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_0 == uint32(block.number):
+                              checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 = balanceOf[address(signer)]
+                          else:
+                              checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                              checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = balanceOf[address(signer)]
+                              checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = 0
+                              numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                      log DelegateVotesChanged(
+                            address delegate=0,
+                            uint256 previousBalance=balanceOf[address(signer)],
+                            uint256 newBalance=delegatee)
+          else:
+              if numCheckpoints[stor2[address(signer)]] > 0:
+                  if balanceOf[address(signer)] > checkpoints[stor2[address(signer)]][stor4[stor2[address(signer)]] - 1 << 224].field_32:
+                      revert with 0, 32, 40, 0x73476561723a3a5f6d6f7665566f7465733a20766f746520616d6f756e7420756e646572666c6f77, Mask(192, 0, r) >> 64, 0
+                  if block.number >= unknown10000000():
+                      revert with 0, 
+                                  32,
+                                  52,
+                                  0x73476561723a3a5f7772697465436865636b706f696e743a20626c6f636b206e756d626572206578636565647320333220626974, mem[790 len 12] >> 160,
+                                  0
+                  if numCheckpoints[stor2[address(signer)]] <= 0:
+                      checkpoints[stor2[address(signer)]][stor4[stor2[address(signer)]]].field_0 = uint32(block.number)
+                      checkpoints[stor2[address(signer)]][stor4[stor2[address(signer)]]].field_32 = Mask(96, 0, checkpoints[stor2[address(signer)]][stor4[stor2[address(signer)]] - 1 << 224].field_32 - balanceOf[address(signer)])
+                      numCheckpoints[stor2[address(signer)]] = uint32(numCheckpoints[stor2[address(signer)]] + 1)
+                      log DelegateVotesChanged(
+                            address delegate=checkpoints[stor2[address(signer)]][stor4[stor2[address(signer)]] - 1 << 224].field_0,
+                            uint256 previousBalance=Mask(96, 0, checkpoints[stor2[address(signer)]][stor4[stor2[address(signer)]] - 1 << 224].field_32 - balanceOf[address(signer)]),
+                            uint256 newBalance=delegates[address(signer)])
+                      if delegatee:
+                          if numCheckpoints[address(delegatee)] > 0:
+                              if Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[address(signer)]) < checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32:
+                                  revert with 0, 32, 39, 0x73476561723a3a5f6d6f7665566f7465733a20766f746520616d6f756e74206f766572666c6f77, mem[937 len 25] >> 56, 0
+                              if block.number >= unknown10000000():
+                                  revert with 0, 
+                                              32,
+                                              52,
+                                              0x73476561723a3a5f7772697465436865636b706f696e743a20626c6f636b206e756d626572206578636565647320333220626974, mem[1046 len 12] >> 160,
+                                              0
+                              if numCheckpoints[address(delegatee)] <= 0:
+                                  checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                                  checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[address(signer)])
+                                  numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                              else:
+                                  if checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_0 == uint32(block.number):
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 = Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[address(signer)])
+                                  else:
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[address(signer)])
+                                      numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                              log DelegateVotesChanged(
+                                    address delegate=checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_0,
+                                    uint256 previousBalance=Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[address(signer)]),
+                                    uint256 newBalance=delegatee)
+                          else:
+                              if balanceOf[address(signer)] < 0:
+                                  revert with 0, 32, 39, 0x73476561723a3a5f6d6f7665566f7465733a20766f746520616d6f756e74206f766572666c6f77, mem[937 len 25] >> 56, 0
+                              if block.number >= unknown10000000():
+                                  revert with 0, 
+                                              32,
+                                              52,
+                                              0x73476561723a3a5f7772697465436865636b706f696e743a20626c6f636b206e756d626572206578636565647320333220626974, mem[1046 len 12] >> 160,
+                                              0
+                              if numCheckpoints[address(delegatee)] <= 0:
+                                  checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                                  checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = balanceOf[address(signer)]
+                                  checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = 0
+                                  numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                              else:
+                                  if checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_0 == uint32(block.number):
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 = balanceOf[address(signer)]
+                                  else:
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = balanceOf[address(signer)]
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = 0
+                                      numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                              log DelegateVotesChanged(
+                                    address delegate=0,
+                                    uint256 previousBalance=balanceOf[address(signer)],
+                                    uint256 newBalance=delegatee)
+                  else:
+                      if checkpoints[stor2[address(signer)]][stor4[stor2[address(signer)]] - 1 << 224].field_0 == uint32(block.number):
+                          checkpoints[stor2[address(signer)]][stor4[stor2[address(signer)]] - 1 << 224].field_32 = Mask(96, 0, checkpoints[stor2[address(signer)]][stor4[stor2[address(signer)]] - 1 << 224].field_32 - balanceOf[address(signer)])
+                          log DelegateVotesChanged(
+                                address delegate=checkpoints[stor2[address(signer)]][stor4[stor2[address(signer)]] - 1 << 224].field_0,
+                                uint256 previousBalance=Mask(96, 0, checkpoints[stor2[address(signer)]][stor4[stor2[address(signer)]] - 1 << 224].field_32 - balanceOf[address(signer)]),
+                                uint256 newBalance=delegates[address(signer)])
+                          if delegatee:
+                              if numCheckpoints[address(delegatee)] > 0:
+                                  if Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[address(signer)]) < checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32:
+                                      revert with 0, 32, 39, 0x73476561723a3a5f6d6f7665566f7465733a20766f746520616d6f756e74206f766572666c6f77, mem[873 len 25] >> 56, 0
+                                  if block.number >= unknown10000000():
+                                      revert with 0, 
+                                                  32,
+                                                  52,
+                                                  0x73476561723a3a5f7772697465436865636b706f696e743a20626c6f636b206e756d626572206578636565647320333220626974, mem[982 len 12] >> 160,
+                                                  0
+                                  if numCheckpoints[address(delegatee)] <= 0:
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[address(signer)])
+                                      numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                                  else:
+                                      if checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_0 == uint32(block.number):
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 = Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[address(signer)])
+                                      else:
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[address(signer)])
+                                          numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                                  log DelegateVotesChanged(
+                                        address delegate=checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_0,
+                                        uint256 previousBalance=Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[address(signer)]),
+                                        uint256 newBalance=delegatee)
+                              else:
+                                  if balanceOf[address(signer)] < 0:
+                                      revert with 0, 32, 39, 0x73476561723a3a5f6d6f7665566f7465733a20766f746520616d6f756e74206f766572666c6f77, mem[873 len 25] >> 56, 0
+                                  if block.number >= unknown10000000():
+                                      revert with 0, 
+                                                  32,
+                                                  52,
+                                                  0x73476561723a3a5f7772697465436865636b706f696e743a20626c6f636b206e756d626572206578636565647320333220626974, mem[982 len 12] >> 160,
+                                                  0
+                                  if numCheckpoints[address(delegatee)] <= 0:
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = balanceOf[address(signer)]
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = 0
+                                      numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                                  else:
+                                      if checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_0 == uint32(block.number):
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 = balanceOf[address(signer)]
+                                      else:
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = balanceOf[address(signer)]
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = 0
+                                          numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                                  log DelegateVotesChanged(
+                                        address delegate=0,
+                                        uint256 previousBalance=balanceOf[address(signer)],
+                                        uint256 newBalance=delegatee)
+                      else:
+                          checkpoints[stor2[address(signer)]][stor4[stor2[address(signer)]]].field_0 = uint32(block.number)
+                          checkpoints[stor2[address(signer)]][stor4[stor2[address(signer)]]].field_32 = Mask(96, 0, checkpoints[stor2[address(signer)]][stor4[stor2[address(signer)]] - 1 << 224].field_32 - balanceOf[address(signer)])
+                          numCheckpoints[stor2[address(signer)]] = uint32(numCheckpoints[stor2[address(signer)]] + 1)
+                          log DelegateVotesChanged(
+                                address delegate=checkpoints[stor2[address(signer)]][stor4[stor2[address(signer)]] - 1 << 224].field_0,
+                                uint256 previousBalance=Mask(96, 0, checkpoints[stor2[address(signer)]][stor4[stor2[address(signer)]] - 1 << 224].field_32 - balanceOf[address(signer)]),
+                                uint256 newBalance=delegates[address(signer)])
+                          if delegatee:
+                              if numCheckpoints[address(delegatee)] > 0:
+                                  if Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[address(signer)]) < checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32:
+                                      revert with 0, 32, 39, 0x73476561723a3a5f6d6f7665566f7465733a20766f746520616d6f756e74206f766572666c6f77, mem[937 len 25] >> 56, 0
+                                  if block.number >= unknown10000000():
+                                      revert with 0, 
+                                                  32,
+                                                  52,
+                                                  0x73476561723a3a5f7772697465436865636b706f696e743a20626c6f636b206e756d626572206578636565647320333220626974, mem[1046 len 12] >> 160,
+                                                  0
+                                  if numCheckpoints[address(delegatee)] <= 0:
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[address(signer)])
+                                      numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                                  else:
+                                      if checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_0 == uint32(block.number):
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 = Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[address(signer)])
+                                      else:
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[address(signer)])
+                                          numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                                  log DelegateVotesChanged(
+                                        address delegate=checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_0,
+                                        uint256 previousBalance=Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[address(signer)]),
+                                        uint256 newBalance=delegatee)
+                              else:
+                                  if balanceOf[address(signer)] < 0:
+                                      revert with 0, 32, 39, 0x73476561723a3a5f6d6f7665566f7465733a20766f746520616d6f756e74206f766572666c6f77, mem[937 len 25] >> 56, 0
+                                  if block.number >= unknown10000000():
+                                      revert with 0, 
+                                                  32,
+                                                  52,
+                                                  0x73476561723a3a5f7772697465436865636b706f696e743a20626c6f636b206e756d626572206578636565647320333220626974, mem[1046 len 12] >> 160,
+                                                  0
+                                  if numCheckpoints[address(delegatee)] <= 0:
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = balanceOf[address(signer)]
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = 0
+                                      numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                                  else:
+                                      if checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_0 == uint32(block.number):
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 = balanceOf[address(signer)]
+                                      else:
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = balanceOf[address(signer)]
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = 0
+                                          numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                                  log DelegateVotesChanged(
+                                        address delegate=0,
+                                        uint256 previousBalance=balanceOf[address(signer)],
+                                        uint256 newBalance=delegatee)
+              else:
+                  if balanceOf[address(signer)] > 0:
+                      revert with 0, 32, 40, 0x73476561723a3a5f6d6f7665566f7465733a20766f746520616d6f756e7420756e646572666c6f77, Mask(192, 0, r) >> 64, 0
+                  if block.number >= unknown10000000():
+                      revert with 0, 
+                                  32,
+                                  52,
+                                  0x73476561723a3a5f7772697465436865636b706f696e743a20626c6f636b206e756d626572206578636565647320333220626974, mem[790 len 12] >> 160,
+                                  0
+                  if numCheckpoints[stor2[address(signer)]] <= 0:
+                      checkpoints[stor2[address(signer)]][stor4[stor2[address(signer)]]].field_0 = uint32(block.number)
+                      checkpoints[stor2[address(signer)]][stor4[stor2[address(signer)]]].field_32 = Mask(96, 0, -balanceOf[address(signer)])
+                      numCheckpoints[stor2[address(signer)]] = uint32(numCheckpoints[stor2[address(signer)]] + 1)
+                      log DelegateVotesChanged(
+                            address delegate=0,
+                            uint256 previousBalance=Mask(96, 0, -balanceOf[address(signer)]),
+                            uint256 newBalance=delegates[address(signer)])
+                      if delegatee:
+                          if numCheckpoints[address(delegatee)] > 0:
+                              if Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[address(signer)]) < checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32:
+                                  revert with 0, 32, 39, 0x73476561723a3a5f6d6f7665566f7465733a20766f746520616d6f756e74206f766572666c6f77, mem[937 len 25] >> 56, 0
+                              if block.number >= unknown10000000():
+                                  revert with 0, 
+                                              32,
+                                              52,
+                                              0x73476561723a3a5f7772697465436865636b706f696e743a20626c6f636b206e756d626572206578636565647320333220626974, mem[1046 len 12] >> 160,
+                                              0
+                              if numCheckpoints[address(delegatee)] <= 0:
+                                  checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                                  checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[address(signer)])
+                                  numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                              else:
+                                  if checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_0 == uint32(block.number):
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 = Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[address(signer)])
+                                  else:
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[address(signer)])
+                                      numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                              log DelegateVotesChanged(
+                                    address delegate=checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_0,
+                                    uint256 previousBalance=Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[address(signer)]),
+                                    uint256 newBalance=delegatee)
+                          else:
+                              if balanceOf[address(signer)] < 0:
+                                  revert with 0, 32, 39, 0x73476561723a3a5f6d6f7665566f7465733a20766f746520616d6f756e74206f766572666c6f77, mem[937 len 25] >> 56, 0
+                              if block.number >= unknown10000000():
+                                  revert with 0, 
+                                              32,
+                                              52,
+                                              0x73476561723a3a5f7772697465436865636b706f696e743a20626c6f636b206e756d626572206578636565647320333220626974, mem[1046 len 12] >> 160,
+                                              0
+                              if numCheckpoints[address(delegatee)] <= 0:
+                                  checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                                  checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = balanceOf[address(signer)]
+                                  checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = 0
+                                  numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                              else:
+                                  if checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_0 == uint32(block.number):
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 = balanceOf[address(signer)]
+                                  else:
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = balanceOf[address(signer)]
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = 0
+                                      numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                              log DelegateVotesChanged(
+                                    address delegate=0,
+                                    uint256 previousBalance=balanceOf[address(signer)],
+                                    uint256 newBalance=delegatee)
+                  else:
+                      if checkpoints[stor2[address(signer)]][stor4[stor2[address(signer)]] - 1 << 224].field_0 == uint32(block.number):
+                          checkpoints[stor2[address(signer)]][stor4[stor2[address(signer)]] - 1 << 224].field_32 = Mask(96, 0, -balanceOf[address(signer)])
+                          log DelegateVotesChanged(
+                                address delegate=0,
+                                uint256 previousBalance=Mask(96, 0, -balanceOf[address(signer)]),
+                                uint256 newBalance=delegates[address(signer)])
+                          if delegatee:
+                              if numCheckpoints[address(delegatee)] > 0:
+                                  if Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[address(signer)]) < checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32:
+                                      revert with 0, 32, 39, 0x73476561723a3a5f6d6f7665566f7465733a20766f746520616d6f756e74206f766572666c6f77, mem[873 len 25] >> 56, 0
+                                  if block.number >= unknown10000000():
+                                      revert with 0, 
+                                                  32,
+                                                  52,
+                                                  0x73476561723a3a5f7772697465436865636b706f696e743a20626c6f636b206e756d626572206578636565647320333220626974, mem[982 len 12] >> 160,
+                                                  0
+                                  if numCheckpoints[address(delegatee)] <= 0:
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[address(signer)])
+                                      numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                                  else:
+                                      if checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_0 == uint32(block.number):
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 = Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[address(signer)])
+                                      else:
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[address(signer)])
+                                          numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                                  log DelegateVotesChanged(
+                                        address delegate=checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_0,
+                                        uint256 previousBalance=Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[address(signer)]),
+                                        uint256 newBalance=delegatee)
+                              else:
+                                  if balanceOf[address(signer)] < 0:
+                                      revert with 0, 32, 39, 0x73476561723a3a5f6d6f7665566f7465733a20766f746520616d6f756e74206f766572666c6f77, mem[873 len 25] >> 56, 0
+                                  if block.number >= unknown10000000():
+                                      revert with 0, 
+                                                  32,
+                                                  52,
+                                                  0x73476561723a3a5f7772697465436865636b706f696e743a20626c6f636b206e756d626572206578636565647320333220626974, mem[982 len 12] >> 160,
+                                                  0
+                                  if numCheckpoints[address(delegatee)] <= 0:
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = balanceOf[address(signer)]
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = 0
+                                      numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                                  else:
+                                      if checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_0 == uint32(block.number):
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 = balanceOf[address(signer)]
+                                      else:
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = balanceOf[address(signer)]
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = 0
+                                          numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                                  log DelegateVotesChanged(
+                                        address delegate=0,
+                                        uint256 previousBalance=balanceOf[address(signer)],
+                                        uint256 newBalance=delegatee)
+                      else:
+                          checkpoints[stor2[address(signer)]][stor4[stor2[address(signer)]]].field_0 = uint32(block.number)
+                          checkpoints[stor2[address(signer)]][stor4[stor2[address(signer)]]].field_32 = Mask(96, 0, -balanceOf[address(signer)])
+                          numCheckpoints[stor2[address(signer)]] = uint32(numCheckpoints[stor2[address(signer)]] + 1)
+                          log DelegateVotesChanged(
+                                address delegate=0,
+                                uint256 previousBalance=Mask(96, 0, -balanceOf[address(signer)]),
+                                uint256 newBalance=delegates[address(signer)])
+                          if delegatee:
+                              if numCheckpoints[address(delegatee)] > 0:
+                                  if Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[address(signer)]) < checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32:
+                                      revert with 0, 32, 39, 0x73476561723a3a5f6d6f7665566f7465733a20766f746520616d6f756e74206f766572666c6f77, mem[937 len 25] >> 56, 0
+                                  if block.number >= unknown10000000():
+                                      revert with 0, 
+                                                  32,
+                                                  52,
+                                                  0x73476561723a3a5f7772697465436865636b706f696e743a20626c6f636b206e756d626572206578636565647320333220626974, mem[1046 len 12] >> 160,
+                                                  0
+                                  if numCheckpoints[address(delegatee)] <= 0:
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[address(signer)])
+                                      numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                                  else:
+                                      if checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_0 == uint32(block.number):
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 = Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[address(signer)])
+                                      else:
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[address(signer)])
+                                          numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                                  log DelegateVotesChanged(
+                                        address delegate=checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_0,
+                                        uint256 previousBalance=Mask(96, 0, checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 + balanceOf[address(signer)]),
+                                        uint256 newBalance=delegatee)
+                              else:
+                                  if balanceOf[address(signer)] < 0:
+                                      revert with 0, 32, 39, 0x73476561723a3a5f6d6f7665566f7465733a20766f746520616d6f756e74206f766572666c6f77, mem[937 len 25] >> 56, 0
+                                  if block.number >= unknown10000000():
+                                      revert with 0, 
+                                                  32,
+                                                  52,
+                                                  0x73476561723a3a5f7772697465436865636b706f696e743a20626c6f636b206e756d626572206578636565647320333220626974, mem[1046 len 12] >> 160,
+                                                  0
+                                  if numCheckpoints[address(delegatee)] <= 0:
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = balanceOf[address(signer)]
+                                      checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = 0
+                                      numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                                  else:
+                                      if checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_0 == uint32(block.number):
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)] - 1 << 224].field_32 = balanceOf[address(signer)]
+                                      else:
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = uint32(block.number)
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)]].field_0 = balanceOf[address(signer)]
+                                          checkpoints[address(delegatee)][stor4[address(delegatee)]].field_32 = 0
+                                          numCheckpoints[address(delegatee)] = uint32(numCheckpoints[address(delegatee)] + 1)
+                                  log DelegateVotesChanged(
+                                        address delegate=0,
+                                        uint256 previousBalance=balanceOf[address(signer)],
+                                        uint256 newBalance=delegatee)
+
+def transferFrom(address sender, address recipient, uint256 amount) payable: 
+  require calldata.size - 4 >=′ 96
+  require sender == sender
+  require recipient == recipient
+  require amount == amount
+  if amount < unknown10000000():
+      if caller == sender:
+          if transfersAllowed:
+              if not sender:
+                  revert with 0, 'Gear::_transferTokens: cannot transfer from the zero address'
+              if not recipient:
+                  revert with 0, 'Gear::_transferTokens: cannot transfer to the zero address'
+              if Mask(96, 0, amount) <= balanceOf[address(sender)]:
+                  balanceOf[address(sender)] = Mask(96, 0, balanceOf[address(sender)] - amount)
+                  if Mask(96, 0, balanceOf[address(recipient)] + amount) >= balanceOf[address(recipient)]:
+                      balanceOf[address(recipient)] = Mask(96, 0, balanceOf[address(recipient)] + amount)
+                      log Transfer(
+                            address from=Mask(96, 0, amount),
+                            address to=sender,
+                            uint256 value=recipient)
+                      if delegates[address(sender)] == delegates[address(recipient)]:
+                          return 1
+                      if Mask(96, 0, amount) <= 0:
+                          return 1
+                      if not delegates[address(sender)]:
+                          if not delegates[address(recipient)]:
+                              return 1
+                          if numCheckpoints[stor2[address(recipient)]] > 0:
+                              if Mask(96, 0, checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 + amount) >= checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32:
+                                  if block.number < unknown10000000():
+                                      if numCheckpoints[stor2[address(recipient)]] <= 0:
+                                          checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_0 = uint32(block.number)
+                                          checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_32 = Mask(96, 0, checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 + amount)
+                                          numCheckpoints[stor2[address(recipient)]] = uint32(numCheckpoints[stor2[address(recipient)]] + 1)
+                                      else:
+                                          if checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_0 == uint32(block.number):
+                                              checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 = Mask(96, 0, checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 + amount)
+                                          else:
+                                              checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_0 = uint32(block.number)
+                                              checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_32 = Mask(96, 0, checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 + amount)
+                                              numCheckpoints[stor2[address(recipient)]] = uint32(numCheckpoints[stor2[address(recipient)]] + 1)
+                                      log DelegateVotesChanged(
+                                            address delegate=checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_0,
+                                            uint256 previousBalance=Mask(96, 0, checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 + amount),
+                                            uint256 newBalance=delegates[address(recipient)])
+                          else:
+                              if Mask(96, 0, amount) >= 0:
+                                  if block.number < unknown10000000():
+                                      if numCheckpoints[stor2[address(recipient)]] <= 0:
+                                          checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_0 = uint32(block.number)
+                                          checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_32 = Mask(96, 0, amount)
+                                          numCheckpoints[stor2[address(recipient)]] = uint32(numCheckpoints[stor2[address(recipient)]] + 1)
+                                      else:
+                                          if checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_0 == uint32(block.number):
+                                              checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 = Mask(96, 0, amount)
+                                          else:
+                                              checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_0 = uint32(block.number)
+                                              checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_32 = Mask(96, 0, amount)
+                                              numCheckpoints[stor2[address(recipient)]] = uint32(numCheckpoints[stor2[address(recipient)]] + 1)
+                                      log DelegateVotesChanged(
+                                            address delegate=0,
+                                            uint256 previousBalance=Mask(96, 0, amount),
+                                            uint256 newBalance=delegates[address(recipient)])
+                      else:
+                          if numCheckpoints[stor2[address(sender)]] > 0:
+                              if Mask(96, 0, amount) <= checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32:
+                                  if block.number < unknown10000000():
+                                      if numCheckpoints[stor2[address(sender)]] <= 0:
+                                          checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_0 = uint32(block.number)
+                                          checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_32 = Mask(96, 0, checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32 - amount)
+                                          numCheckpoints[stor2[address(sender)]] = uint32(numCheckpoints[stor2[address(sender)]] + 1)
+                                          log DelegateVotesChanged(
+                                                address delegate=checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_0,
+                                                uint256 previousBalance=Mask(96, 0, checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32 - amount),
+                                                uint256 newBalance=delegates[address(sender)])
+                                          if delegates[address(recipient)]:
+                                      else:
+                                          if checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_0 == uint32(block.number):
+                                              checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32 = Mask(96, 0, checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32 - amount)
+                                          else:
+                                              checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_0 = uint32(block.number)
+                                              checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_32 = Mask(96, 0, checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32 - amount)
+                                              numCheckpoints[stor2[address(sender)]] = uint32(numCheckpoints[stor2[address(sender)]] + 1)
+                                          log DelegateVotesChanged(
+                                                address delegate=checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_0,
+                                                uint256 previousBalance=Mask(96, 0, checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32 - amount),
+                                                uint256 newBalance=delegates[address(sender)])
+                                          if delegates[address(recipient)]:
+                          else:
+                              if Mask(96, 0, amount) <= 0:
+                                  if block.number < unknown10000000():
+                                      if numCheckpoints[stor2[address(sender)]] <= 0:
+                                          checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_0 = uint32(block.number)
+                                          checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_32 = Mask(96, 0, -amount)
+                                          numCheckpoints[stor2[address(sender)]] = uint32(numCheckpoints[stor2[address(sender)]] + 1)
+                                          log DelegateVotesChanged(
+                                                address delegate=0,
+                                                uint256 previousBalance=Mask(96, 0, -amount),
+                                                uint256 newBalance=delegates[address(sender)])
+                                          if delegates[address(recipient)]:
+                                      else:
+                                          if checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_0 == uint32(block.number):
+                                              checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32 = Mask(96, 0, -amount)
+                                          else:
+                                              checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_0 = uint32(block.number)
+                                              checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_32 = Mask(96, 0, -amount)
+                                              numCheckpoints[stor2[address(sender)]] = uint32(numCheckpoints[stor2[address(sender)]] + 1)
+                                          log DelegateVotesChanged(
+                                                address delegate=0,
+                                                uint256 previousBalance=Mask(96, 0, -amount),
+                                                uint256 newBalance=delegates[address(sender)])
+                                          if delegates[address(recipient)]:
+          else:
+              if caller == managerAddress:
+                  if not sender:
+                      revert with 0, 'Gear::_transferTokens: cannot transfer from the zero address'
+                  if not recipient:
+                      revert with 0, 'Gear::_transferTokens: cannot transfer to the zero address'
+                  if Mask(96, 0, amount) <= balanceOf[address(sender)]:
+                      balanceOf[address(sender)] = Mask(96, 0, balanceOf[address(sender)] - amount)
+                      if Mask(96, 0, balanceOf[address(recipient)] + amount) >= balanceOf[address(recipient)]:
+                          balanceOf[address(recipient)] = Mask(96, 0, balanceOf[address(recipient)] + amount)
+                          log Transfer(
+                                address from=Mask(96, 0, amount),
+                                address to=sender,
+                                uint256 value=recipient)
+                          if delegates[address(sender)] == delegates[address(recipient)]:
+                              return 1
+                          if Mask(96, 0, amount) <= 0:
+                              return 1
+                          if not delegates[address(sender)]:
+                              if not delegates[address(recipient)]:
+                                  return 1
+                              if numCheckpoints[stor2[address(recipient)]] > 0:
+                                  if Mask(96, 0, checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 + amount) >= checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32:
+                                      if block.number < unknown10000000():
+                                          if numCheckpoints[stor2[address(recipient)]] <= 0:
+                                              checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_0 = uint32(block.number)
+                                              checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_32 = Mask(96, 0, checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 + amount)
+                                              numCheckpoints[stor2[address(recipient)]] = uint32(numCheckpoints[stor2[address(recipient)]] + 1)
+                                          else:
+                                              if checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_0 == uint32(block.number):
+                                                  checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 = Mask(96, 0, checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 + amount)
+                                              else:
+                                                  checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_0 = uint32(block.number)
+                                                  checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_32 = Mask(96, 0, checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 + amount)
+                                                  numCheckpoints[stor2[address(recipient)]] = uint32(numCheckpoints[stor2[address(recipient)]] + 1)
+                                          log DelegateVotesChanged(
+                                                address delegate=checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_0,
+                                                uint256 previousBalance=Mask(96, 0, checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 + amount),
+                                                uint256 newBalance=delegates[address(recipient)])
+                              else:
+                                  if Mask(96, 0, amount) >= 0:
+                                      if block.number < unknown10000000():
+                                          if numCheckpoints[stor2[address(recipient)]] <= 0:
+                                              checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_0 = uint32(block.number)
+                                              checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_32 = Mask(96, 0, amount)
+                                              numCheckpoints[stor2[address(recipient)]] = uint32(numCheckpoints[stor2[address(recipient)]] + 1)
+                                          else:
+                                              if checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_0 == uint32(block.number):
+                                                  checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 = Mask(96, 0, amount)
+                                              else:
+                                                  checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_0 = uint32(block.number)
+                                                  checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_32 = Mask(96, 0, amount)
+                                                  numCheckpoints[stor2[address(recipient)]] = uint32(numCheckpoints[stor2[address(recipient)]] + 1)
+                                          log DelegateVotesChanged(
+                                                address delegate=0,
+                                                uint256 previousBalance=Mask(96, 0, amount),
+                                                uint256 newBalance=delegates[address(recipient)])
+                          else:
+                              if numCheckpoints[stor2[address(sender)]] > 0:
+                                  if Mask(96, 0, amount) <= checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32:
+                                      if block.number < unknown10000000():
+                                          if numCheckpoints[stor2[address(sender)]] <= 0:
+                                              checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_0 = uint32(block.number)
+                                              checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_32 = Mask(96, 0, checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32 - amount)
+                                              numCheckpoints[stor2[address(sender)]] = uint32(numCheckpoints[stor2[address(sender)]] + 1)
+                                              log DelegateVotesChanged(
+                                                    address delegate=checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_0,
+                                                    uint256 previousBalance=Mask(96, 0, checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32 - amount),
+                                                    uint256 newBalance=delegates[address(sender)])
+                                              if delegates[address(recipient)]:
+                                          else:
+                                              if checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_0 == uint32(block.number):
+                                                  checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32 = Mask(96, 0, checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32 - amount)
+                                              else:
+                                                  checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_0 = uint32(block.number)
+                                                  checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_32 = Mask(96, 0, checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32 - amount)
+                                                  numCheckpoints[stor2[address(sender)]] = uint32(numCheckpoints[stor2[address(sender)]] + 1)
+                                              log DelegateVotesChanged(
+                                                    address delegate=checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_0,
+                                                    uint256 previousBalance=Mask(96, 0, checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32 - amount),
+                                                    uint256 newBalance=delegates[address(sender)])
+                                              if delegates[address(recipient)]:
+                              else:
+                                  if Mask(96, 0, amount) <= 0:
+                                      if block.number < unknown10000000():
+                                          if numCheckpoints[stor2[address(sender)]] <= 0:
+                                              checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_0 = uint32(block.number)
+                                              checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_32 = Mask(96, 0, -amount)
+                                              numCheckpoints[stor2[address(sender)]] = uint32(numCheckpoints[stor2[address(sender)]] + 1)
+                                              log DelegateVotesChanged(
+                                                    address delegate=0,
+                                                    uint256 previousBalance=Mask(96, 0, -amount),
+                                                    uint256 newBalance=delegates[address(sender)])
+                                              if delegates[address(recipient)]:
+                                          else:
+                                              if checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_0 == uint32(block.number):
+                                                  checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32 = Mask(96, 0, -amount)
+                                              else:
+                                                  checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_0 = uint32(block.number)
+                                                  checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_32 = Mask(96, 0, -amount)
+                                                  numCheckpoints[stor2[address(sender)]] = uint32(numCheckpoints[stor2[address(sender)]] + 1)
+                                              log DelegateVotesChanged(
+                                                    address delegate=0,
+                                                    uint256 previousBalance=Mask(96, 0, -amount),
+                                                    uint256 newBalance=delegates[address(sender)])
+                                              if delegates[address(recipient)]:
+              else:
+                  if minerAddress != caller:
+                      revert with 0, 'Gear::transfers are forbidden'
+                  if not sender:
+                      revert with 0, 'Gear::_transferTokens: cannot transfer from the zero address'
+                  if not recipient:
+                      revert with 0, 'Gear::_transferTokens: cannot transfer to the zero address'
+                  if Mask(96, 0, amount) <= balanceOf[address(sender)]:
+                      balanceOf[address(sender)] = Mask(96, 0, balanceOf[address(sender)] - amount)
+                      if Mask(96, 0, balanceOf[address(recipient)] + amount) >= balanceOf[address(recipient)]:
+                          balanceOf[address(recipient)] = Mask(96, 0, balanceOf[address(recipient)] + amount)
+                          log Transfer(
+                                address from=Mask(96, 0, amount),
+                                address to=sender,
+                                uint256 value=recipient)
+                          if delegates[address(sender)] == delegates[address(recipient)]:
+                              return 1
+                          if Mask(96, 0, amount) <= 0:
+                              return 1
+                          if not delegates[address(sender)]:
+                              if not delegates[address(recipient)]:
+                                  return 1
+                              if numCheckpoints[stor2[address(recipient)]] > 0:
+                                  if Mask(96, 0, checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 + amount) >= checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32:
+                                      if block.number < unknown10000000():
+                                          if numCheckpoints[stor2[address(recipient)]] <= 0:
+                                              checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_0 = uint32(block.number)
+                                              checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_32 = Mask(96, 0, checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 + amount)
+                                              numCheckpoints[stor2[address(recipient)]] = uint32(numCheckpoints[stor2[address(recipient)]] + 1)
+                                          else:
+                                              if checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_0 == uint32(block.number):
+                                                  checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 = Mask(96, 0, checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 + amount)
+                                              else:
+                                                  checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_0 = uint32(block.number)
+                                                  checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_32 = Mask(96, 0, checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 + amount)
+                                                  numCheckpoints[stor2[address(recipient)]] = uint32(numCheckpoints[stor2[address(recipient)]] + 1)
+                                          log DelegateVotesChanged(
+                                                address delegate=checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_0,
+                                                uint256 previousBalance=Mask(96, 0, checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 + amount),
+                                                uint256 newBalance=delegates[address(recipient)])
+                              else:
+                                  if Mask(96, 0, amount) >= 0:
+                                      if block.number < unknown10000000():
+                                          if numCheckpoints[stor2[address(recipient)]] <= 0:
+                                              checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_0 = uint32(block.number)
+                                              checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_32 = Mask(96, 0, amount)
+                                              numCheckpoints[stor2[address(recipient)]] = uint32(numCheckpoints[stor2[address(recipient)]] + 1)
+                                          else:
+                                              if checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_0 == uint32(block.number):
+                                                  checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 = Mask(96, 0, amount)
+                                              else:
+                                                  checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_0 = uint32(block.number)
+                                                  checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_32 = Mask(96, 0, amount)
+                                                  numCheckpoints[stor2[address(recipient)]] = uint32(numCheckpoints[stor2[address(recipient)]] + 1)
+                                          log DelegateVotesChanged(
+                                                address delegate=0,
+                                                uint256 previousBalance=Mask(96, 0, amount),
+                                                uint256 newBalance=delegates[address(recipient)])
+                          else:
+                              if numCheckpoints[stor2[address(sender)]] > 0:
+                                  if Mask(96, 0, amount) <= checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32:
+                                      if block.number < unknown10000000():
+                                          if numCheckpoints[stor2[address(sender)]] <= 0:
+                                              checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_0 = uint32(block.number)
+                                              checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_32 = Mask(96, 0, checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32 - amount)
+                                              numCheckpoints[stor2[address(sender)]] = uint32(numCheckpoints[stor2[address(sender)]] + 1)
+                                              log DelegateVotesChanged(
+                                                    address delegate=checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_0,
+                                                    uint256 previousBalance=Mask(96, 0, checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32 - amount),
+                                                    uint256 newBalance=delegates[address(sender)])
+                                              if delegates[address(recipient)]:
+                                          else:
+                                              if checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_0 == uint32(block.number):
+                                                  checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32 = Mask(96, 0, checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32 - amount)
+                                              else:
+                                                  checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_0 = uint32(block.number)
+                                                  checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_32 = Mask(96, 0, checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32 - amount)
+                                                  numCheckpoints[stor2[address(sender)]] = uint32(numCheckpoints[stor2[address(sender)]] + 1)
+                                              log DelegateVotesChanged(
+                                                    address delegate=checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_0,
+                                                    uint256 previousBalance=Mask(96, 0, checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32 - amount),
+                                                    uint256 newBalance=delegates[address(sender)])
+                              else:
+                                  if Mask(96, 0, amount) <= 0:
+                                      if block.number < unknown10000000():
+                                          if numCheckpoints[stor2[address(sender)]] <= 0:
+                                              checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_0 = uint32(block.number)
+                                              checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_32 = Mask(96, 0, -amount)
+                                              numCheckpoints[stor2[address(sender)]] = uint32(numCheckpoints[stor2[address(sender)]] + 1)
+                                              log DelegateVotesChanged(
+                                                    address delegate=0,
+                                                    uint256 previousBalance=Mask(96, 0, -amount),
+                                                    uint256 newBalance=delegates[address(sender)])
+                                              if delegates[address(recipient)]:
+                                          else:
+                                              if checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_0 == uint32(block.number):
+                                                  checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32 = Mask(96, 0, -amount)
+                                              else:
+                                                  checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_0 = uint32(block.number)
+                                                  checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_32 = Mask(96, 0, -amount)
+                                                  numCheckpoints[stor2[address(sender)]] = uint32(numCheckpoints[stor2[address(sender)]] + 1)
+                                              log DelegateVotesChanged(
+                                                    address delegate=0,
+                                                    uint256 previousBalance=Mask(96, 0, -amount),
+                                                    uint256 newBalance=delegates[address(sender)])
+      else:
+          if allowance[address(sender)][caller] == LOCK8605463013():
+              if transfersAllowed:
+                  if not sender:
+                      revert with 0, 'Gear::_transferTokens: cannot transfer from the zero address'
+                  if not recipient:
+                      revert with 0, 'Gear::_transferTokens: cannot transfer to the zero address'
+                  if Mask(96, 0, amount) <= balanceOf[address(sender)]:
+                      balanceOf[address(sender)] = Mask(96, 0, balanceOf[address(sender)] - amount)
+                      if Mask(96, 0, balanceOf[address(recipient)] + amount) >= balanceOf[address(recipient)]:
+                          balanceOf[address(recipient)] = Mask(96, 0, balanceOf[address(recipient)] + amount)
+                          log Transfer(
+                                address from=Mask(96, 0, amount),
+                                address to=sender,
+                                uint256 value=recipient)
+                          if delegates[address(sender)] == delegates[address(recipient)]:
+                              return 1
+                          if Mask(96, 0, amount) <= 0:
+                              return 1
+                          if not delegates[address(sender)]:
+                              if not delegates[address(recipient)]:
+                                  return 1
+                              if numCheckpoints[stor2[address(recipient)]] > 0:
+                                  if Mask(96, 0, checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 + amount) >= checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32:
+                                      if block.number < unknown10000000():
+                                          if numCheckpoints[stor2[address(recipient)]] <= 0:
+                                              checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_0 = uint32(block.number)
+                                              checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_32 = Mask(96, 0, checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 + amount)
+                                              numCheckpoints[stor2[address(recipient)]] = uint32(numCheckpoints[stor2[address(recipient)]] + 1)
+                                          else:
+                                              if checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_0 == uint32(block.number):
+                                                  checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 = Mask(96, 0, checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 + amount)
+                                              else:
+                                                  checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_0 = uint32(block.number)
+                                                  checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_32 = Mask(96, 0, checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 + amount)
+                                                  numCheckpoints[stor2[address(recipient)]] = uint32(numCheckpoints[stor2[address(recipient)]] + 1)
+                                          log DelegateVotesChanged(
+                                                address delegate=checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_0,
+                                                uint256 previousBalance=Mask(96, 0, checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 + amount),
+                                                uint256 newBalance=delegates[address(recipient)])
+                              else:
+                                  if Mask(96, 0, amount) >= 0:
+                                      if block.number < unknown10000000():
+                                          if numCheckpoints[stor2[address(recipient)]] <= 0:
+                                              checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_0 = uint32(block.number)
+                                              checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_32 = Mask(96, 0, amount)
+                                              numCheckpoints[stor2[address(recipient)]] = uint32(numCheckpoints[stor2[address(recipient)]] + 1)
+                                          else:
+                                              if checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_0 == uint32(block.number):
+                                                  checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 = Mask(96, 0, amount)
+                                              else:
+                                                  checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_0 = uint32(block.number)
+                                                  checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_32 = Mask(96, 0, amount)
+                                                  numCheckpoints[stor2[address(recipient)]] = uint32(numCheckpoints[stor2[address(recipient)]] + 1)
+                                          log DelegateVotesChanged(
+                                                address delegate=0,
+                                                uint256 previousBalance=Mask(96, 0, amount),
+                                                uint256 newBalance=delegates[address(recipient)])
+                          else:
+                              if numCheckpoints[stor2[address(sender)]] > 0:
+                                  if Mask(96, 0, amount) <= checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32:
+                                      if block.number < unknown10000000():
+                                          if numCheckpoints[stor2[address(sender)]] <= 0:
+                                              checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_0 = uint32(block.number)
+                                              checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_32 = Mask(96, 0, checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32 - amount)
+                                              numCheckpoints[stor2[address(sender)]] = uint32(numCheckpoints[stor2[address(sender)]] + 1)
+                                              log DelegateVotesChanged(
+                                                    address delegate=checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_0,
+                                                    uint256 previousBalance=Mask(96, 0, checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32 - amount),
+                                                    uint256 newBalance=delegates[address(sender)])
+                                              if delegates[address(recipient)]:
+                                          else:
+                                              if checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_0 == uint32(block.number):
+                                                  checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32 = Mask(96, 0, checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32 - amount)
+                                              else:
+                                                  checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_0 = uint32(block.number)
+                                                  checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_32 = Mask(96, 0, checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32 - amount)
+                                                  numCheckpoints[stor2[address(sender)]] = uint32(numCheckpoints[stor2[address(sender)]] + 1)
+                                              log DelegateVotesChanged(
+                                                    address delegate=checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_0,
+                                                    uint256 previousBalance=Mask(96, 0, checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32 - amount),
+                                                    uint256 newBalance=delegates[address(sender)])
+                                              if delegates[address(recipient)]:
+                              else:
+                                  if Mask(96, 0, amount) <= 0:
+                                      if block.number < unknown10000000():
+                                          if numCheckpoints[stor2[address(sender)]] <= 0:
+                                              checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_0 = uint32(block.number)
+                                              checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_32 = Mask(96, 0, -amount)
+                                              numCheckpoints[stor2[address(sender)]] = uint32(numCheckpoints[stor2[address(sender)]] + 1)
+                                              log DelegateVotesChanged(
+                                                    address delegate=0,
+                                                    uint256 previousBalance=Mask(96, 0, -amount),
+                                                    uint256 newBalance=delegates[address(sender)])
+                                              if delegates[address(recipient)]:
+                                          else:
+                                              if checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_0 == uint32(block.number):
+                                                  checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32 = Mask(96, 0, -amount)
+                                              else:
+                                                  checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_0 = uint32(block.number)
+                                                  checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_32 = Mask(96, 0, -amount)
+                                                  numCheckpoints[stor2[address(sender)]] = uint32(numCheckpoints[stor2[address(sender)]] + 1)
+                                              log DelegateVotesChanged(
+                                                    address delegate=0,
+                                                    uint256 previousBalance=Mask(96, 0, -amount),
+                                                    uint256 newBalance=delegates[address(sender)])
+                                              if delegates[address(recipient)]:
+              else:
+                  if caller == managerAddress:
+                      if not sender:
+                          revert with 0, 'Gear::_transferTokens: cannot transfer from the zero address'
+                      if not recipient:
+                          revert with 0, 'Gear::_transferTokens: cannot transfer to the zero address'
+                      if Mask(96, 0, amount) <= balanceOf[address(sender)]:
+                          balanceOf[address(sender)] = Mask(96, 0, balanceOf[address(sender)] - amount)
+                          if Mask(96, 0, balanceOf[address(recipient)] + amount) >= balanceOf[address(recipient)]:
+                              balanceOf[address(recipient)] = Mask(96, 0, balanceOf[address(recipient)] + amount)
+                              log Transfer(
+                                    address from=Mask(96, 0, amount),
+                                    address to=sender,
+                                    uint256 value=recipient)
+                              if delegates[address(sender)] == delegates[address(recipient)]:
+                                  return 1
+                              if Mask(96, 0, amount) <= 0:
+                                  return 1
+                              if not delegates[address(sender)]:
+                                  if not delegates[address(recipient)]:
+                                      return 1
+                                  if numCheckpoints[stor2[address(recipient)]] > 0:
+                                      if Mask(96, 0, checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 + amount) >= checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32:
+                                          if block.number < unknown10000000():
+                                              if numCheckpoints[stor2[address(recipient)]] <= 0:
+                                                  checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_0 = uint32(block.number)
+                                                  checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_32 = Mask(96, 0, checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 + amount)
+                                                  numCheckpoints[stor2[address(recipient)]] = uint32(numCheckpoints[stor2[address(recipient)]] + 1)
+                                              else:
+                                                  if checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_0 == uint32(block.number):
+                                                      checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 = Mask(96, 0, checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 + amount)
+                                                  else:
+                                                      checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_0 = uint32(block.number)
+                                                      checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_32 = Mask(96, 0, checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 + amount)
+                                                      numCheckpoints[stor2[address(recipient)]] = uint32(numCheckpoints[stor2[address(recipient)]] + 1)
+                                              log DelegateVotesChanged(
+                                                    address delegate=checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_0,
+                                                    uint256 previousBalance=Mask(96, 0, checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 + amount),
+                                                    uint256 newBalance=delegates[address(recipient)])
+                                  else:
+                                      if Mask(96, 0, amount) >= 0:
+                                          if block.number < unknown10000000():
+                                              if numCheckpoints[stor2[address(recipient)]] <= 0:
+                                                  checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_0 = uint32(block.number)
+                                                  checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_32 = Mask(96, 0, amount)
+                                                  numCheckpoints[stor2[address(recipient)]] = uint32(numCheckpoints[stor2[address(recipient)]] + 1)
+                                              else:
+                                                  if checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_0 == uint32(block.number):
+                                                      checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 = Mask(96, 0, amount)
+                                                  else:
+                                                      checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_0 = uint32(block.number)
+                                                      checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_32 = Mask(96, 0, amount)
+                                                      numCheckpoints[stor2[address(recipient)]] = uint32(numCheckpoints[stor2[address(recipient)]] + 1)
+                                              log DelegateVotesChanged(
+                                                    address delegate=0,
+                                                    uint256 previousBalance=Mask(96, 0, amount),
+                                                    uint256 newBalance=delegates[address(recipient)])
+                              else:
+                                  if numCheckpoints[stor2[address(sender)]] > 0:
+                                      if Mask(96, 0, amount) <= checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32:
+                                          if block.number < unknown10000000():
+                                              if numCheckpoints[stor2[address(sender)]] <= 0:
+                                                  checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_0 = uint32(block.number)
+                                                  checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_32 = Mask(96, 0, checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32 - amount)
+                                                  numCheckpoints[stor2[address(sender)]] = uint32(numCheckpoints[stor2[address(sender)]] + 1)
+                                                  log DelegateVotesChanged(
+                                                        address delegate=checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_0,
+                                                        uint256 previousBalance=Mask(96, 0, checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32 - amount),
+                                                        uint256 newBalance=delegates[address(sender)])
+                                                  if delegates[address(recipient)]:
+                                              else:
+                                                  if checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_0 == uint32(block.number):
+                                                      checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32 = Mask(96, 0, checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32 - amount)
+                                                  else:
+                                                      checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_0 = uint32(block.number)
+                                                      checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_32 = Mask(96, 0, checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32 - amount)
+                                                      numCheckpoints[stor2[address(sender)]] = uint32(numCheckpoints[stor2[address(sender)]] + 1)
+                                                  log DelegateVotesChanged(
+                                                        address delegate=checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_0,
+                                                        uint256 previousBalance=Mask(96, 0, checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32 - amount),
+                                                        uint256 newBalance=delegates[address(sender)])
+                                  else:
+                                      if Mask(96, 0, amount) <= 0:
+                                          if block.number < unknown10000000():
+                                              if numCheckpoints[stor2[address(sender)]] <= 0:
+                                                  checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_0 = uint32(block.number)
+                                                  checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_32 = Mask(96, 0, -amount)
+                                                  numCheckpoints[stor2[address(sender)]] = uint32(numCheckpoints[stor2[address(sender)]] + 1)
+                                                  log DelegateVotesChanged(
+                                                        address delegate=0,
+                                                        uint256 previousBalance=Mask(96, 0, -amount),
+                                                        uint256 newBalance=delegates[address(sender)])
+                                                  if delegates[address(recipient)]:
+                                              else:
+                                                  if checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_0 == uint32(block.number):
+                                                      checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32 = Mask(96, 0, -amount)
+                                                  else:
+                                                      checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_0 = uint32(block.number)
+                                                      checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_32 = Mask(96, 0, -amount)
+                                                      numCheckpoints[stor2[address(sender)]] = uint32(numCheckpoints[stor2[address(sender)]] + 1)
+                                                  log DelegateVotesChanged(
+                                                        address delegate=0,
+                                                        uint256 previousBalance=Mask(96, 0, -amount),
+                                                        uint256 newBalance=delegates[address(sender)])
+                  else:
+                      if minerAddress != caller:
+                          revert with 0, 'Gear::transfers are forbidden'
+                      if not sender:
+                          revert with 0, 'Gear::_transferTokens: cannot transfer from the zero address'
+                      if not recipient:
+                          revert with 0, 'Gear::_transferTokens: cannot transfer to the zero address'
+                      if Mask(96, 0, amount) <= balanceOf[address(sender)]:
+                          balanceOf[address(sender)] = Mask(96, 0, balanceOf[address(sender)] - amount)
+                          if Mask(96, 0, balanceOf[address(recipient)] + amount) >= balanceOf[address(recipient)]:
+                              balanceOf[address(recipient)] = Mask(96, 0, balanceOf[address(recipient)] + amount)
+                              log Transfer(
+                                    address from=Mask(96, 0, amount),
+                                    address to=sender,
+                                    uint256 value=recipient)
+                              if delegates[address(sender)] == delegates[address(recipient)]:
+                                  return 1
+                              if Mask(96, 0, amount) <= 0:
+                                  return 1
+                              if delegates[address(sender)]:
+                                  if numCheckpoints[stor2[address(sender)]] > 0:
+                                      if Mask(96, 0, amount) <= checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32:
+                                          if block.number < unknown10000000():
+                                              if numCheckpoints[stor2[address(sender)]] <= 0:
+                                                  checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_0 = uint32(block.number)
+                                                  checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_32 = Mask(96, 0, checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32 - amount)
+                                                  numCheckpoints[stor2[address(sender)]] = uint32(numCheckpoints[stor2[address(sender)]] + 1)
+                                                  log DelegateVotesChanged(
+                                                        address delegate=checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_0,
+                                                        uint256 previousBalance=Mask(96, 0, checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32 - amount),
+                                                        uint256 newBalance=delegates[address(sender)])
+                                              else:
+                                                  if checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_0 == uint32(block.number):
+                                                      checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32 = Mask(96, 0, checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32 - amount)
+                                                  else:
+                                                      checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_0 = uint32(block.number)
+                                                      checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_32 = Mask(96, 0, checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32 - amount)
+                                                      numCheckpoints[stor2[address(sender)]] = uint32(numCheckpoints[stor2[address(sender)]] + 1)
+                                                  log DelegateVotesChanged(
+                                                        address delegate=checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_0,
+                                                        uint256 previousBalance=Mask(96, 0, checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32 - amount),
+                                                        uint256 newBalance=delegates[address(sender)])
+                                  else:
+                                      if Mask(96, 0, amount) <= 0:
+                                          if block.number < unknown10000000():
+                                              if numCheckpoints[stor2[address(sender)]] <= 0:
+                                                  checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_0 = uint32(block.number)
+                                                  checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_32 = Mask(96, 0, -amount)
+                                                  numCheckpoints[stor2[address(sender)]] = uint32(numCheckpoints[stor2[address(sender)]] + 1)
+                                                  log DelegateVotesChanged(
+                                                        address delegate=0,
+                                                        uint256 previousBalance=Mask(96, 0, -amount),
+                                                        uint256 newBalance=delegates[address(sender)])
+                                              else:
+                                                  if checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_0 == uint32(block.number):
+                                                      checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32 = Mask(96, 0, -amount)
+                                                  else:
+                                                      checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_0 = uint32(block.number)
+                                                      checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_32 = Mask(96, 0, -amount)
+                                                      numCheckpoints[stor2[address(sender)]] = uint32(numCheckpoints[stor2[address(sender)]] + 1)
+                                                  log DelegateVotesChanged(
+                                                        address delegate=0,
+                                                        uint256 previousBalance=Mask(96, 0, -amount),
+                                                        uint256 newBalance=delegates[address(sender)])
+                              else:
+                                  if not delegates[address(recipient)]:
+                                      return 1
+                                  if numCheckpoints[stor2[address(recipient)]] > 0:
+                                      if Mask(96, 0, checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 + amount) >= checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32:
+                                          if block.number < unknown10000000():
+                                              if numCheckpoints[stor2[address(recipient)]] <= 0:
+                                                  checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_0 = uint32(block.number)
+                                                  checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_32 = Mask(96, 0, checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 + amount)
+                                                  numCheckpoints[stor2[address(recipient)]] = uint32(numCheckpoints[stor2[address(recipient)]] + 1)
+                                              else:
+                                                  if checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_0 == uint32(block.number):
+                                                      checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 = Mask(96, 0, checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 + amount)
+                                                  else:
+                                                      checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_0 = uint32(block.number)
+                                                      checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_32 = Mask(96, 0, checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 + amount)
+                                                      numCheckpoints[stor2[address(recipient)]] = uint32(numCheckpoints[stor2[address(recipient)]] + 1)
+                                              log DelegateVotesChanged(
+                                                    address delegate=checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_0,
+                                                    uint256 previousBalance=Mask(96, 0, checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 + amount),
+                                                    uint256 newBalance=delegates[address(recipient)])
+                                  else:
+                                      if Mask(96, 0, amount) >= 0:
+                                          if block.number < unknown10000000():
+                                              if numCheckpoints[stor2[address(recipient)]] <= 0:
+                                                  checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_0 = uint32(block.number)
+                                                  checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_32 = Mask(96, 0, amount)
+                                                  numCheckpoints[stor2[address(recipient)]] = uint32(numCheckpoints[stor2[address(recipient)]] + 1)
+                                              else:
+                                                  if checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_0 == uint32(block.number):
+                                                      checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 = Mask(96, 0, amount)
+                                                  else:
+                                                      checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_0 = uint32(block.number)
+                                                      checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_32 = Mask(96, 0, amount)
+                                                      numCheckpoints[stor2[address(recipient)]] = uint32(numCheckpoints[stor2[address(recipient)]] + 1)
+                                              log DelegateVotesChanged(
+                                                    address delegate=0,
+                                                    uint256 previousBalance=Mask(96, 0, amount),
+                                                    uint256 newBalance=delegates[address(recipient)])
+          else:
+              if Mask(96, 0, amount) <= allowance[address(sender)][caller]:
+                  allowance[address(sender)][caller] = Mask(96, 0, allowance[address(sender)][caller] - amount)
+                  log Approval(
+                        address owner=Mask(96, 0, allowance[address(sender)][caller] - amount),
+                        address spender=sender,
+                        uint256 value=caller)
+                  if not transfersAllowed:
+                      if managerAddress != caller:
+                          if minerAddress != caller:
+                              revert with 0, 'Gear::transfers are forbidden'
+                  if not sender:
+                      revert with 0, 'Gear::_transferTokens: cannot transfer from the zero address'
+                  if not recipient:
+                      revert with 0, 'Gear::_transferTokens: cannot transfer to the zero address'
+                  if Mask(96, 0, amount) <= balanceOf[address(sender)]:
+                      balanceOf[address(sender)] = Mask(96, 0, balanceOf[address(sender)] - amount)
+                      if Mask(96, 0, balanceOf[address(recipient)] + amount) >= balanceOf[address(recipient)]:
+                          balanceOf[address(recipient)] = Mask(96, 0, balanceOf[address(recipient)] + amount)
+                          log Transfer(
+                                address from=Mask(96, 0, amount),
+                                address to=sender,
+                                uint256 value=recipient)
+                          if delegates[address(sender)] == delegates[address(recipient)]:
+                              return 1
+                          if Mask(96, 0, amount) <= 0:
+                              return 1
+                          if delegates[address(sender)]:
+                              if numCheckpoints[stor2[address(sender)]] > 0:
+                                  if Mask(96, 0, amount) <= checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32:
+                                      if block.number < unknown10000000():
+                                          if numCheckpoints[stor2[address(sender)]] <= 0:
+                                              checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_0 = uint32(block.number)
+                                              checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_32 = Mask(96, 0, checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32 - amount)
+                                              numCheckpoints[stor2[address(sender)]] = uint32(numCheckpoints[stor2[address(sender)]] + 1)
+                                          else:
+                                              if checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_0 == uint32(block.number):
+                                                  checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32 = Mask(96, 0, checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32 - amount)
+                                              else:
+                                                  checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_0 = uint32(block.number)
+                                                  checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_32 = Mask(96, 0, checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32 - amount)
+                                                  numCheckpoints[stor2[address(sender)]] = uint32(numCheckpoints[stor2[address(sender)]] + 1)
+                              else:
+                                  if Mask(96, 0, amount) <= 0:
+                                      if block.number < unknown10000000():
+                                          if numCheckpoints[stor2[address(sender)]] <= 0:
+                                              checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_0 = uint32(block.number)
+                                              checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_32 = Mask(96, 0, -amount)
+                                              numCheckpoints[stor2[address(sender)]] = uint32(numCheckpoints[stor2[address(sender)]] + 1)
+                                          else:
+                                              if checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_0 == uint32(block.number):
+                                                  checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]] - 1 << 224].field_32 = Mask(96, 0, -amount)
+                                              else:
+                                                  checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_0 = uint32(block.number)
+                                                  checkpoints[stor2[address(sender)]][stor4[stor2[address(sender)]]].field_32 = Mask(96, 0, -amount)
+                                                  numCheckpoints[stor2[address(sender)]] = uint32(numCheckpoints[stor2[address(sender)]] + 1)
+                          else:
+                              if not delegates[address(recipient)]:
+                                  return 1
+                              if numCheckpoints[stor2[address(recipient)]] > 0:
+                                  if Mask(96, 0, checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 + amount) >= checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32:
+                                      if block.number < unknown10000000():
+                                          if numCheckpoints[stor2[address(recipient)]] <= 0:
+                                              checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_0 = uint32(block.number)
+                                              checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_32 = Mask(96, 0, checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 + amount)
+                                              numCheckpoints[stor2[address(recipient)]] = uint32(numCheckpoints[stor2[address(recipient)]] + 1)
+                                          else:
+                                              if checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_0 == uint32(block.number):
+                                                  checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 = Mask(96, 0, checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 + amount)
+                                              else:
+                                                  checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_0 = uint32(block.number)
+                                                  checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_32 = Mask(96, 0, checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 + amount)
+                                                  numCheckpoints[stor2[address(recipient)]] = uint32(numCheckpoints[stor2[address(recipient)]] + 1)
+                              else:
+                                  if Mask(96, 0, amount) >= 0:
+                                      if block.number < unknown10000000():
+                                          if numCheckpoints[stor2[address(recipient)]] <= 0:
+                                              checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_0 = uint32(block.number)
+                                              checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_32 = Mask(96, 0, amount)
+                                              numCheckpoints[stor2[address(recipient)]] = uint32(numCheckpoints[stor2[address(recipient)]] + 1)
+                                          else:
+                                              if checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_0 == uint32(block.number):
+                                                  checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]] - 1 << 224].field_32 = Mask(96, 0, amount)
+                                              else:
+                                                  checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_0 = uint32(block.number)
+                                                  checkpoints[stor2[address(recipient)]][stor4[stor2[address(recipient)]]].field_32 = Mask(96, 0, amount)
+                                                  numCheckpoints[stor2[address(recipient)]] = uint32(numCheckpoints[stor2[address(recipient)]] + 1)
+  ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+
+

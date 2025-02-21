@@ -1,0 +1,1742 @@
+# Palkeoramix decompiler. 
+
+const unknown4886c675 = 10^18
+const unknown6c082c13 = 2147483648
+
+def storage:
+  owner is address at storage 0
+  addressList is array of address at storage 1
+  unknowne7d3fc60 is uint256 at storage 2
+  unknownf827065e is mapping of struct at storage 3
+  stor80084422859880547211683076133703299733277748156566366325829078699459944778996 is array of uint256 at storage 0xb10e2d527612073b26eecdfd717e6a320cf44b4afac2b0732d9fcbe2b7fa0cf4
+
+def owner(): # not payable
+  return owner
+
+def addressList(uint256 _param1): # not payable
+  require calldata.size - 4 >=′ 32
+  require _param1 < addressList.length
+  return addressList[_param1]
+
+def unknowne7d3fc60(): # not payable
+  return unknowne7d3fc60
+
+def unknownf827065e(uint256 _param1): # not payable
+  require calldata.size - 4 >=′ 32
+  require _param1 == uint32(_param1)
+  return unknownf827065e[_param1].field_0, unknownf827065e[_param1].field_0, bool(unknownf827065e[_param1].field_224)
+
+#
+#  Regular functions
+#
+
+def renounceOwnership(): # not payable
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  owner = 0
+  log OwnershipTransferred(
+        address previousOwner=owner,
+        address newOwner=0)
+
+def unknown9286b93d(uint256 _param1): # not payable
+  require calldata.size - 4 >=′ 32
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  if _param1 > 5 * 10^15:
+      revert with 0, 'Fee too high'
+  unknowne7d3fc60 = _param1
+
+def unknown84a7f3dd() payable: 
+  if uint8(cd[4]) >> 248 > LOCK8605463013():
+      revert with 0, 65
+  if not Mask(256, -248, cd[4]):
+      if uint8(cd[5]) >> 248 > LOCK8605463013():
+          revert with 0, 65
+      if not Mask(256, -248, cd[5]):
+          if Mask(256, -240, cd[6]):
+  ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+
+def transferOwnership(address newOwner): # not payable
+  require calldata.size - 4 >=′ 32
+  require newOwner == newOwner
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  if not newOwner:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'Ownable: new owner is the zero address'
+  owner = newOwner
+  log OwnershipTransferred(
+        address previousOwner=owner,
+        address newOwner=newOwner)
+
+def unknown7bf2d6d4(array _param1) payable: 
+  require calldata.size - 4 >=′ 192
+  require _param1 <= LOCK8605463013()
+  require _param1 + 35 <′ calldata.size
+  if _param1.length > LOCK8605463013():
+      revert with 0, 65
+  if ceil32(32 * _param1.length) + 97 < 96 or ceil32(32 * _param1.length) + 97 > LOCK8605463013():
+      revert with 0, 65
+  require _param1 + (96 * _param1.length) + 36 <= calldata.size
+  ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+
+def unknown28be42f4(array _param1): # not payable
+  require calldata.size - 4 >=′ 160
+  require _param1 <= LOCK8605463013()
+  require _param1 + 35 <′ calldata.size
+  if _param1.length > LOCK8605463013():
+      revert with 0, 65
+  if ceil32(32 * _param1.length) + 97 < 96 or ceil32(32 * _param1.length) + 97 > LOCK8605463013():
+      revert with 0, 65
+  require _param1 + (96 * _param1.length) + 36 <= calldata.size
+  ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+
+def unknown3596f9a2(): # not payable
+  require calldata.size - 4 >=′ 32
+  require cd[4] <= LOCK8605463013()
+  require cd[4] + 35 <′ calldata.size
+  require ('cd', 4).length <= LOCK8605463013()
+  require cd[4] + (32 * ('cd', 4).length) + 36 <= calldata.size
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  idx = 0
+  while idx < ('cd', 4).length:
+      require cd[((32 * idx) + cd[4] + 36)] == address(cd[((32 * idx) + cd[4] + 36)])
+      addressList.length++
+      mem[0] = 1
+      addressList[addressList.length] = address(cd[((32 * idx) + cd[4] + 36)])
+      if idx == -1:
+          revert with 0, 17
+      idx = idx + 1
+      continue 
+
+def unknown080c25b3() payable: 
+  require calldata.size - 4 >=′ 224
+  require cd[4] <= LOCK8605463013()
+  require calldata.size + -cd[4] - 4 >=′ 128
+  require ('cd', 4).length == address(('cd', 4).length)
+  require ('cd', 4)[2] <= LOCK8605463013()
+  require cd[4] + ('cd', 4)[2] + 35 <′ calldata.size
+  if cd[(cd[4] + ('cd', 4)[2] + 4)] > LOCK8605463013():
+      revert with 0, 65
+  if ceil32(ceil32(cd[(cd[4] + ('cd', 4)[2] + 4)])) + 225 < 224 or ceil32(ceil32(cd[(cd[4] + ('cd', 4)[2] + 4)])) + 225 > LOCK8605463013():
+      revert with 0, 65
+  require cd[4] + ('cd', 4)[2] + cd[(cd[4] + ('cd', 4)[2] + 4)] + 36 <= calldata.size
+  require cd[36] <= LOCK8605463013()
+  require cd[36] + 35 <′ calldata.size
+  if ('cd', 36).length > LOCK8605463013():
+      revert with 0, 65
+  if ceil32(32 * ('cd', 36).length) + 226 < 225 or ceil32(ceil32(cd[(cd[4] + ('cd', 4)[2] + 4)])) + ceil32(32 * ('cd', 36).length) + 226 > LOCK8605463013():
+      revert with 0, 65
+  require cd[36] + (96 * ('cd', 36).length) + 36 <= calldata.size
+  ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+
+def unknowne10895f9(uint256 _param1, uint256 _param2, uint256 _param3): # not payable
+  require calldata.size - 4 >=′ 96
+  require _param1 == uint32(_param1)
+  require _param2 == uint64(_param2)
+  require _param3 == address(_param3)
+  if unknownf827065e[_param1 << 224].field_224:
+      revert with 0, 'Code in use'
+  if uint64(_param2) > 2 * 10^16:
+      revert with 0, 'Fee too high'
+  if uint32(_param1) <= 2147483648:
+      if uint64(_param2):
+          revert with 0, 'Invalid fee for code'
+  else:
+      if uint64(_param2) <= 0:
+          revert with 0, 'Invalid fee for code'
+      if not address(_param3):
+          revert with 0, 'Null beneficiary'
+  unknownf827065e[_param1 << 224].field_0 = uint64(_param2)
+  unknownf827065e[_param1 << 224].field_64 = address(_param3)
+  unknownf827065e[_param1 << 224].field_224 = 1
+
+def unknown87b621b5(): # not payable
+  require calldata.size - 4 >=′ 352
+  require cd[4] <= LOCK8605463013()
+  require calldata.size + -cd[4] - 4 >=′ 128
+  require ('cd', 4).length == address(('cd', 4).length)
+  require ('cd', 4)[2] <= LOCK8605463013()
+  require cd[4] + ('cd', 4)[2] + 35 <′ calldata.size
+  if cd[(cd[4] + ('cd', 4)[2] + 4)] > LOCK8605463013():
+      revert with 0, 65
+  if ceil32(ceil32(cd[(cd[4] + ('cd', 4)[2] + 4)])) + 225 < 224 or ceil32(ceil32(cd[(cd[4] + ('cd', 4)[2] + 4)])) + 225 > LOCK8605463013():
+      revert with 0, 65
+  require cd[4] + ('cd', 4)[2] + cd[(cd[4] + ('cd', 4)[2] + 4)] + 36 <= calldata.size
+  require calldata.size - 36 >=′ 224
+  if not bool(ceil32(ceil32(cd[(cd[4] + ('cd', 4)[2] + 4)])) + 449 <= LOCK8605463013()):
+      revert with 0, 65
+  require cd[36] == address(cd[36])
+  require cd[100] == address(cd[100])
+  require cd[132] == address(cd[132])
+  require cd[228] == address(cd[228])
+  require cd[260] <= LOCK8605463013()
+  require cd[260] + 35 <′ calldata.size
+  require ('cd', 260).length <= LOCK8605463013()
+  require cd[260] + ('cd', 260).length + 36 <= calldata.size
+  require cd[292] == address(cd[292])
+  require cd[324] == uint32(cd[324])
+  ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+
+def unknown3b635ce4(uint256 _param1, uint256 _param2, uint256 _param3, uint256 _param4, uint256 _param5, uint256 _param6, uint256 _param7, array _param8, uint256 _param9, uint256 _param10) payable: 
+  require calldata.size - 4 >=′ 320
+  require calldata.size - 4 >=′ 224
+  require _param1 == address(_param1)
+  require _param3 == address(_param3)
+  require _param4 == address(_param4)
+  require _param7 == address(_param7)
+  require _param8 <= LOCK8605463013()
+  require _param8 + 35 <′ calldata.size
+  require _param8.length <= LOCK8605463013()
+  require _param8 + _param8.length + 36 <= calldata.size
+  require _param9 == address(_param9)
+  require _param10 == uint32(_param10)
+  if address(_param1):
+      if not _param2:
+          require ext_code.size(address(_param1))
+          static call address(_param1).balanceOf(address account) with:
+                  gas gas_remaining wei
+                 args caller
+          if not ext_call.success:
+              revert with ext_call.return_data[0 len return_data.size]
+          require return_data.size >=′ 32
+      if eth.balance(this.address) < 0:
+          revert with 0, 'Address: insufficient balance for call'
+  else:
+      if _param2:
+          if _param2 != call.value:
+              revert with 0, 'Wrong msg.value'
+      if _param6 > _param5:
+          revert with 0, 'Minimum greater than quote'
+      if _param6 <= 0:
+          revert with 0, 'Slippage limit too low'
+      if address(_param1) == address(_param4):
+          revert with 0, 'Arbitrage not supported'
+      if address(_param4):
+          require ext_code.size(address(_param4))
+          static call address(_param4).balanceOf(address account) with:
+                  gas gas_remaining wei
+                 args this.address
+          if not ext_call.success:
+              revert with ext_call.return_data[0 len return_data.size]
+          require return_data.size >=′ 32
+  ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+
+def unknown174da621() payable: 
+  mem[64] = 96
+  require not call.value
+  require calldata.size - 4 >=′ 96
+  require cd[4] <= LOCK8605463013()
+  require cd[4] + 35 <′ calldata.size
+  require ('cd', 4).length <= LOCK8605463013()
+  require cd[4] + (32 * ('cd', 4).length) + 36 <= calldata.size
+  require cd[36] <= LOCK8605463013()
+  require cd[36] + 35 <′ calldata.size
+  require ('cd', 36).length <= LOCK8605463013()
+  require cd[36] + (32 * ('cd', 36).length) + 36 <= calldata.size
+  require cd[68] == address(cd[68])
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  if ('cd', 36).length != ('cd', 4).length:
+      revert with 0, 'Invalid funds transfer'
+  idx = 0
+  while idx < ('cd', 4).length:
+      require cd[((32 * idx) + cd[4] + 36)] == address(cd[((32 * idx) + cd[4] + 36)])
+      if idx >= ('cd', 36).length:
+          revert with 0, 50
+      if cd[((32 * idx) + cd[36] + 36)]:
+          if idx >= ('cd', 36).length:
+              revert with 0, 50
+          if not address(cd[((32 * idx) + cd[4] + 36)]):
+              call address(cd[68]) with:
+                 value cd[((32 * idx) + cd[36] + 36)] wei
+                   gas gas_remaining wei
+              if return_data.size:
+                  _219 = mem[64]
+                  mem[64] = mem[64] + ceil32(return_data.size) + 1
+                  mem[_219] = return_data.size
+                  mem[_219 + 32 len return_data.size] = ext_call.return_data[0 len return_data.size]
+              if not ext_call.success:
+                  revert with 0, 'ETH transfer failed'
+          else:
+              _218 = mem[64]
+              mem[mem[64] + 36] = address(cd[68])
+              mem[mem[64] + 68] = cd[((32 * idx) + cd[36] + 36)]
+              _220 = mem[64]
+              mem[mem[64]] = 68
+              mem[64] = mem[64] + 100
+              mem[_220 + 32] = 0xa9059cbb00000000000000000000000000000000000000000000000000000000 or mem[_220 + 36 len 28]
+              mem[64] = _218 + 164
+              mem[_218 + 100] = 32
+              mem[_218 + 132] = 'SafeERC20: low-level call failed'
+              if eth.balance(this.address) < 0:
+                  revert with 0, 'Address: insufficient balance for call'
+              _231 = mem[_220]
+              s = 0
+              while s < _231:
+                  mem[s + _218 + 164] = mem[s + _220 + 32]
+                  s = s + 32
+                  continue 
+              if ceil32(_231) > _231:
+                  mem[_231 + _218 + 164] = 0
+              call address(cd[((32 * idx) + cd[4] + 36)]).mem[_218 + 164 len 4] with:
+                   gas gas_remaining wei
+                  args mem[_218 + 168 len _231 - 4]
+              if not return_data.size:
+                  if not ext_call.success:
+                      if mem[96]:
+                          revert with memory
+                            from 128
+                             len mem[96]
+                      mem[_218 + 164] = 0x8c379a000000000000000000000000000000000000000000000000000000000
+                      mem[_218 + 168] = 32
+                      idx = 0
+                      while idx < 32:
+                          mem[idx + _218 + 232] = mem[idx + _218 + 132]
+                          idx = idx + 32
+                          continue 
+                      revert with 0, 32, 32, mem[_218 + 232]
+                  if not mem[96]:
+                      if not ext_code.size(address(cd[((32 * idx) + cd[4] + 36)])):
+                          revert with 0, 'Address: call to non-contract'
+                  if mem[96]:
+                      require mem[96] >=′ 32
+                      require mem[128] == bool(mem[128])
+                      if not mem[128]:
+                          revert with 0, 'SafeERC20: ERC20 operation did not succeed'
+              else:
+                  mem[64] = _218 + ceil32(return_data.size) + 165
+                  mem[_218 + 164] = return_data.size
+                  mem[_218 + 196 len return_data.size] = ext_call.return_data[0 len return_data.size]
+                  if not ext_call.success:
+                      if return_data.size:
+                          revert with ext_call.return_data[0 len return_data.size]
+                      mem[_218 + ceil32(return_data.size) + 165] = 0x8c379a000000000000000000000000000000000000000000000000000000000
+                      mem[_218 + ceil32(return_data.size) + 169] = 32
+                      idx = 0
+                      while idx < 32:
+                          mem[idx + _218 + ceil32(return_data.size) + 233] = mem[idx + _218 + 132]
+                          idx = idx + 32
+                          continue 
+                      revert with 0, 32, 32, mem[_218 + ceil32(return_data.size) + 233]
+                  if not return_data.size:
+                      if not ext_code.size(address(cd[((32 * idx) + cd[4] + 36)])):
+                          revert with 0, 'Address: call to non-contract'
+                  if return_data.size:
+                      require return_data.size >=′ 32
+                      require mem[_218 + 196] == bool(mem[_218 + 196])
+                      if not mem[_218 + 196]:
+                          revert with 0, 'SafeERC20: ERC20 operation did not succeed'
+      else:
+          if idx >= ('cd', 4).length:
+              revert with 0, 50
+          require cd[((32 * idx) + cd[4] + 36)] == address(cd[((32 * idx) + cd[4] + 36)])
+          if not address(cd[((32 * idx) + cd[4] + 36)]):
+              call address(cd[68]) with:
+                 value eth.balance(this.address) wei
+                   gas gas_remaining wei
+              if return_data.size:
+                  _237 = mem[64]
+                  mem[64] = mem[64] + ceil32(return_data.size) + 1
+                  mem[_237] = return_data.size
+                  mem[_237 + 32 len return_data.size] = ext_call.return_data[0 len return_data.size]
+              if not ext_call.success:
+                  revert with 0, 'ETH transfer failed'
+          else:
+              mem[mem[64] + 4] = this.address
+              require ext_code.size(address(cd[((32 * idx) + cd[4] + 36)]))
+              static call address(cd[((32 * idx) + cd[4] + 36)]).balanceOf(address account) with:
+                      gas gas_remaining wei
+                     args this.address
+              mem[mem[64]] = ext_call.return_data[0]
+              if not ext_call.success:
+                  revert with ext_call.return_data[0 len return_data.size]
+              _233 = mem[64]
+              mem[64] = mem[64] + ceil32(return_data.size)
+              require return_data.size >=′ 32
+              _236 = mem[_233]
+              if not address(cd[((32 * idx) + cd[4] + 36)]):
+                  call address(cd[68]) with:
+                     value mem[_233] wei
+                       gas gas_remaining wei
+                  if return_data.size:
+                      _250 = mem[64]
+                      mem[64] = mem[64] + ceil32(return_data.size) + 1
+                      mem[_250] = return_data.size
+                      mem[_250 + 32 len return_data.size] = ext_call.return_data[0 len return_data.size]
+                  if not ext_call.success:
+                      revert with 0, 'ETH transfer failed'
+              else:
+                  _249 = mem[64]
+                  mem[mem[64] + 36] = address(cd[68])
+                  mem[mem[64] + 68] = _236
+                  _251 = mem[64]
+                  mem[mem[64]] = 68
+                  mem[64] = mem[64] + 100
+                  mem[_251 + 32] = 0xa9059cbb00000000000000000000000000000000000000000000000000000000 or mem[_251 + 36 len 28]
+                  mem[64] = _249 + 164
+                  mem[_249 + 100] = 32
+                  mem[_249 + 132] = 'SafeERC20: low-level call failed'
+                  if eth.balance(this.address) < 0:
+                      revert with 0, 'Address: insufficient balance for call'
+                  _288 = mem[_251]
+                  s = 0
+                  while s < _288:
+                      mem[s + _249 + 164] = mem[s + _251 + 32]
+                      s = s + 32
+                      continue 
+                  if ceil32(_288) > _288:
+                      mem[_288 + _249 + 164] = 0
+                  call address(cd[((32 * idx) + cd[4] + 36)]).mem[_249 + 164 len 4] with:
+                       gas gas_remaining wei
+                      args mem[_249 + 168 len _288 - 4]
+                  if not return_data.size:
+                      if not ext_call.success:
+                          if mem[96]:
+                              revert with memory
+                                from 128
+                                 len mem[96]
+                          mem[_249 + 164] = 0x8c379a000000000000000000000000000000000000000000000000000000000
+                          mem[_249 + 168] = 32
+                          idx = 0
+                          while idx < 32:
+                              mem[idx + _249 + 232] = mem[idx + _249 + 132]
+                              idx = idx + 32
+                              continue 
+                          revert with 0, 32, 32, mem[_249 + 232]
+                      if not mem[96]:
+                          if not ext_code.size(address(cd[((32 * idx) + cd[4] + 36)])):
+                              revert with 0, 'Address: call to non-contract'
+                      if mem[96]:
+                          require mem[96] >=′ 32
+                          require mem[128] == bool(mem[128])
+                          if not mem[128]:
+                              revert with 0, 'SafeERC20: ERC20 operation did not succeed'
+                  else:
+                      mem[64] = _249 + ceil32(return_data.size) + 165
+                      mem[_249 + 164] = return_data.size
+                      mem[_249 + 196 len return_data.size] = ext_call.return_data[0 len return_data.size]
+                      if not ext_call.success:
+                          if return_data.size:
+                              revert with ext_call.return_data[0 len return_data.size]
+                          mem[_249 + ceil32(return_data.size) + 165] = 0x8c379a000000000000000000000000000000000000000000000000000000000
+                          mem[_249 + ceil32(return_data.size) + 169] = 32
+                          idx = 0
+                          while idx < 32:
+                              mem[idx + _249 + ceil32(return_data.size) + 233] = mem[idx + _249 + 132]
+                              idx = idx + 32
+                              continue 
+                          revert with 0, 32, 32, mem[_249 + ceil32(return_data.size) + 233]
+                      if not return_data.size:
+                          if not ext_code.size(address(cd[((32 * idx) + cd[4] + 36)])):
+                              revert with 0, 'Address: call to non-contract'
+                      if return_data.size:
+                          require return_data.size >=′ 32
+                          require mem[_249 + 196] == bool(mem[_249 + 196])
+                          if not mem[_249 + 196]:
+                              revert with 0, 'SafeERC20: ERC20 operation did not succeed'
+      if idx == -1:
+          revert with 0, 17
+      idx = idx + 1
+      continue 
+
+def _fallback(?) payable: # default function
+  if calldata.size < 4:
+      require not calldata.size
+  else:
+      if 2210215929 > uint32(call.func_hash) >> 224:
+          if 996367588 <= uint32(call.func_hash) >> 224:
+              if uint32(call.func_hash) >> 224 != 996367588:
+                  if unknown4886c675() == uint32(call.func_hash) >> 224:
+                      require not call.value
+                      return 10^18
+                  if 1812474899 == uint32(call.func_hash) >> 224:
+                      require not call.value
+                      return 2147483648
+                  if renounceOwnership() == uint32(call.func_hash) >> 224:
+                      require not call.value
+                      if owner != caller:
+                          revert with 0, 'Ownable: caller is not the owner'
+                      owner = 0
+                      log OwnershipTransferred(
+                            address previousOwner=owner,
+                            address newOwner=0)
+                      stop
+                  require 2079512276 == uint32(call.func_hash) >> 224
+                  require calldata.size - 4 >=′ 192
+                  require cd[4] <= LOCK8605463013()
+                  require cd[4] + 35 <′ calldata.size
+                  if ('cd', 4).length > LOCK8605463013():
+                      revert with 0, 65
+                  if ceil32(32 * ('cd', 4).length) + 129 < 128 or ceil32(32 * ('cd', 4).length) + 129 > LOCK8605463013():
+                      revert with 0, 65
+                  require cd[4] + (96 * ('cd', 4).length) + 36 <= calldata.size
+              else:
+                  require calldata.size - 4 >=′ 320
+                  require calldata.size - 4 >=′ 224
+                  require cd[4] == address(cd[4])
+                  require cd[68] == address(cd[68])
+                  require cd[100] == address(cd[100])
+                  require cd[196] == address(cd[196])
+                  require cd[228] <= LOCK8605463013()
+                  require cd[228] + 35 <′ calldata.size
+                  require ('cd', 228).length <= LOCK8605463013()
+                  require cd[228] + ('cd', 228).length + 36 <= calldata.size
+          else:
+              if 135013811 == uint32(call.func_hash) >> 224:
+                  require calldata.size - 4 >=′ 224
+                  require cd[4] <= LOCK8605463013()
+                  require calldata.size + -cd[4] - 4 >=′ 128
+                  require ('cd', 4).length == address(('cd', 4).length)
+                  require ('cd', 4)[2] <= LOCK8605463013()
+                  require cd[4] + ('cd', 4)[2] + 35 <′ calldata.size
+                  if cd[(cd[4] + ('cd', 4)[2] + 4)] > LOCK8605463013():
+                      revert with 0, 65
+                  if ceil32(ceil32(cd[(cd[4] + ('cd', 4)[2] + 4)])) + 257 < 256 or ceil32(ceil32(cd[(cd[4] + ('cd', 4)[2] + 4)])) + 257 > LOCK8605463013():
+                      revert with 0, 65
+                  require cd[4] + ('cd', 4)[2] + cd[(cd[4] + ('cd', 4)[2] + 4)] + 36 <= calldata.size
+                  require cd[36] <= LOCK8605463013()
+                  require cd[36] + 35 <′ calldata.size
+                  if ('cd', 36).length > LOCK8605463013():
+                      revert with 0, 65
+              else:
+                  if uint32(call.func_hash) >> 224 != 390964769:
+                      if 683557620 == uint32(call.func_hash) >> 224:
+                          require not call.value
+                          require calldata.size - 4 >=′ 160
+                          require cd[4] <= LOCK8605463013()
+                          require cd[4] + 35 <′ calldata.size
+                          if ('cd', 4).length > LOCK8605463013():
+                              revert with 0, 65
+                          if ceil32(32 * ('cd', 4).length) + 129 < 128 or ceil32(32 * ('cd', 4).length) + 129 > LOCK8605463013():
+                              revert with 0, 65
+                          require cd[4] + (96 * ('cd', 4).length) + 36 <= calldata.size
+                      else:
+                          require 899086754 == uint32(call.func_hash) >> 224
+                          require not call.value
+                          require calldata.size - 4 >=′ 32
+                          require cd[4] <= LOCK8605463013()
+                          require cd[4] + 35 <′ calldata.size
+                          require ('cd', 4).length <= LOCK8605463013()
+                          require cd[4] + (32 * ('cd', 4).length) + 36 <= calldata.size
+                          if owner != caller:
+                              revert with 0, 'Ownable: caller is not the owner'
+                          if 0 >= ('cd', 4).length:
+                              stop
+                          require ('cd', 4)[0] == address(('cd', 4)[0])
+                  else:
+                      require not call.value
+                      require calldata.size - 4 >=′ 96
+                      require cd[4] <= LOCK8605463013()
+                      require cd[4] + 35 <′ calldata.size
+                      require ('cd', 4).length <= LOCK8605463013()
+                      require cd[4] + (32 * ('cd', 4).length) + 36 <= calldata.size
+                      require cd[36] <= LOCK8605463013()
+                      require cd[36] + 35 <′ calldata.size
+                      require ('cd', 36).length <= LOCK8605463013()
+                      require cd[36] + (32 * ('cd', 36).length) + 36 <= calldata.size
+                      require cd[68] == address(cd[68])
+                      if owner != caller:
+                          revert with 0, 'Ownable: caller is not the owner'
+          ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+      if addressList(uint256 _param1) > uint32(call.func_hash) >> 224:
+          if 2210215929 == uint32(call.func_hash) >> 224:
+              if not Mask(256, -240, cd[4]):
+                  if not Mask(256, -240, cd[6]):
+                      if not Mask(256, -248, cd[8]):
+                          if not Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 13)]):
+                              if not Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 15)]):
+                                  if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 17)]):
+                              else:
+                                  if uint16(cd[((uint8(cd[9]) >> 248) + 15)]) >> 240 == 1:
+                                      if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 37)]):
+                                  else:
+                                      if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 17)]):
+                          else:
+                              if uint16(cd[((uint8(cd[9]) >> 248) + 13)]) >> 240 == 1:
+                                  if not Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 35)]):
+                                      if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 37)]):
+                                  else:
+                                      if uint16(cd[((uint8(cd[9]) >> 248) + 35)]) >> 240 == 1:
+                                          if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 57)]):
+                                      else:
+                                          if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 37)]):
+                              else:
+                                  if not Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 15)]):
+                                      if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 17)]):
+                                  else:
+                                      if uint16(cd[((uint8(cd[9]) >> 248) + 15)]) >> 240 == 1:
+                                          if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 37)]):
+                                      else:
+                                          if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 17)]):
+                      else:
+                          if not Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 13)]):
+                              if not Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 15)]):
+                                  if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 17)]):
+                              else:
+                                  if uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 15)]) >> 240 == 1:
+                                      if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 37)]):
+                                  else:
+                                      if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 17)]):
+                          else:
+                              if uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 13)]) >> 240 == 1:
+                                  if not Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 35)]):
+                                      if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 37)]):
+                                  else:
+                                      if uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 35)]) >> 240 == 1:
+                                          if Mask(96, 80, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 35)]):
+                                              if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 57)]):
+                                      else:
+                                          if storB10E[uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 35)]) >> 240]:
+                                              if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 37)]):
+                              else:
+                                  if not Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 15)]):
+                                      if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 17)]):
+                                  else:
+                                      if uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 15)]) >> 240 == 1:
+                                          if Mask(96, 80, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 15)]):
+                                              if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 37)]):
+                                      else:
+                                          if storB10E[uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 15)]) >> 240]:
+                                              if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 17)]):
+                  else:
+                      if uint16(cd[6]) >> 240 == 1:
+                          if Mask(256, -248, cd[28]):
+                              if not Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 33)]):
+                                  if not Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 35)]):
+                                      if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 37)]):
+                                  else:
+                                      if uint16(cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 35)]) >> 240 == 1:
+                                          if Mask(96, 80, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 35)]):
+                                              if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 57)]):
+                                      else:
+                                          if storB10E[uint16(cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 35)]) >> 240]:
+                                              if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 37)]):
+                              else:
+                                  if uint16(cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 33)]) >> 240 == 1:
+                                      if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 55)]):
+                                          if uint16(cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 55)]) >> 240 == 1:
+                                              if Mask(96, 80, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 55)]):
+                                          else:
+                                              if storB10E[uint16(cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 55)]) >> 240]:
+                                  else:
+                                      if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 35)]):
+                                          if uint16(cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 35)]) >> 240 == 1:
+                                              if Mask(96, 80, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 35)]):
+                                          else:
+                                              if storB10E[uint16(cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 35)]) >> 240]:
+                          else:
+                              if not Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 33)]):
+                                  if not Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 35)]):
+                                      if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 37)]):
+                                  else:
+                                      if uint16(cd[((uint8(cd[29]) >> 248) + 35)]) >> 240 == 1:
+                                          if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 57)]):
+                                      else:
+                                          if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 37)]):
+                              else:
+                                  if uint16(cd[((uint8(cd[29]) >> 248) + 33)]) >> 240 == 1:
+                                      if not Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 55)]):
+                                          if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 57)]):
+                                      else:
+                                          if uint16(cd[((uint8(cd[29]) >> 248) + 55)]) >> 240 == 1:
+                                              if Mask(96, 80, cd[((uint8(cd[29]) >> 248) + 55)]):
+                                                  if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 77)]):
+                                          else:
+                                              if storB10E[uint16(cd[((uint8(cd[29]) >> 248) + 55)]) >> 240]:
+                                                  if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 57)]):
+                                  else:
+                                      if not Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 35)]):
+                                          if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 37)]):
+                                      else:
+                                          if uint16(cd[((uint8(cd[29]) >> 248) + 35)]) >> 240 == 1:
+                                              if Mask(96, 80, cd[((uint8(cd[29]) >> 248) + 35)]):
+                                                  if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 57)]):
+                                          else:
+                                              if storB10E[uint16(cd[((uint8(cd[29]) >> 248) + 35)]) >> 240]:
+                                                  if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 37)]):
+                      else:
+                          if Mask(256, -248, cd[8]):
+                              if not Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 13)]):
+                                  if not Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 15)]):
+                                      if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 17)]):
+                                  else:
+                                      if uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 15)]) >> 240 == 1:
+                                          if Mask(96, 80, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 15)]):
+                                              if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 37)]):
+                                      else:
+                                          if storB10E[uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 15)]) >> 240]:
+                                              if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 17)]):
+                              else:
+                                  if uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 13)]) >> 240 == 1:
+                                      if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 35)]):
+                                          if uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 35)]) >> 240 == 1:
+                                              if Mask(96, 80, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 35)]):
+                                          else:
+                                              if storB10E[uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 35)]) >> 240]:
+                                  else:
+                                      if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 15)]):
+                                          if uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 15)]) >> 240 == 1:
+                                              if Mask(96, 80, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 15)]):
+                                          else:
+                                              if storB10E[uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 15)]) >> 240]:
+                          else:
+                              if not Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 13)]):
+                                  if not Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 15)]):
+                                      if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 17)]):
+                                  else:
+                                      if uint16(cd[((uint8(cd[9]) >> 248) + 15)]) >> 240 == 1:
+                                          if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 37)]):
+                                      else:
+                                          if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 17)]):
+                              else:
+                                  if uint16(cd[((uint8(cd[9]) >> 248) + 13)]) >> 240 == 1:
+                                      if not Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 35)]):
+                                          if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 37)]):
+                                      else:
+                                          if uint16(cd[((uint8(cd[9]) >> 248) + 35)]) >> 240 == 1:
+                                              if Mask(96, 80, cd[((uint8(cd[9]) >> 248) + 35)]):
+                                                  if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 57)]):
+                                          else:
+                                              if storB10E[uint16(cd[((uint8(cd[9]) >> 248) + 35)]) >> 240]:
+                                                  if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 37)]):
+                                  else:
+                                      if not Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 15)]):
+                                          if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 17)]):
+                                      else:
+                                          if uint16(cd[((uint8(cd[9]) >> 248) + 15)]) >> 240 == 1:
+                                              if Mask(96, 80, cd[((uint8(cd[9]) >> 248) + 15)]):
+                                                  if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 37)]):
+                                          else:
+                                              if storB10E[uint16(cd[((uint8(cd[9]) >> 248) + 15)]) >> 240]:
+                                                  if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 17)]):
+              else:
+                  if uint16(cd[4]) >> 240 == 1:
+                      if not Mask(256, -240, cd[26]):
+                          if Mask(256, -248, cd[28]):
+                              if not Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 33)]):
+                                  if not Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 35)]):
+                                      if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 37)]):
+                                  else:
+                                      if uint16(cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 35)]) >> 240 == 1:
+                                          if Mask(96, 80, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 35)]):
+                                              if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 57)]):
+                                      else:
+                                          if storB10E[uint16(cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 35)]) >> 240]:
+                                              if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 37)]):
+                              else:
+                                  if uint16(cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 33)]) >> 240 == 1:
+                                      if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 55)]):
+                                          if uint16(cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 55)]) >> 240 == 1:
+                                              if Mask(96, 80, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 55)]):
+                                          else:
+                                              if storB10E[uint16(cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 55)]) >> 240]:
+                                  else:
+                                      if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 35)]):
+                                          if uint16(cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 35)]) >> 240 == 1:
+                                              if Mask(96, 80, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 35)]):
+                                          else:
+                                              if storB10E[uint16(cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 35)]) >> 240]:
+                          else:
+                              if not Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 33)]):
+                                  if not Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 35)]):
+                                      if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 37)]):
+                                  else:
+                                      if uint16(cd[((uint8(cd[29]) >> 248) + 35)]) >> 240 == 1:
+                                          if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 57)]):
+                                      else:
+                                          if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 37)]):
+                              else:
+                                  if uint16(cd[((uint8(cd[29]) >> 248) + 33)]) >> 240 == 1:
+                                      if not Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 55)]):
+                                          if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 57)]):
+                                      else:
+                                          if uint16(cd[((uint8(cd[29]) >> 248) + 55)]) >> 240 == 1:
+                                              if Mask(96, 80, cd[((uint8(cd[29]) >> 248) + 55)]):
+                                                  if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 77)]):
+                                          else:
+                                              if storB10E[uint16(cd[((uint8(cd[29]) >> 248) + 55)]) >> 240]:
+                                                  if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 57)]):
+                                  else:
+                                      if not Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 35)]):
+                                          if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 37)]):
+                                      else:
+                                          if uint16(cd[((uint8(cd[29]) >> 248) + 35)]) >> 240 == 1:
+                                              if Mask(96, 80, cd[((uint8(cd[29]) >> 248) + 35)]):
+                                                  if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 57)]):
+                                          else:
+                                              if storB10E[uint16(cd[((uint8(cd[29]) >> 248) + 35)]) >> 240]:
+                                                  if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 37)]):
+                      else:
+                          if uint16(cd[26]) >> 240 == 1:
+                              if Mask(256, -248, cd[48]):
+                                  if not Mask(256, -240, cd[((uint8(cd[48]) >> 248) + (uint8(cd[((uint8(cd[48]) >> 248) + 49)]) >> 248) + 53)]):
+                                      if Mask(256, -240, cd[((uint8(cd[48]) >> 248) + (uint8(cd[((uint8(cd[48]) >> 248) + 49)]) >> 248) + 55)]):
+                                          if uint16(cd[((uint8(cd[48]) >> 248) + (uint8(cd[((uint8(cd[48]) >> 248) + 49)]) >> 248) + 55)]) >> 240 == 1:
+                                              if Mask(96, 80, cd[((uint8(cd[48]) >> 248) + (uint8(cd[((uint8(cd[48]) >> 248) + 49)]) >> 248) + 55)]):
+                                          else:
+                                              if storB10E[uint16(cd[((uint8(cd[48]) >> 248) + (uint8(cd[((uint8(cd[48]) >> 248) + 49)]) >> 248) + 55)]) >> 240]:
+                                  else:
+                                      if uint16(cd[((uint8(cd[48]) >> 248) + (uint8(cd[((uint8(cd[48]) >> 248) + 49)]) >> 248) + 53)]) >> 240 == 1:
+                                          if Mask(256, -240, cd[((uint8(cd[48]) >> 248) + (uint8(cd[((uint8(cd[48]) >> 248) + 49)]) >> 248) + 75)]):
+                                              if uint16(cd[((uint8(cd[48]) >> 248) + (uint8(cd[((uint8(cd[48]) >> 248) + 49)]) >> 248) + 75)]) >> 240 != 1:
+                                      else:
+                                          if Mask(256, -240, cd[((uint8(cd[48]) >> 248) + (uint8(cd[((uint8(cd[48]) >> 248) + 49)]) >> 248) + 55)]):
+                                              if uint16(cd[((uint8(cd[48]) >> 248) + (uint8(cd[((uint8(cd[48]) >> 248) + 49)]) >> 248) + 55)]) >> 240 != 1:
+                              else:
+                                  if not Mask(256, -240, cd[((uint8(cd[49]) >> 248) + 53)]):
+                                      if not Mask(256, -240, cd[((uint8(cd[49]) >> 248) + 55)]):
+                                          if Mask(256, -240, cd[((uint8(cd[49]) >> 248) + 57)]):
+                                      else:
+                                          if uint16(cd[((uint8(cd[49]) >> 248) + 55)]) >> 240 == 1:
+                                              if Mask(96, 80, cd[((uint8(cd[49]) >> 248) + 55)]):
+                                                  if Mask(256, -240, cd[((uint8(cd[49]) >> 248) + 77)]):
+                                          else:
+                                              if storB10E[uint16(cd[((uint8(cd[49]) >> 248) + 55)]) >> 240]:
+                                                  if Mask(256, -240, cd[((uint8(cd[49]) >> 248) + 57)]):
+                                  else:
+                                      if uint16(cd[((uint8(cd[49]) >> 248) + 53)]) >> 240 == 1:
+                                          if Mask(256, -240, cd[((uint8(cd[49]) >> 248) + 75)]):
+                                              if uint16(cd[((uint8(cd[49]) >> 248) + 75)]) >> 240 == 1:
+                                                  if Mask(96, 80, cd[((uint8(cd[49]) >> 248) + 75)]):
+                                              else:
+                                                  if storB10E[uint16(cd[((uint8(cd[49]) >> 248) + 75)]) >> 240]:
+                                      else:
+                                          if Mask(256, -240, cd[((uint8(cd[49]) >> 248) + 55)]):
+                                              if uint16(cd[((uint8(cd[49]) >> 248) + 55)]) >> 240 == 1:
+                                                  if Mask(96, 80, cd[((uint8(cd[49]) >> 248) + 55)]):
+                                              else:
+                                                  if storB10E[uint16(cd[((uint8(cd[49]) >> 248) + 55)]) >> 240]:
+                          else:
+                              if Mask(256, -248, cd[28]):
+                                  if not Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 33)]):
+                                      if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 35)]):
+                                          if uint16(cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 35)]) >> 240 == 1:
+                                              if Mask(96, 80, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 35)]):
+                                          else:
+                                              if storB10E[uint16(cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 35)]) >> 240]:
+                                  else:
+                                      if uint16(cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 33)]) >> 240 == 1:
+                                          if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 55)]):
+                                              if uint16(cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 55)]) >> 240 != 1:
+                                      else:
+                                          if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 35)]):
+                                              if uint16(cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 35)]) >> 240 != 1:
+                              else:
+                                  if not Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 33)]):
+                                      if not Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 35)]):
+                                          if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 37)]):
+                                      else:
+                                          if uint16(cd[((uint8(cd[29]) >> 248) + 35)]) >> 240 == 1:
+                                              if Mask(96, 80, cd[((uint8(cd[29]) >> 248) + 35)]):
+                                                  if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 57)]):
+                                          else:
+                                              if storB10E[uint16(cd[((uint8(cd[29]) >> 248) + 35)]) >> 240]:
+                                                  if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 37)]):
+                                  else:
+                                      if uint16(cd[((uint8(cd[29]) >> 248) + 33)]) >> 240 == 1:
+                                          if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 55)]):
+                                              if uint16(cd[((uint8(cd[29]) >> 248) + 55)]) >> 240 == 1:
+                                                  if Mask(96, 80, cd[((uint8(cd[29]) >> 248) + 55)]):
+                                              else:
+                                                  if storB10E[uint16(cd[((uint8(cd[29]) >> 248) + 55)]) >> 240]:
+                                      else:
+                                          if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 35)]):
+                                              if uint16(cd[((uint8(cd[29]) >> 248) + 35)]) >> 240 == 1:
+                                                  if Mask(96, 80, cd[((uint8(cd[29]) >> 248) + 35)]):
+                                              else:
+                                                  if storB10E[uint16(cd[((uint8(cd[29]) >> 248) + 35)]) >> 240]:
+                  else:
+                      if not Mask(256, -240, cd[6]):
+                          if Mask(256, -248, cd[8]):
+                              if not Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 13)]):
+                                  if not Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 15)]):
+                                      if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 17)]):
+                                  else:
+                                      if uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 15)]) >> 240 == 1:
+                                          if Mask(96, 80, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 15)]):
+                                              if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 37)]):
+                                      else:
+                                          if storB10E[uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 15)]) >> 240]:
+                                              if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 17)]):
+                              else:
+                                  if uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 13)]) >> 240 == 1:
+                                      if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 35)]):
+                                          if uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 35)]) >> 240 == 1:
+                                              if Mask(96, 80, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 35)]):
+                                          else:
+                                              if storB10E[uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 35)]) >> 240]:
+                                  else:
+                                      if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 15)]):
+                                          if uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 15)]) >> 240 == 1:
+                                              if Mask(96, 80, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 15)]):
+                                          else:
+                                              if storB10E[uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 15)]) >> 240]:
+                          else:
+                              if not Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 13)]):
+                                  if not Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 15)]):
+                                      if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 17)]):
+                                  else:
+                                      if uint16(cd[((uint8(cd[9]) >> 248) + 15)]) >> 240 == 1:
+                                          if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 37)]):
+                                      else:
+                                          if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 17)]):
+                              else:
+                                  if uint16(cd[((uint8(cd[9]) >> 248) + 13)]) >> 240 == 1:
+                                      if not Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 35)]):
+                                          if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 37)]):
+                                      else:
+                                          if uint16(cd[((uint8(cd[9]) >> 248) + 35)]) >> 240 == 1:
+                                              if Mask(96, 80, cd[((uint8(cd[9]) >> 248) + 35)]):
+                                                  if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 57)]):
+                                          else:
+                                              if storB10E[uint16(cd[((uint8(cd[9]) >> 248) + 35)]) >> 240]:
+                                                  if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 37)]):
+                                  else:
+                                      if not Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 15)]):
+                                          if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 17)]):
+                                      else:
+                                          if uint16(cd[((uint8(cd[9]) >> 248) + 15)]) >> 240 == 1:
+                                              if Mask(96, 80, cd[((uint8(cd[9]) >> 248) + 15)]):
+                                                  if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 37)]):
+                                          else:
+                                              if storB10E[uint16(cd[((uint8(cd[9]) >> 248) + 15)]) >> 240]:
+                                                  if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 17)]):
+                      else:
+                          if uint16(cd[6]) >> 240 == 1:
+                              if Mask(256, -248, cd[28]):
+                                  if not Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 33)]):
+                                      if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 35)]):
+                                          if uint16(cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 35)]) >> 240 == 1:
+                                              if Mask(96, 80, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 35)]):
+                                          else:
+                                              if storB10E[uint16(cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 35)]) >> 240]:
+                                  else:
+                                      if uint16(cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 33)]) >> 240 == 1:
+                                          if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 55)]):
+                                              if uint16(cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 55)]) >> 240 != 1:
+                                      else:
+                                          if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 35)]):
+                                              if uint16(cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 35)]) >> 240 != 1:
+                              else:
+                                  if not Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 33)]):
+                                      if not Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 35)]):
+                                          if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 37)]):
+                                      else:
+                                          if uint16(cd[((uint8(cd[29]) >> 248) + 35)]) >> 240 == 1:
+                                              if Mask(96, 80, cd[((uint8(cd[29]) >> 248) + 35)]):
+                                                  if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 57)]):
+                                          else:
+                                              if storB10E[uint16(cd[((uint8(cd[29]) >> 248) + 35)]) >> 240]:
+                                                  if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 37)]):
+                                  else:
+                                      if uint16(cd[((uint8(cd[29]) >> 248) + 33)]) >> 240 == 1:
+                                          if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 55)]):
+                                              if uint16(cd[((uint8(cd[29]) >> 248) + 55)]) >> 240 == 1:
+                                                  if Mask(96, 80, cd[((uint8(cd[29]) >> 248) + 55)]):
+                                              else:
+                                                  if storB10E[uint16(cd[((uint8(cd[29]) >> 248) + 55)]) >> 240]:
+                                      else:
+                                          if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 35)]):
+                                              if uint16(cd[((uint8(cd[29]) >> 248) + 35)]) >> 240 == 1:
+                                                  if Mask(96, 80, cd[((uint8(cd[29]) >> 248) + 35)]):
+                                              else:
+                                                  if storB10E[uint16(cd[((uint8(cd[29]) >> 248) + 35)]) >> 240]:
+                          else:
+                              if Mask(256, -248, cd[8]):
+                                  if not Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 13)]):
+                                      if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 15)]):
+                                          if uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 15)]) >> 240 == 1:
+                                              if Mask(96, 80, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 15)]):
+                                          else:
+                                              if storB10E[uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 15)]) >> 240]:
+                                  else:
+                                      if uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 13)]) >> 240 == 1:
+                                          if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 35)]):
+                                              if uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 35)]) >> 240 != 1:
+                                      else:
+                                          if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 15)]):
+                                              if uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 15)]) >> 240 != 1:
+                              else:
+                                  if not Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 13)]):
+                                      if not Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 15)]):
+                                          if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 17)]):
+                                      else:
+                                          if uint16(cd[((uint8(cd[9]) >> 248) + 15)]) >> 240 == 1:
+                                              if Mask(96, 80, cd[((uint8(cd[9]) >> 248) + 15)]):
+                                                  if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 37)]):
+                                          else:
+                                              if storB10E[uint16(cd[((uint8(cd[9]) >> 248) + 15)]) >> 240]:
+                                                  if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 17)]):
+                                  else:
+                                      if uint16(cd[((uint8(cd[9]) >> 248) + 13)]) >> 240 == 1:
+                                          if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 35)]):
+                                              if uint16(cd[((uint8(cd[9]) >> 248) + 35)]) >> 240 == 1:
+                                                  if Mask(96, 80, cd[((uint8(cd[9]) >> 248) + 35)]):
+                                              else:
+                                                  if storB10E[uint16(cd[((uint8(cd[9]) >> 248) + 35)]) >> 240]:
+                                      else:
+                                          if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 15)]):
+                                              if uint16(cd[((uint8(cd[9]) >> 248) + 15)]) >> 240 == 1:
+                                                  if Mask(96, 80, cd[((uint8(cd[9]) >> 248) + 15)]):
+                                              else:
+                                                  if storB10E[uint16(cd[((uint8(cd[9]) >> 248) + 15)]) >> 240]:
+          else:
+              if 2225599453 == uint32(call.func_hash) >> 224:
+                  if uint8(cd[4]) >> 248 > LOCK8605463013():
+                      revert with 0, 65
+                  if not Mask(256, -248, cd[4]):
+                      if uint8(cd[5]) >> 248 > LOCK8605463013():
+                          revert with 0, 65
+                      if not Mask(256, -248, cd[5]):
+                          if Mask(256, -240, cd[6]):
+              else:
+                  if uint32(call.func_hash) >> 224 != 2276860341:
+                      if owner() == uint32(call.func_hash) >> 224:
+                          require not call.value
+                          return owner
+                      require 2458302781 == uint32(call.func_hash) >> 224
+                      require not call.value
+                      require calldata.size - 4 >=′ 32
+                      if owner != caller:
+                          revert with 0, 'Ownable: caller is not the owner'
+                      if cd[4] > 5 * 10^15:
+                          revert with 0, 'Fee too high'
+                      unknowne7d3fc60 = cd[4]
+                      stop
+                  require not call.value
+                  require calldata.size - 4 >=′ 352
+                  require cd[4] <= LOCK8605463013()
+                  require calldata.size + -cd[4] - 4 >=′ 128
+                  require ('cd', 4).length == address(('cd', 4).length)
+                  require ('cd', 4)[2] <= LOCK8605463013()
+                  require cd[4] + ('cd', 4)[2] + 35 <′ calldata.size
+                  if cd[(cd[4] + ('cd', 4)[2] + 4)] > LOCK8605463013():
+                      revert with 0, 65
+                  if ceil32(ceil32(cd[(cd[4] + ('cd', 4)[2] + 4)])) + 257 < 256 or ceil32(ceil32(cd[(cd[4] + ('cd', 4)[2] + 4)])) + 257 > LOCK8605463013():
+                      revert with 0, 65
+                  require cd[4] + ('cd', 4)[2] + cd[(cd[4] + ('cd', 4)[2] + 4)] + 36 <= calldata.size
+                  require calldata.size - 36 >=′ 224
+          ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+      if addressList(uint256 _param1) == uint32(call.func_hash) >> 224:
+          require not call.value
+          require calldata.size - 4 >=′ 32
+          require cd[4] < addressList.length
+          return addressList[cd[4]]
+      if uint32(call.func_hash) >> 224 != 3775436281:
+          if 3889429600 == uint32(call.func_hash) >> 224:
+              require not call.value
+              return unknowne7d3fc60
+          if uint32(call.func_hash) >> 224 != transferOwnership(address newOwner):
+              require 4163307102 == uint32(call.func_hash) >> 224
+              require not call.value
+              require calldata.size - 4 >=′ 32
+              require cd[4] == uint32(cd[4])
+              return unknownf827065e[cd[4]].field_0, unknownf827065e[cd[4]].field_0, bool(unknownf827065e[cd[4]].field_224)
+          require not call.value
+          require calldata.size - 4 >=′ 32
+          require cd[4] == address(cd[4])
+          if owner != caller:
+              revert with 0, 'Ownable: caller is not the owner'
+          if not address(cd[4]):
+              revert with 0, 'Ownable: new owner is the zero address'
+          owner = address(cd[4])
+          log OwnershipTransferred(
+                address previousOwner=owner,
+                address newOwner=address(cd[4]))
+      else:
+          require not call.value
+          require calldata.size - 4 >=′ 96
+          require cd[4] == uint32(cd[4])
+          require cd[36] == uint64(cd[36])
+          require cd[68] == address(cd[68])
+          if unknownf827065e[cd[4] << 224].field_224:
+              revert with 0, 'Code in use'
+          if uint64(cd[36]) > 2 * 10^16:
+              revert with 0, 'Fee too high'
+          if uint32(cd[4]) <= 2147483648:
+              if uint64(cd[36]):
+                  revert with 0, 'Invalid fee for code'
+          else:
+              if uint64(cd[36]) <= 0:
+                  revert with 0, 'Invalid fee for code'
+              if not address(cd[68]):
+                  revert with 0, 'Null beneficiary'
+          unknownf827065e[cd[4] << 224].field_0 = uint64(cd[36])
+          unknownf827065e[cd[4] << 224].field_64 = address(cd[68])
+          unknownf827065e[cd[4] << 224].field_224 = 1
+
+def unknown83bd37f9() payable: 
+  if not Mask(256, -240, cd[4]):
+      if not Mask(256, -240, cd[6]):
+          if not Mask(256, -248, cd[8]):
+              if not Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 13)]):
+                  if not Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 15)]):
+                      if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 17)]):
+                          if uint16(cd[((uint8(cd[9]) >> 248) + 17)]) >> 240 != 1:
+                  else:
+                      if uint16(cd[((uint8(cd[9]) >> 248) + 15)]) >> 240 == 1:
+                          if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 37)]):
+                              if uint16(cd[((uint8(cd[9]) >> 248) + 37)]) >> 240 != 1:
+                      else:
+                          if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 17)]):
+                              if uint16(cd[((uint8(cd[9]) >> 248) + 17)]) >> 240 != 1:
+              else:
+                  if uint16(cd[((uint8(cd[9]) >> 248) + 13)]) >> 240 == 1:
+                      if not Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 35)]):
+                          if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 37)]):
+                              if uint16(cd[((uint8(cd[9]) >> 248) + 37)]) >> 240 != 1:
+                      else:
+                          if uint16(cd[((uint8(cd[9]) >> 248) + 35)]) >> 240 == 1:
+                              if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 57)]):
+                                  if uint16(cd[((uint8(cd[9]) >> 248) + 57)]) >> 240 != 1:
+                          else:
+                              if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 37)]):
+                                  if uint16(cd[((uint8(cd[9]) >> 248) + 37)]) >> 240 != 1:
+                  else:
+                      if not Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 15)]):
+                          if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 17)]):
+                              if uint16(cd[((uint8(cd[9]) >> 248) + 17)]) >> 240 != 1:
+                      else:
+                          if uint16(cd[((uint8(cd[9]) >> 248) + 15)]) >> 240 == 1:
+                              if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 37)]):
+                                  if uint16(cd[((uint8(cd[9]) >> 248) + 37)]) >> 240 != 1:
+                          else:
+                              if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 17)]):
+                                  if uint16(cd[((uint8(cd[9]) >> 248) + 17)]) >> 240 != 1:
+          else:
+              if not Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 13)]):
+                  if not Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 15)]):
+                      if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 17)]):
+                          if uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 17)]) >> 240 != 1:
+                  else:
+                      if uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 15)]) >> 240 == 1:
+                          if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 37)]):
+                              if uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 37)]) >> 240 != 1:
+                      else:
+                          if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 17)]):
+                              if uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 17)]) >> 240 != 1:
+              else:
+                  if uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 13)]) >> 240 == 1:
+                      if not Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 35)]):
+                          if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 37)]):
+                              if uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 37)]) >> 240 != 1:
+                      else:
+                          if uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 35)]) >> 240 == 1:
+                              if not Mask(96, 80, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 35)]):
+                                  if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 57)]):
+                              else:
+                                  if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 57)]):
+                                      if uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 57)]) >> 240 != 1:
+                          else:
+                              if not storB10E[uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 35)]) >> 240]:
+                                  if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 37)]):
+                              else:
+                                  if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 37)]):
+                                      if uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 37)]) >> 240 != 1:
+                  else:
+                      if not Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 15)]):
+                          if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 17)]):
+                              if uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 17)]) >> 240 != 1:
+                      else:
+                          if uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 15)]) >> 240 == 1:
+                              if not Mask(96, 80, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 15)]):
+                                  if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 37)]):
+                              else:
+                                  if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 37)]):
+                                      if uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 37)]) >> 240 != 1:
+                          else:
+                              if not storB10E[uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 15)]) >> 240]:
+                                  if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 17)]):
+                              else:
+                                  if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 17)]):
+                                      if uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 17)]) >> 240 != 1:
+      else:
+          if uint16(cd[6]) >> 240 == 1:
+              if Mask(256, -248, cd[28]):
+                  if not Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 33)]):
+                      if not Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 35)]):
+                          if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 37)]):
+                              if uint16(cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 37)]) >> 240 != 1:
+                      else:
+                          if uint16(cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 35)]) >> 240 == 1:
+                              if not Mask(96, 80, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 35)]):
+                                  if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 57)]):
+                              else:
+                                  if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 57)]):
+                                      if uint16(cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 57)]) >> 240 != 1:
+                          else:
+                              if not storB10E[uint16(cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 35)]) >> 240]:
+                                  if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 37)]):
+                              else:
+                                  if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 37)]):
+                                      if uint16(cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 37)]) >> 240 != 1:
+                  else:
+                      if uint16(cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 33)]) >> 240 == 1:
+                          if not Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 55)]):
+                              if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 57)]):
+                          else:
+                              if uint16(cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 55)]) >> 240 == 1:
+                                  if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 77)]):
+                              else:
+                                  if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 57)]):
+                      else:
+                          if not Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 35)]):
+                              if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 37)]):
+                          else:
+                              if uint16(cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 35)]) >> 240 == 1:
+                                  if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 57)]):
+                              else:
+                                  if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 37)]):
+              else:
+                  if not Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 33)]):
+                      if not Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 35)]):
+                          if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 37)]):
+                              if uint16(cd[((uint8(cd[29]) >> 248) + 37)]) >> 240 != 1:
+                      else:
+                          if uint16(cd[((uint8(cd[29]) >> 248) + 35)]) >> 240 == 1:
+                              if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 57)]):
+                                  if uint16(cd[((uint8(cd[29]) >> 248) + 57)]) >> 240 != 1:
+                          else:
+                              if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 37)]):
+                                  if uint16(cd[((uint8(cd[29]) >> 248) + 37)]) >> 240 != 1:
+                  else:
+                      if uint16(cd[((uint8(cd[29]) >> 248) + 33)]) >> 240 == 1:
+                          if not Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 55)]):
+                              if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 57)]):
+                                  if uint16(cd[((uint8(cd[29]) >> 248) + 57)]) >> 240 != 1:
+                          else:
+                              if uint16(cd[((uint8(cd[29]) >> 248) + 55)]) >> 240 == 1:
+                                  if not Mask(96, 80, cd[((uint8(cd[29]) >> 248) + 55)]):
+                                      if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 77)]):
+                                  else:
+                                      if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 77)]):
+                                          if uint16(cd[((uint8(cd[29]) >> 248) + 77)]) >> 240 != 1:
+                              else:
+                                  if not storB10E[uint16(cd[((uint8(cd[29]) >> 248) + 55)]) >> 240]:
+                                      if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 57)]):
+                                  else:
+                                      if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 57)]):
+                                          if uint16(cd[((uint8(cd[29]) >> 248) + 57)]) >> 240 != 1:
+                      else:
+                          if not Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 35)]):
+                              if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 37)]):
+                                  if uint16(cd[((uint8(cd[29]) >> 248) + 37)]) >> 240 != 1:
+                          else:
+                              if uint16(cd[((uint8(cd[29]) >> 248) + 35)]) >> 240 == 1:
+                                  if not Mask(96, 80, cd[((uint8(cd[29]) >> 248) + 35)]):
+                                      if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 57)]):
+                                  else:
+                                      if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 57)]):
+                                          if uint16(cd[((uint8(cd[29]) >> 248) + 57)]) >> 240 != 1:
+                              else:
+                                  if not storB10E[uint16(cd[((uint8(cd[29]) >> 248) + 35)]) >> 240]:
+                                      if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 37)]):
+                                  else:
+                                      if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 37)]):
+                                          if uint16(cd[((uint8(cd[29]) >> 248) + 37)]) >> 240 != 1:
+          else:
+              if Mask(256, -248, cd[8]):
+                  if not Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 13)]):
+                      if not Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 15)]):
+                          if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 17)]):
+                              if uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 17)]) >> 240 != 1:
+                      else:
+                          if uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 15)]) >> 240 == 1:
+                              if not Mask(96, 80, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 15)]):
+                                  if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 37)]):
+                              else:
+                                  if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 37)]):
+                                      if uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 37)]) >> 240 != 1:
+                          else:
+                              if not storB10E[uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 15)]) >> 240]:
+                                  if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 17)]):
+                              else:
+                                  if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 17)]):
+                                      if uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 17)]) >> 240 != 1:
+                  else:
+                      if uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 13)]) >> 240 == 1:
+                          if not Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 35)]):
+                              if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 37)]):
+                          else:
+                              if uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 35)]) >> 240 == 1:
+                                  if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 57)]):
+                              else:
+                                  if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 37)]):
+                      else:
+                          if not Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 15)]):
+                              if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 17)]):
+                          else:
+                              if uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 15)]) >> 240 == 1:
+                                  if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 37)]):
+                              else:
+                                  if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 17)]):
+              else:
+                  if not Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 13)]):
+                      if not Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 15)]):
+                          if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 17)]):
+                              if uint16(cd[((uint8(cd[9]) >> 248) + 17)]) >> 240 != 1:
+                      else:
+                          if uint16(cd[((uint8(cd[9]) >> 248) + 15)]) >> 240 == 1:
+                              if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 37)]):
+                                  if uint16(cd[((uint8(cd[9]) >> 248) + 37)]) >> 240 != 1:
+                          else:
+                              if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 17)]):
+                                  if uint16(cd[((uint8(cd[9]) >> 248) + 17)]) >> 240 != 1:
+                  else:
+                      if uint16(cd[((uint8(cd[9]) >> 248) + 13)]) >> 240 == 1:
+                          if not Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 35)]):
+                              if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 37)]):
+                                  if uint16(cd[((uint8(cd[9]) >> 248) + 37)]) >> 240 != 1:
+                          else:
+                              if uint16(cd[((uint8(cd[9]) >> 248) + 35)]) >> 240 == 1:
+                                  if not Mask(96, 80, cd[((uint8(cd[9]) >> 248) + 35)]):
+                                      if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 57)]):
+                                  else:
+                                      if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 57)]):
+                                          if uint16(cd[((uint8(cd[9]) >> 248) + 57)]) >> 240 != 1:
+                              else:
+                                  if not storB10E[uint16(cd[((uint8(cd[9]) >> 248) + 35)]) >> 240]:
+                                      if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 37)]):
+                                  else:
+                                      if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 37)]):
+                                          if uint16(cd[((uint8(cd[9]) >> 248) + 37)]) >> 240 != 1:
+                      else:
+                          if not Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 15)]):
+                              if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 17)]):
+                                  if uint16(cd[((uint8(cd[9]) >> 248) + 17)]) >> 240 != 1:
+                          else:
+                              if uint16(cd[((uint8(cd[9]) >> 248) + 15)]) >> 240 == 1:
+                                  if not Mask(96, 80, cd[((uint8(cd[9]) >> 248) + 15)]):
+                                      if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 37)]):
+                                  else:
+                                      if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 37)]):
+                                          if uint16(cd[((uint8(cd[9]) >> 248) + 37)]) >> 240 != 1:
+                              else:
+                                  if not storB10E[uint16(cd[((uint8(cd[9]) >> 248) + 15)]) >> 240]:
+                                      if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 17)]):
+                                  else:
+                                      if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 17)]):
+                                          if uint16(cd[((uint8(cd[9]) >> 248) + 17)]) >> 240 != 1:
+  else:
+      if uint16(cd[4]) >> 240 == 1:
+          if not Mask(256, -240, cd[26]):
+              if Mask(256, -248, cd[28]):
+                  if not Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 33)]):
+                      if not Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 35)]):
+                          if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 37)]):
+                              if uint16(cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 37)]) >> 240 != 1:
+                      else:
+                          if uint16(cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 35)]) >> 240 == 1:
+                              if not Mask(96, 80, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 35)]):
+                                  if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 57)]):
+                              else:
+                                  if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 57)]):
+                                      if uint16(cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 57)]) >> 240 != 1:
+                          else:
+                              if not storB10E[uint16(cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 35)]) >> 240]:
+                                  if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 37)]):
+                              else:
+                                  if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 37)]):
+                                      if uint16(cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 37)]) >> 240 != 1:
+                  else:
+                      if uint16(cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 33)]) >> 240 == 1:
+                          if not Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 55)]):
+                              if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 57)]):
+                          else:
+                              if uint16(cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 55)]) >> 240 == 1:
+                                  if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 77)]):
+                              else:
+                                  if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 57)]):
+                      else:
+                          if not Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 35)]):
+                              if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 37)]):
+                          else:
+                              if uint16(cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 35)]) >> 240 == 1:
+                                  if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 57)]):
+                              else:
+                                  if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 37)]):
+              else:
+                  if not Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 33)]):
+                      if not Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 35)]):
+                          if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 37)]):
+                              if uint16(cd[((uint8(cd[29]) >> 248) + 37)]) >> 240 != 1:
+                      else:
+                          if uint16(cd[((uint8(cd[29]) >> 248) + 35)]) >> 240 == 1:
+                              if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 57)]):
+                                  if uint16(cd[((uint8(cd[29]) >> 248) + 57)]) >> 240 != 1:
+                          else:
+                              if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 37)]):
+                                  if uint16(cd[((uint8(cd[29]) >> 248) + 37)]) >> 240 != 1:
+                  else:
+                      if uint16(cd[((uint8(cd[29]) >> 248) + 33)]) >> 240 == 1:
+                          if not Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 55)]):
+                              if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 57)]):
+                                  if uint16(cd[((uint8(cd[29]) >> 248) + 57)]) >> 240 != 1:
+                          else:
+                              if uint16(cd[((uint8(cd[29]) >> 248) + 55)]) >> 240 == 1:
+                                  if not Mask(96, 80, cd[((uint8(cd[29]) >> 248) + 55)]):
+                                      if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 77)]):
+                                  else:
+                                      if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 77)]):
+                                          if uint16(cd[((uint8(cd[29]) >> 248) + 77)]) >> 240 != 1:
+                              else:
+                                  if not storB10E[uint16(cd[((uint8(cd[29]) >> 248) + 55)]) >> 240]:
+                                      if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 57)]):
+                                  else:
+                                      if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 57)]):
+                                          if uint16(cd[((uint8(cd[29]) >> 248) + 57)]) >> 240 != 1:
+                      else:
+                          if not Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 35)]):
+                              if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 37)]):
+                                  if uint16(cd[((uint8(cd[29]) >> 248) + 37)]) >> 240 != 1:
+                          else:
+                              if uint16(cd[((uint8(cd[29]) >> 248) + 35)]) >> 240 == 1:
+                                  if not Mask(96, 80, cd[((uint8(cd[29]) >> 248) + 35)]):
+                                      if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 57)]):
+                                  else:
+                                      if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 57)]):
+                                          if uint16(cd[((uint8(cd[29]) >> 248) + 57)]) >> 240 != 1:
+                              else:
+                                  if not storB10E[uint16(cd[((uint8(cd[29]) >> 248) + 35)]) >> 240]:
+                                      if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 37)]):
+                                  else:
+                                      if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 37)]):
+                                          if uint16(cd[((uint8(cd[29]) >> 248) + 37)]) >> 240 != 1:
+          else:
+              if uint16(cd[26]) >> 240 == 1:
+                  if not Mask(256, -248, cd[48]):
+                      if not Mask(256, -240, cd[((uint8(cd[49]) >> 248) + 53)]):
+                          if not Mask(256, -240, cd[((uint8(cd[49]) >> 248) + 55)]):
+                              if Mask(256, -240, cd[((uint8(cd[49]) >> 248) + 57)]):
+                                  if uint16(cd[((uint8(cd[49]) >> 248) + 57)]) >> 240 != 1:
+                          else:
+                              if uint16(cd[((uint8(cd[49]) >> 248) + 55)]) >> 240 == 1:
+                                  if not Mask(96, 80, cd[((uint8(cd[49]) >> 248) + 55)]):
+                                      if Mask(256, -240, cd[((uint8(cd[49]) >> 248) + 77)]):
+                                  else:
+                                      if Mask(256, -240, cd[((uint8(cd[49]) >> 248) + 77)]):
+                                          if uint16(cd[((uint8(cd[49]) >> 248) + 77)]) >> 240 != 1:
+                              else:
+                                  if not storB10E[uint16(cd[((uint8(cd[49]) >> 248) + 55)]) >> 240]:
+                                      if Mask(256, -240, cd[((uint8(cd[49]) >> 248) + 57)]):
+                                  else:
+                                      if Mask(256, -240, cd[((uint8(cd[49]) >> 248) + 57)]):
+                                          if uint16(cd[((uint8(cd[49]) >> 248) + 57)]) >> 240 != 1:
+                      else:
+                          if uint16(cd[((uint8(cd[49]) >> 248) + 53)]) >> 240 == 1:
+                              if not Mask(256, -240, cd[((uint8(cd[49]) >> 248) + 75)]):
+                                  if Mask(256, -240, cd[((uint8(cd[49]) >> 248) + 77)]):
+                              else:
+                                  if uint16(cd[((uint8(cd[49]) >> 248) + 75)]) >> 240 == 1:
+                                      if Mask(256, -240, cd[((uint8(cd[49]) >> 248) + 97)]):
+                                  else:
+                                      if Mask(256, -240, cd[((uint8(cd[49]) >> 248) + 77)]):
+                          else:
+                              if not Mask(256, -240, cd[((uint8(cd[49]) >> 248) + 55)]):
+                                  if Mask(256, -240, cd[((uint8(cd[49]) >> 248) + 57)]):
+                              else:
+                                  if uint16(cd[((uint8(cd[49]) >> 248) + 55)]) >> 240 == 1:
+                                      if Mask(256, -240, cd[((uint8(cd[49]) >> 248) + 77)]):
+                                  else:
+                                      if Mask(256, -240, cd[((uint8(cd[49]) >> 248) + 57)]):
+                  else:
+                      if not Mask(256, -240, cd[((uint8(cd[48]) >> 248) + (uint8(cd[((uint8(cd[48]) >> 248) + 49)]) >> 248) + 53)]):
+                          if not Mask(256, -240, cd[((uint8(cd[48]) >> 248) + (uint8(cd[((uint8(cd[48]) >> 248) + 49)]) >> 248) + 55)]):
+                              if Mask(256, -240, cd[((uint8(cd[48]) >> 248) + (uint8(cd[((uint8(cd[48]) >> 248) + 49)]) >> 248) + 57)]):
+                          else:
+                              if uint16(cd[((uint8(cd[48]) >> 248) + (uint8(cd[((uint8(cd[48]) >> 248) + 49)]) >> 248) + 55)]) >> 240 == 1:
+                                  if Mask(256, -240, cd[((uint8(cd[48]) >> 248) + (uint8(cd[((uint8(cd[48]) >> 248) + 49)]) >> 248) + 77)]):
+                              else:
+                                  if Mask(256, -240, cd[((uint8(cd[48]) >> 248) + (uint8(cd[((uint8(cd[48]) >> 248) + 49)]) >> 248) + 57)]):
+                      else:
+                          if uint16(cd[((uint8(cd[48]) >> 248) + (uint8(cd[((uint8(cd[48]) >> 248) + 49)]) >> 248) + 53)]) >> 240 == 1:
+                              if not Mask(256, -240, cd[((uint8(cd[48]) >> 248) + (uint8(cd[((uint8(cd[48]) >> 248) + 49)]) >> 248) + 75)]):
+                                  if Mask(256, -240, cd[((uint8(cd[48]) >> 248) + (uint8(cd[((uint8(cd[48]) >> 248) + 49)]) >> 248) + 77)]):
+                              else:
+                                  if uint16(cd[((uint8(cd[48]) >> 248) + (uint8(cd[((uint8(cd[48]) >> 248) + 49)]) >> 248) + 75)]) >> 240 == 1:
+                                      if Mask(256, -240, cd[((uint8(cd[48]) >> 248) + (uint8(cd[((uint8(cd[48]) >> 248) + 49)]) >> 248) + 97)]):
+                                  else:
+                                      if Mask(256, -240, cd[((uint8(cd[48]) >> 248) + (uint8(cd[((uint8(cd[48]) >> 248) + 49)]) >> 248) + 77)]):
+                          else:
+                              if not Mask(256, -240, cd[((uint8(cd[48]) >> 248) + (uint8(cd[((uint8(cd[48]) >> 248) + 49)]) >> 248) + 55)]):
+                                  if Mask(256, -240, cd[((uint8(cd[48]) >> 248) + (uint8(cd[((uint8(cd[48]) >> 248) + 49)]) >> 248) + 57)]):
+                              else:
+                                  if uint16(cd[((uint8(cd[48]) >> 248) + (uint8(cd[((uint8(cd[48]) >> 248) + 49)]) >> 248) + 55)]) >> 240 == 1:
+                                      if Mask(256, -240, cd[((uint8(cd[48]) >> 248) + (uint8(cd[((uint8(cd[48]) >> 248) + 49)]) >> 248) + 77)]):
+                                  else:
+                                      if Mask(256, -240, cd[((uint8(cd[48]) >> 248) + (uint8(cd[((uint8(cd[48]) >> 248) + 49)]) >> 248) + 57)]):
+              else:
+                  if not Mask(256, -248, cd[28]):
+                      if not Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 33)]):
+                          if not Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 35)]):
+                              if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 37)]):
+                                  if uint16(cd[((uint8(cd[29]) >> 248) + 37)]) >> 240 != 1:
+                          else:
+                              if uint16(cd[((uint8(cd[29]) >> 248) + 35)]) >> 240 == 1:
+                                  if not Mask(96, 80, cd[((uint8(cd[29]) >> 248) + 35)]):
+                                      if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 57)]):
+                                  else:
+                                      if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 57)]):
+                                          if uint16(cd[((uint8(cd[29]) >> 248) + 57)]) >> 240 != 1:
+                              else:
+                                  if not storB10E[uint16(cd[((uint8(cd[29]) >> 248) + 35)]) >> 240]:
+                                      if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 37)]):
+                                  else:
+                                      if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 37)]):
+                                          if uint16(cd[((uint8(cd[29]) >> 248) + 37)]) >> 240 != 1:
+                      else:
+                          if uint16(cd[((uint8(cd[29]) >> 248) + 33)]) >> 240 == 1:
+                              if not Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 55)]):
+                                  if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 57)]):
+                              else:
+                                  if uint16(cd[((uint8(cd[29]) >> 248) + 55)]) >> 240 == 1:
+                                      if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 77)]):
+                                  else:
+                                      if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 57)]):
+                          else:
+                              if not Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 35)]):
+                                  if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 37)]):
+                              else:
+                                  if uint16(cd[((uint8(cd[29]) >> 248) + 35)]) >> 240 == 1:
+                                      if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 57)]):
+                                  else:
+                                      if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 37)]):
+                  else:
+                      if not Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 33)]):
+                          if not Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 35)]):
+                              if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 37)]):
+                          else:
+                              if uint16(cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 35)]) >> 240 == 1:
+                                  if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 57)]):
+                              else:
+                                  if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 37)]):
+                      else:
+                          if uint16(cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 33)]) >> 240 == 1:
+                              if not Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 55)]):
+                                  if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 57)]):
+                              else:
+                                  if uint16(cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 55)]) >> 240 == 1:
+                                      if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 77)]):
+                                  else:
+                                      if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 57)]):
+                          else:
+                              if not Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 35)]):
+                                  if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 37)]):
+                              else:
+                                  if uint16(cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 35)]) >> 240 == 1:
+                                      if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 57)]):
+                                  else:
+                                      if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 37)]):
+      else:
+          if not Mask(256, -240, cd[6]):
+              if Mask(256, -248, cd[8]):
+                  if not Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 13)]):
+                      if not Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 15)]):
+                          if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 17)]):
+                              if uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 17)]) >> 240 != 1:
+                      else:
+                          if uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 15)]) >> 240 == 1:
+                              if not Mask(96, 80, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 15)]):
+                                  if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 37)]):
+                              else:
+                                  if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 37)]):
+                                      if uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 37)]) >> 240 != 1:
+                          else:
+                              if not storB10E[uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 15)]) >> 240]:
+                                  if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 17)]):
+                              else:
+                                  if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 17)]):
+                                      if uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 17)]) >> 240 != 1:
+                  else:
+                      if uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 13)]) >> 240 == 1:
+                          if not Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 35)]):
+                              if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 37)]):
+                          else:
+                              if uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 35)]) >> 240 == 1:
+                                  if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 57)]):
+                              else:
+                                  if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 37)]):
+                      else:
+                          if not Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 15)]):
+                              if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 17)]):
+                          else:
+                              if uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 15)]) >> 240 == 1:
+                                  if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 37)]):
+                              else:
+                                  if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 17)]):
+              else:
+                  if not Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 13)]):
+                      if not Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 15)]):
+                          if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 17)]):
+                              if uint16(cd[((uint8(cd[9]) >> 248) + 17)]) >> 240 != 1:
+                      else:
+                          if uint16(cd[((uint8(cd[9]) >> 248) + 15)]) >> 240 == 1:
+                              if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 37)]):
+                                  if uint16(cd[((uint8(cd[9]) >> 248) + 37)]) >> 240 != 1:
+                          else:
+                              if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 17)]):
+                                  if uint16(cd[((uint8(cd[9]) >> 248) + 17)]) >> 240 != 1:
+                  else:
+                      if uint16(cd[((uint8(cd[9]) >> 248) + 13)]) >> 240 == 1:
+                          if not Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 35)]):
+                              if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 37)]):
+                                  if uint16(cd[((uint8(cd[9]) >> 248) + 37)]) >> 240 != 1:
+                          else:
+                              if uint16(cd[((uint8(cd[9]) >> 248) + 35)]) >> 240 == 1:
+                                  if not Mask(96, 80, cd[((uint8(cd[9]) >> 248) + 35)]):
+                                      if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 57)]):
+                                  else:
+                                      if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 57)]):
+                                          if uint16(cd[((uint8(cd[9]) >> 248) + 57)]) >> 240 != 1:
+                              else:
+                                  if not storB10E[uint16(cd[((uint8(cd[9]) >> 248) + 35)]) >> 240]:
+                                      if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 37)]):
+                                  else:
+                                      if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 37)]):
+                                          if uint16(cd[((uint8(cd[9]) >> 248) + 37)]) >> 240 != 1:
+                      else:
+                          if not Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 15)]):
+                              if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 17)]):
+                                  if uint16(cd[((uint8(cd[9]) >> 248) + 17)]) >> 240 != 1:
+                          else:
+                              if uint16(cd[((uint8(cd[9]) >> 248) + 15)]) >> 240 == 1:
+                                  if not Mask(96, 80, cd[((uint8(cd[9]) >> 248) + 15)]):
+                                      if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 37)]):
+                                  else:
+                                      if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 37)]):
+                                          if uint16(cd[((uint8(cd[9]) >> 248) + 37)]) >> 240 != 1:
+                              else:
+                                  if not storB10E[uint16(cd[((uint8(cd[9]) >> 248) + 15)]) >> 240]:
+                                      if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 17)]):
+                                  else:
+                                      if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 17)]):
+                                          if uint16(cd[((uint8(cd[9]) >> 248) + 17)]) >> 240 != 1:
+          else:
+              if uint16(cd[6]) >> 240 == 1:
+                  if not Mask(256, -248, cd[28]):
+                      if not Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 33)]):
+                          if not Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 35)]):
+                              if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 37)]):
+                                  if uint16(cd[((uint8(cd[29]) >> 248) + 37)]) >> 240 != 1:
+                          else:
+                              if uint16(cd[((uint8(cd[29]) >> 248) + 35)]) >> 240 == 1:
+                                  if not Mask(96, 80, cd[((uint8(cd[29]) >> 248) + 35)]):
+                                      if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 57)]):
+                                  else:
+                                      if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 57)]):
+                                          if uint16(cd[((uint8(cd[29]) >> 248) + 57)]) >> 240 != 1:
+                              else:
+                                  if not storB10E[uint16(cd[((uint8(cd[29]) >> 248) + 35)]) >> 240]:
+                                      if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 37)]):
+                                  else:
+                                      if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 37)]):
+                                          if uint16(cd[((uint8(cd[29]) >> 248) + 37)]) >> 240 != 1:
+                      else:
+                          if uint16(cd[((uint8(cd[29]) >> 248) + 33)]) >> 240 == 1:
+                              if not Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 55)]):
+                                  if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 57)]):
+                              else:
+                                  if uint16(cd[((uint8(cd[29]) >> 248) + 55)]) >> 240 == 1:
+                                      if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 77)]):
+                                  else:
+                                      if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 57)]):
+                          else:
+                              if not Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 35)]):
+                                  if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 37)]):
+                              else:
+                                  if uint16(cd[((uint8(cd[29]) >> 248) + 35)]) >> 240 == 1:
+                                      if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 57)]):
+                                  else:
+                                      if Mask(256, -240, cd[((uint8(cd[29]) >> 248) + 37)]):
+                  else:
+                      if not Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 33)]):
+                          if not Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 35)]):
+                              if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 37)]):
+                          else:
+                              if uint16(cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 35)]) >> 240 == 1:
+                                  if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 57)]):
+                              else:
+                                  if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 37)]):
+                      else:
+                          if uint16(cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 33)]) >> 240 == 1:
+                              if not Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 55)]):
+                                  if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 57)]):
+                              else:
+                                  if uint16(cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 55)]) >> 240 == 1:
+                                      if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 77)]):
+                                  else:
+                                      if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 57)]):
+                          else:
+                              if not Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 35)]):
+                                  if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 37)]):
+                              else:
+                                  if uint16(cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 35)]) >> 240 == 1:
+                                      if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 57)]):
+                                  else:
+                                      if Mask(256, -240, cd[((uint8(cd[28]) >> 248) + (uint8(cd[((uint8(cd[28]) >> 248) + 29)]) >> 248) + 37)]):
+              else:
+                  if not Mask(256, -248, cd[8]):
+                      if not Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 13)]):
+                          if not Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 15)]):
+                              if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 17)]):
+                                  if uint16(cd[((uint8(cd[9]) >> 248) + 17)]) >> 240 != 1:
+                          else:
+                              if uint16(cd[((uint8(cd[9]) >> 248) + 15)]) >> 240 == 1:
+                                  if not Mask(96, 80, cd[((uint8(cd[9]) >> 248) + 15)]):
+                                      if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 37)]):
+                                  else:
+                                      if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 37)]):
+                                          if uint16(cd[((uint8(cd[9]) >> 248) + 37)]) >> 240 != 1:
+                              else:
+                                  if not storB10E[uint16(cd[((uint8(cd[9]) >> 248) + 15)]) >> 240]:
+                                      if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 17)]):
+                                  else:
+                                      if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 17)]):
+                                          if uint16(cd[((uint8(cd[9]) >> 248) + 17)]) >> 240 != 1:
+                      else:
+                          if uint16(cd[((uint8(cd[9]) >> 248) + 13)]) >> 240 == 1:
+                              if not Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 35)]):
+                                  if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 37)]):
+                              else:
+                                  if uint16(cd[((uint8(cd[9]) >> 248) + 35)]) >> 240 == 1:
+                                      if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 57)]):
+                                  else:
+                                      if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 37)]):
+                          else:
+                              if not Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 15)]):
+                                  if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 17)]):
+                              else:
+                                  if uint16(cd[((uint8(cd[9]) >> 248) + 15)]) >> 240 == 1:
+                                      if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 37)]):
+                                  else:
+                                      if Mask(256, -240, cd[((uint8(cd[9]) >> 248) + 17)]):
+                  else:
+                      if not Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 13)]):
+                          if not Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 15)]):
+                              if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 17)]):
+                          else:
+                              if uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 15)]) >> 240 == 1:
+                                  if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 37)]):
+                              else:
+                                  if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 17)]):
+                      else:
+                          if uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 13)]) >> 240 == 1:
+                              if not Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 35)]):
+                                  if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 37)]):
+                              else:
+                                  if uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 35)]) >> 240 == 1:
+                                      if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 57)]):
+                                  else:
+                                      if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 37)]):
+                          else:
+                              if not Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 15)]):
+                                  if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 17)]):
+                              else:
+                                  if uint16(cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 15)]) >> 240 == 1:
+                                      if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 37)]):
+                                  else:
+                                      if Mask(256, -240, cd[((uint8(cd[8]) >> 248) + (uint8(cd[((uint8(cd[8]) >> 248) + 9)]) >> 248) + 17)]):
+  ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+
+

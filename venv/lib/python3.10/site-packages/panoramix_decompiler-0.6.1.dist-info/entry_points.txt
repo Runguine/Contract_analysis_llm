@@ -1,0 +1,3 @@
+[console_scripts]
+panoramix=panoramix.__main__:main
+

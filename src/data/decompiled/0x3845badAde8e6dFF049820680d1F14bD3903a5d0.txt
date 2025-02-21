@@ -1,0 +1,617 @@
+# Palkeoramix decompiler. 
+
+const name = 'SAND'
+const decimals = 18
+const symbol = 'SAND'
+
+def storage:
+  executionAdminAddress is address at storage 0
+  stor1 is mapping of uint8 at storage 1
+  adminAddress is address at storage 2
+  stor3 is mapping of uint8 at storage 3
+  totalSupply is uint256 at storage 4
+  balanceOf is mapping of uint256 at storage 5
+  allowance is mapping of uint256 at storage 6
+
+def totalSupply(): # not payable
+  return totalSupply
+
+def isExecutionOperator(address who): # not payable
+  require calldata.size - 4 >= 32
+  return bool(stor1[address(who)])
+
+def isSuperOperator(address who): # not payable
+  require calldata.size - 4 >= 32
+  return bool(stor3[address(who)])
+
+def getAdmin(): # not payable
+  return adminAddress
+
+def balanceOf(address account): # not payable
+  require calldata.size - 4 >= 32
+  return balanceOf[address(account)]
+
+def getExecutionAdmin(): # not payable
+  return executionAdminAddress
+
+def allowance(address owner, address spender): # not payable
+  require calldata.size - 4 >= 64
+  return allowance[address(owner)][address(spender)]
+
+#
+#  Regular functions
+#
+
+def _fallback(?) payable: # default function
+  revert
+
+def changeAdmin(address newAdmin): # not payable
+  require calldata.size - 4 >= 32
+  if adminAddress != caller:
+      revert with 0, 'only admin can change admin'
+  log AdminChanged(
+        address previousAdmin=adminAddress,
+        address newAdmin=newAdmin)
+  adminAddress = newAdmin
+
+def approve(address spender, uint256 amount): # not payable
+  require calldata.size - 4 >= 64
+  if not caller:
+      revert with 0, 'Cannot approve with 0x0'
+  if not spender:
+      revert with 0, 'Cannot approve with 0x0'
+  allowance[caller][address(spender)] = amount
+  log Approval(
+        address owner=amount,
+        address spender=caller,
+        uint256 value=spender)
+  return 1
+
+def transfer(address recipient, uint256 amount): # not payable
+  require calldata.size - 4 >= 64
+  if not recipient:
+      revert with 0, 'Cannot send to 0x0'
+  if balanceOf[caller] < amount:
+      revert with 0, 'not enough fund'
+  balanceOf[caller] -= amount
+  balanceOf[recipient] += amount
+  log Transfer(
+        address from=amount,
+        address to=caller,
+        uint256 value=recipient)
+  return 1
+
+def changeExecutionAdmin(address newAdmin): # not payable
+  require calldata.size - 4 >= 32
+  if executionAdminAddress != caller:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  45,
+                  0x736f6e6c7920657865637574696f6e41646d696e2063616e206368616e676520657865637574696f6e41646d69,
+                  mem[209 len 19]
+  log ExecutionAdminAdminChanged(
+        address oldAdmin=executionAdminAddress,
+        address newAdmin=newAdmin)
+  executionAdminAddress = newAdmin
+
+def setSuperOperator(address superOperator, bool enabled): # not payable
+  require calldata.size - 4 >= 64
+  if adminAddress != caller:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  44,
+                  0x736f6e6c792061646d696e20697320616c6c6f77656420746f20616464207375706572206f70657261746f72,
+                  mem[208 len 20]
+  stor3[address(superOperator)] = uint8(enabled)
+  log SuperOperator(
+        address superOperator=address(superOperator),
+        bool enabled=enabled)
+
+def setExecutionOperator(address executionOperator, bool enabled): # not payable
+  require calldata.size - 4 >= 64
+  if executionAdminAddress != caller:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  58,
+                  0x656f6e6c7920657865637574696f6e2061646d696e20697320616c6c6f77656420746f2061646420657865637574696f6e206f70657261746f72,
+                  mem[222 len 6]
+  stor1[address(executionOperator)] = uint8(enabled)
+  log ExecutionOperator(
+        address executionOperator=address(executionOperator),
+        bool enabled=enabled)
+
+def burn(uint256 _value): # not payable
+  require calldata.size - 4 >= 32
+  if _value <= 0:
+      revert with 0, 'cannot burn 0 tokens'
+  if caller != caller:
+      if not stor3[caller]:
+          if allowance[caller][caller] < _value:
+              revert with 0, 'Not enough funds allowed'
+          if allowance[caller][caller] != -1:
+              allowance[caller][caller] -= _value
+  if balanceOf[caller] < _value:
+      revert with 0, 'Not enough funds'
+  balanceOf[caller] -= _value
+  totalSupply -= _value
+  log Transfer(
+        address from=_value,
+        address to=caller,
+        uint256 value=0)
+  return 1
+
+def approveFor(address sender, address operator, uint256 id): # not payable
+  require calldata.size - 4 >= 96
+  if sender != caller:
+      if not stor3[caller]:
+          revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                      32,
+                      37,
+                      0xfe6d73672e73656e64657220213d206f776e6572202626202173757065724f70657261746f,
+                      mem[201 len 27]
+  if not sender:
+      revert with 0, 'Cannot approve with 0x0'
+  if not operator:
+      revert with 0, 'Cannot approve with 0x0'
+  allowance[address(sender)][address(operator)] = id
+  log Approval(
+        address owner=id,
+        address spender=sender,
+        uint256 value=operator)
+  return 1
+
+def burnFor(address _user, uint256 _amount): # not payable
+  require calldata.size - 4 >= 64
+  if _amount <= 0:
+      revert with 0, 'cannot burn 0 tokens'
+  if _user != caller:
+      if not stor3[caller]:
+          if allowance[address(_user)][caller] < _amount:
+              revert with 0, 'Not enough funds allowed'
+          if allowance[address(_user)][caller] != -1:
+              allowance[address(_user)][caller] -= _amount
+  if balanceOf[address(_user)] < _amount:
+      revert with 0, 'Not enough funds'
+  balanceOf[address(_user)] -= _amount
+  totalSupply -= _amount
+  log Transfer(
+        address from=_amount,
+        address to=_user,
+        uint256 value=0)
+  return 1
+
+def transferFrom(address sender, address recipient, uint256 amount): # not payable
+  require calldata.size - 4 >= 96
+  if sender != caller:
+      if not stor3[caller]:
+          if allowance[address(sender)][caller] != -1:
+              if allowance[address(sender)][caller] < amount:
+                  revert with 0, 'Not enough funds allowed'
+              allowance[address(sender)][caller] -= amount
+  if not recipient:
+      revert with 0, 'Cannot send to 0x0'
+  if balanceOf[address(sender)] < amount:
+      revert with 0, 'not enough fund'
+  balanceOf[address(sender)] -= amount
+  balanceOf[recipient] += amount
+  log Transfer(
+        address from=amount,
+        address to=sender,
+        uint256 value=recipient)
+  return 1
+
+def addAllowanceIfNeeded(address owner, address spender, uint256 amountNeeded): # not payable
+  require calldata.size - 4 >= 96
+  if owner != caller:
+      if not stor3[caller]:
+          revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                      32,
+                      37,
+                      0xfe6d73672e73656e64657220213d206f776e6572202626202173757065724f70657261746f,
+                      mem[201 len 27]
+  if amountNeeded > 0:
+      if not stor3[address(spender)]:
+          if allowance[address(owner)][address(spender)] < amountNeeded:
+              if not owner:
+                  revert with 0, 'Cannot approve with 0x0'
+              if not spender:
+                  revert with 0, 'Cannot approve with 0x0'
+              allowance[address(owner)][address(spender)] = amountNeeded
+              log Approval(
+                    address owner=amountNeeded,
+                    address spender=owner,
+                    uint256 value=spender)
+  return 1
+
+def executeWithSpecificGas(address to, uint256 gasLimit, bytes data) payable: 
+  mem[64] = 96
+  require not call.value
+  require calldata.size - 4 >= 96
+  require data <= unknown10000000()
+  require data + 36 <= calldata.size
+  require data.length <= unknown10000000() and data + data.length + 36 <= calldata.size
+  mem[0] = caller
+  mem[32] = 1
+  if not stor1[caller]:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  58,
+                  0x6e6f6e6c7920657865637574696f6e206f70657261746f727320616c6c6f77656420746f2065786563757465206f6e2053414e4420626568616c,
+                  mem[222 len 6]
+  mem[96 len data.length] = data[all]
+  call to with:
+       gas gasLimit wei
+      args data[all]
+  if return_data.size:
+      require gas_remaining > gasLimit / 63
+      return bool(ext_call.success), Array(len=return_data.size, data=ext_call.return_data[0 len return_data.size])
+  require gas_remaining > gasLimit / 63
+  mem[96] = bool(ext_call.success)
+  mem[128] = 64
+  mem[160] = bool(ext_call.success)
+  mem[192 len ceil32(bool(ext_call.success))] = mem[128 len ceil32(bool(ext_call.success))]
+  if not bool(ext_call.success) % 32:
+      return memory
+        from 96
+         len bool(ext_call.success) + 96
+  mem[floor32(bool(ext_call.success)) + 192] = Mask(-(8 * -(bool(ext_call.success) % 32) + 32) + 256, 0, mem[floor32(bool(ext_call.success)) + 192])
+  return memory
+    from 96
+     len floor32(bool(ext_call.success)) + 128
+
+def transferAndChargeForGas(address from, address to, uint256 amount, uint256 gasLimit, uint256 tokenGasPrice, uint256 baseGasCharge, address tokenReceiver): # not payable
+  require calldata.size - 4 >= 224
+  if not stor1[caller]:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  63,
+                  0x726f6e6c7920657865637574696f6e206f70657261746f727320616c6c6f77656420746f2070657266726f6d207472616e7366657220616e64206368617267,
+                  mem[227 len 1]
+  if not to:
+      revert with 0, 'Cannot send to 0x0'
+  if balanceOf[address(from)] < amount:
+      revert with 0, 'not enough fund'
+  balanceOf[address(from)] -= amount
+  balanceOf[to] += amount
+  log Transfer(
+        address from=amount,
+        address to=from,
+        uint256 value=to)
+  if tokenGasPrice:
+      if 0 <= gasLimit:
+          require baseGasCharge
+          if baseGasCharge * tokenGasPrice / baseGasCharge != tokenGasPrice:
+              revert with 0, 'overflow'
+          if not tokenReceiver:
+              revert with 0, 'Cannot send to 0x0'
+          if balanceOf[address(from)] < baseGasCharge * tokenGasPrice:
+              revert with 0, 'not enough fund'
+          balanceOf[address(from)] += -1 * baseGasCharge * tokenGasPrice
+          balanceOf[tokenReceiver] += baseGasCharge * tokenGasPrice
+          log Transfer(
+                address from=(baseGasCharge * tokenGasPrice),
+                address to=from,
+                uint256 value=tokenReceiver)
+      else:
+          require baseGasCharge + gasLimit
+          if (baseGasCharge * tokenGasPrice) + (gasLimit * tokenGasPrice) / baseGasCharge + gasLimit != tokenGasPrice:
+              revert with 0, 'overflow'
+          if not tokenReceiver:
+              revert with 0, 'Cannot send to 0x0'
+          if balanceOf[address(from)] < (baseGasCharge * tokenGasPrice) + (gasLimit * tokenGasPrice):
+              revert with 0, 'not enough fund'
+          balanceOf[address(from)] = balanceOf[address(from)] - (baseGasCharge * tokenGasPrice) - (gasLimit * tokenGasPrice)
+          balanceOf[tokenReceiver] = (baseGasCharge * tokenGasPrice) + (gasLimit * tokenGasPrice) + balanceOf[tokenReceiver]
+          log Transfer(
+                address from=((baseGasCharge * tokenGasPrice) + (gasLimit * tokenGasPrice)),
+                address to=from,
+                uint256 value=tokenReceiver)
+  return 1
+
+def approveAndExecuteWithSpecificGas(address from, address to, uint256 amount, uint256 gasLimit, bytes data): # not payable
+  require calldata.size - 4 >= 160
+  require data <= unknown10000000()
+  require data + 36 <= calldata.size
+  require data.length <= unknown10000000() and data + data.length + 36 <= calldata.size
+  if not stor1[caller]:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  58,
+                  0x6e6f6e6c7920657865637574696f6e206f70657261746f727320616c6c6f77656420746f2065786563757465206f6e2053414e4420626568616c,
+                  mem[222 len 6]
+  mem[128 len data.length] = data[all]
+  mem[data.length + 128] = 0
+  if amount:
+      if amount > 0:
+          if not stor3[address(to)]:
+              if allowance[address(from)][address(to)] < amount:
+                  if not from:
+                      revert with 0, 'Cannot approve with 0x0'
+                  if not to:
+                      revert with 0, 'Cannot approve with 0x0'
+                  allowance[address(from)][address(to)] = amount
+                  mem[ceil32(data.length) + 128] = amount
+                  log Approval(address owner, address spender, uint256 value):
+                               Mask(8 * -ceil32(data.length) + data.length + 32, 0, 0),
+                               mem[data.length + 160 len -data.length + ceil32(data.length)],
+                               from,
+                               to,
+  mem[ceil32(data.length) + 128 len floor32(data.length)] = call.data[data + 36 len floor32(data.length)]
+  mem[ceil32(data.length) + floor32(data.length) + -(data.length % 32) + 160 len data.length % 32] = mem[-(data.length % 32) + floor32(data.length) + 160 len data.length % 32]
+  call to with:
+     funct Mask(32, -(8 * ceil32(data.length) + -data.length + 4) + 256, 0) >> -(8 * ceil32(data.length) + -data.length + 4) + 256
+       gas gasLimit wei
+      args mem[ceil32(data.length) + 132 len data.length - 4]
+  if return_data.size:
+      require gas_remaining > gasLimit / 63
+      return bool(ext_call.success), Array(len=return_data.size, data=ext_call.return_data[0 len return_data.size])
+  require gas_remaining > gasLimit / 63
+  mem[ceil32(data.length) + 128] = bool(ext_call.success)
+  mem[ceil32(data.length) + 160] = 64
+  mem[ceil32(data.length) + 224 len ceil32(data.length)] = data[all], mem[data.length + 128 len ceil32(data.length) - data.length]
+  if not data.length % 32:
+      return Mask(8 * -ceil32(data.length) + data.length + 32, 0, 0), 
+             mem[data.length + 160 len ceil32(data.length) + -data.length + 32],
+             data.length,
+             Mask(8 * data.length, -(8 * data.length) + 256, data[all], mem[data.length + 128 len ceil32(data.length) - data.length]) << (8 * data.length) - 256
+  mem[floor32(data.length) + ceil32(data.length) + 224] = mem[floor32(data.length) + ceil32(data.length) + -(data.length % 32) + 256 len data.length % 32]
+  return Mask(8 * -ceil32(data.length) + data.length + 32, 0, 0), 
+         mem[data.length + 160 len ceil32(data.length) + -data.length + 32],
+         data.length,
+         Mask(8 * ceil32(data.length), -(8 * ceil32(data.length)) + 256, data[all], mem[data.length + 128 len ceil32(data.length) - data.length]) << (8 * ceil32(data.length)) - 256,
+         mem[(2 * ceil32(data.length)) + 224 len floor32(data.length) + -ceil32(data.length) + 32]
+
+def paidCall(address target, uint256 amount, bytes data) payable: 
+  require calldata.size - 4 >= 96
+  require data <= unknown10000000()
+  require data + 36 <= calldata.size
+  require data.length <= unknown10000000() and data + data.length + 36 <= calldata.size
+  mem[128 len data.length] = data[all]
+  mem[data.length + 128] = 0
+  if data.length < 68:
+      revert with 0, 'first param != sender'
+  if mem[132] != caller:
+      revert with 0, 'first param != sender'
+  if amount:
+      if amount > 0:
+          if not stor3[address(target)]:
+              if allowance[caller][address(target)] < amount:
+                  if not caller:
+                      revert with 0, 'Cannot approve with 0x0'
+                  if not target:
+                      revert with 0, 'Cannot approve with 0x0'
+                  allowance[caller][address(target)] = amount
+                  mem[ceil32(data.length) + 128] = amount
+                  log Approval(address owner, address spender, uint256 value):
+                               Mask(8 * -ceil32(data.length) + data.length + 32, 0, 0),
+                               mem[data.length + 160 len -data.length + ceil32(data.length)],
+                               caller,
+                               target,
+  mem[ceil32(data.length) + 128 len data.length] = data[all]
+  call target with:
+     funct Mask(32, -(8 * ceil32(data.length) + -data.length + 4) + 256, 0) >> -(8 * ceil32(data.length) + -data.length + 4) + 256
+     value call.value wei
+       gas gas_remaining wei
+      args mem[ceil32(data.length) + 132 len data.length - 4]
+  if return_data.size:
+      if ext_call.success:
+          return Array(len=return_data.size, data=ext_call.return_data[0 len return_data.size])
+      mem[ceil32(data.length) + ceil32(return_data.size) + 197 len ceil32(return_data.size)] = ext_call.return_data[0 len return_data.size], Mask(8 * ceil32(return_data.size) - return_data.size, -(8 * ceil32(return_data.size) + -ceil32(return_data.size) + 27) + 256, 32) >> -(8 * ceil32(return_data.size) + -ceil32(return_data.size) + 27) + 256
+      if not return_data.size % 32:
+          revert with 0, 
+                      32,
+                      return_data.size,
+                      Mask(8 * return_data.size, -(8 * return_data.size) + 256, ext_call.return_data[0 len return_data.size], Mask(8 * ceil32(return_data.size) - return_data.size, -(8 * ceil32(return_data.size) + -ceil32(return_data.size) + 27) + 256, 32) >> -(8 * ceil32(return_data.size) + -ceil32(return_data.size) + 27) + 256) << (8 * return_data.size) - 256
+      mem[floor32(return_data.size) + ceil32(data.length) + ceil32(return_data.size) + 197] = mem[floor32(return_data.size) + ceil32(data.length) + ceil32(return_data.size) + -(return_data.size % 32) + 229 len return_data.size % 32]
+      revert with 0, 
+                  32,
+                  return_data.size,
+                  Mask(8 * ceil32(return_data.size), -(8 * ceil32(return_data.size)) + 256, ext_call.return_data[0 len return_data.size], Mask(8 * ceil32(return_data.size) - return_data.size, -(8 * ceil32(return_data.size) + -ceil32(return_data.size) + 27) + 256, 32) >> -(8 * ceil32(return_data.size) + -ceil32(return_data.size) + 27) + 256) << (8 * ceil32(return_data.size)) - 256,
+                  mem[ceil32(data.length) + ceil32(return_data.size) + ceil32(return_data.size) + 197 len floor32(return_data.size) + -ceil32(return_data.size) + 32]
+  if not ext_call.success:
+      mem[ceil32(data.length) + 128] = 0x8c379a000000000000000000000000000000000000000000000000000000000
+      mem[ceil32(data.length) + 196 len ceil32(data.length)] = data[all], mem[data.length + 128 len ceil32(data.length) - data.length]
+      if not data.length % 32:
+          revert with 0, 
+                      32,
+                      data.length,
+                      Mask(8 * data.length, -(8 * data.length) + 256, data[all], mem[data.length + 128 len ceil32(data.length) - data.length]) << (8 * data.length) - 256
+      mem[floor32(data.length) + ceil32(data.length) + 196] = mem[floor32(data.length) + ceil32(data.length) + -(data.length % 32) + 228 len data.length % 32]
+      revert with 0, 
+                  32,
+                  data.length,
+                  Mask(8 * ceil32(data.length), -(8 * ceil32(data.length)) + 256, data[all], mem[data.length + 128 len ceil32(data.length) - data.length]) << (8 * ceil32(data.length)) - 256,
+                  mem[(2 * ceil32(data.length)) + 196 len floor32(data.length) + -ceil32(data.length) + 32]
+  mem[ceil32(data.length) + 128] = 32
+  mem[ceil32(data.length) + 160] = data.length
+  mem[ceil32(data.length) + 192 len ceil32(data.length)] = data[all], mem[data.length + 128 len ceil32(data.length) - data.length]
+  if not data.length % 32:
+      return Mask(8 * -ceil32(data.length) + data.length + 32, 0, 0), 
+             mem[data.length + 160 len ceil32(data.length) + -data.length + 32],
+             Mask(8 * data.length, -(8 * data.length) + 256, data[all], mem[data.length + 128 len ceil32(data.length) - data.length]) << (8 * data.length) - 256
+  mem[floor32(data.length) + ceil32(data.length) + 192] = mem[floor32(data.length) + ceil32(data.length) + -(data.length % 32) + 224 len data.length % 32]
+  return Mask(8 * -ceil32(data.length) + data.length + 32, 0, 0), 
+         mem[data.length + 160 len ceil32(data.length) + -data.length + 32],
+         Mask(8 * ceil32(data.length), -(8 * ceil32(data.length)) + 256, data[all], mem[data.length + 128 len ceil32(data.length) - data.length]) << (8 * ceil32(data.length)) - 256,
+         mem[(2 * ceil32(data.length)) + 192 len floor32(data.length) + -ceil32(data.length) + 32]
+
+def approveAndCall(address _spender, uint256 _value, bytes _extraData) payable: 
+  require calldata.size - 4 >= 96
+  require _extraData <= unknown10000000()
+  require _extraData + 36 <= calldata.size
+  require _extraData.length <= unknown10000000() and _extraData + _extraData.length + 36 <= calldata.size
+  mem[128 len _extraData.length] = _extraData[all]
+  mem[_extraData.length + 128] = 0
+  if _extraData.length < 68:
+      revert with 0, 'first param != sender'
+  if mem[132] != caller:
+      revert with 0, 'first param != sender'
+  if not caller:
+      revert with 0, 'Cannot approve with 0x0'
+  if not _spender:
+      revert with 0, 'Cannot approve with 0x0'
+  allowance[caller][address(_spender)] = _value
+  mem[ceil32(_extraData.length) + 128] = _value
+  log Approval(address owner, address spender, uint256 value):
+               Mask(8 * -ceil32(_extraData.length) + _extraData.length + 32, 0, 0),
+               mem[_extraData.length + 160 len -_extraData.length + ceil32(_extraData.length)],
+               caller,
+               _spender,
+  mem[ceil32(_extraData.length) + 128 len _extraData.length] = _extraData[all]
+  call _spender with:
+     funct Mask(32, -(8 * ceil32(_extraData.length) + -_extraData.length + 4) + 256, 0) >> -(8 * ceil32(_extraData.length) + -_extraData.length + 4) + 256
+     value call.value wei
+       gas gas_remaining wei
+      args mem[ceil32(_extraData.length) + 132 len _extraData.length - 4]
+  if return_data.size:
+      if ext_call.success:
+          return Array(len=return_data.size, data=ext_call.return_data[0 len return_data.size])
+      mem[ceil32(_extraData.length) + ceil32(return_data.size) + 197 len ceil32(return_data.size)] = ext_call.return_data[0 len return_data.size], Mask(8 * ceil32(return_data.size) - return_data.size, -(8 * ceil32(return_data.size) + -ceil32(return_data.size) + 27) + 256, 32) >> -(8 * ceil32(return_data.size) + -ceil32(return_data.size) + 27) + 256
+      if not return_data.size % 32:
+          revert with 0, 
+                      32,
+                      return_data.size,
+                      Mask(8 * return_data.size, -(8 * return_data.size) + 256, ext_call.return_data[0 len return_data.size], Mask(8 * ceil32(return_data.size) - return_data.size, -(8 * ceil32(return_data.size) + -ceil32(return_data.size) + 27) + 256, 32) >> -(8 * ceil32(return_data.size) + -ceil32(return_data.size) + 27) + 256) << (8 * return_data.size) - 256
+      mem[floor32(return_data.size) + ceil32(_extraData.length) + ceil32(return_data.size) + 197] = mem[floor32(return_data.size) + ceil32(_extraData.length) + ceil32(return_data.size) + -(return_data.size % 32) + 229 len return_data.size % 32]
+      revert with 0, 
+                  32,
+                  return_data.size,
+                  Mask(8 * ceil32(return_data.size), -(8 * ceil32(return_data.size)) + 256, ext_call.return_data[0 len return_data.size], Mask(8 * ceil32(return_data.size) - return_data.size, -(8 * ceil32(return_data.size) + -ceil32(return_data.size) + 27) + 256, 32) >> -(8 * ceil32(return_data.size) + -ceil32(return_data.size) + 27) + 256) << (8 * ceil32(return_data.size)) - 256,
+                  mem[ceil32(_extraData.length) + ceil32(return_data.size) + ceil32(return_data.size) + 197 len floor32(return_data.size) + -ceil32(return_data.size) + 32]
+  if not ext_call.success:
+      mem[ceil32(_extraData.length) + 128] = 0x8c379a000000000000000000000000000000000000000000000000000000000
+      mem[ceil32(_extraData.length) + 196 len ceil32(_extraData.length)] = _extraData[all], mem[_extraData.length + 128 len ceil32(_extraData.length) - _extraData.length]
+      if not _extraData.length % 32:
+          revert with 0, 
+                      32,
+                      _extraData.length,
+                      Mask(8 * _extraData.length, -(8 * _extraData.length) + 256, _extraData[all], mem[_extraData.length + 128 len ceil32(_extraData.length) - _extraData.length]) << (8 * _extraData.length) - 256
+      mem[floor32(_extraData.length) + ceil32(_extraData.length) + 196] = mem[floor32(_extraData.length) + ceil32(_extraData.length) + -(_extraData.length % 32) + 228 len _extraData.length % 32]
+      revert with 0, 
+                  32,
+                  _extraData.length,
+                  Mask(8 * ceil32(_extraData.length), -(8 * ceil32(_extraData.length)) + 256, _extraData[all], mem[_extraData.length + 128 len ceil32(_extraData.length) - _extraData.length]) << (8 * ceil32(_extraData.length)) - 256,
+                  mem[(2 * ceil32(_extraData.length)) + 196 len floor32(_extraData.length) + -ceil32(_extraData.length) + 32]
+  mem[ceil32(_extraData.length) + 128] = 32
+  mem[ceil32(_extraData.length) + 160] = _extraData.length
+  mem[ceil32(_extraData.length) + 192 len ceil32(_extraData.length)] = _extraData[all], mem[_extraData.length + 128 len ceil32(_extraData.length) - _extraData.length]
+  if not _extraData.length % 32:
+      return Mask(8 * -ceil32(_extraData.length) + _extraData.length + 32, 0, 0), 
+             mem[_extraData.length + 160 len ceil32(_extraData.length) + -_extraData.length + 32],
+             Mask(8 * _extraData.length, -(8 * _extraData.length) + 256, _extraData[all], mem[_extraData.length + 128 len ceil32(_extraData.length) - _extraData.length]) << (8 * _extraData.length) - 256
+  mem[floor32(_extraData.length) + ceil32(_extraData.length) + 192] = mem[floor32(_extraData.length) + ceil32(_extraData.length) + -(_extraData.length % 32) + 224 len _extraData.length % 32]
+  return Mask(8 * -ceil32(_extraData.length) + _extraData.length + 32, 0, 0), 
+         mem[_extraData.length + 160 len ceil32(_extraData.length) + -_extraData.length + 32],
+         Mask(8 * ceil32(_extraData.length), -(8 * ceil32(_extraData.length)) + 256, _extraData[all], mem[_extraData.length + 128 len ceil32(_extraData.length) - _extraData.length]) << (8 * ceil32(_extraData.length)) - 256,
+         mem[(2 * ceil32(_extraData.length)) + 192 len floor32(_extraData.length) + -ceil32(_extraData.length) + 32]
+
+def approveAndExecuteWithSpecificGasAndChargeForIt(address from, address to, uint256 amount, uint256 gasLimit, uint256 tokenGasPrice, uint256 baseGasCharge, address tokenReceiver, bytes data): # not payable
+  require calldata.size - 4 >= 256
+  require data <= unknown10000000()
+  require data + 36 <= calldata.size
+  require data.length <= unknown10000000() and data + data.length + 36 <= calldata.size
+  if not stor1[caller]:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  58,
+                  0x6e6f6e6c7920657865637574696f6e206f70657261746f727320616c6c6f77656420746f2065786563757465206f6e2053414e4420626568616c,
+                  mem[222 len 6]
+  mem[128 len data.length] = data[all]
+  mem[data.length + 128] = 0
+  if amount:
+      if amount > 0:
+          if not stor3[address(to)]:
+              if allowance[address(from)][address(to)] < amount:
+                  if not from:
+                      revert with 0, 'Cannot approve with 0x0'
+                  if not to:
+                      revert with 0, 'Cannot approve with 0x0'
+                  allowance[address(from)][address(to)] = amount
+                  mem[ceil32(data.length) + 128] = amount
+                  log Approval(address owner, address spender, uint256 value):
+                               Mask(8 * -ceil32(data.length) + data.length + 32, 0, 0),
+                               mem[data.length + 160 len -data.length + ceil32(data.length)],
+                               from,
+                               to,
+  mem[ceil32(data.length) + 128 len floor32(data.length)] = call.data[data + 36 len floor32(data.length)]
+  mem[ceil32(data.length) + floor32(data.length) + -(data.length % 32) + 160 len data.length % 32] = mem[-(data.length % 32) + floor32(data.length) + 160 len data.length % 32]
+  call to with:
+     funct Mask(32, -(8 * ceil32(data.length) + -data.length + 4) + 256, 0) >> -(8 * ceil32(data.length) + -data.length + 4) + 256
+       gas gasLimit wei
+      args mem[ceil32(data.length) + 132 len data.length - 4]
+  require gas_remaining > gasLimit / 63
+  if return_data.size:
+      if tokenGasPrice:
+          if 0 <= gasLimit:
+              require baseGasCharge
+              if baseGasCharge * tokenGasPrice / baseGasCharge != tokenGasPrice:
+                  revert with 0, 'overflow'
+              if not tokenReceiver:
+                  revert with 0, 'Cannot send to 0x0'
+              if balanceOf[address(from)] < baseGasCharge * tokenGasPrice:
+                  revert with 0, 'not enough fund'
+              balanceOf[address(from)] += -1 * baseGasCharge * tokenGasPrice
+              balanceOf[tokenReceiver] += baseGasCharge * tokenGasPrice
+              log Transfer(
+                    address from=(baseGasCharge * tokenGasPrice),
+                    address to=from,
+                    uint256 value=tokenReceiver)
+          else:
+              require baseGasCharge + gasLimit
+              if (baseGasCharge * tokenGasPrice) + (gasLimit * tokenGasPrice) / baseGasCharge + gasLimit != tokenGasPrice:
+                  revert with 0, 'overflow'
+              if not tokenReceiver:
+                  revert with 0, 'Cannot send to 0x0'
+              if balanceOf[address(from)] < (baseGasCharge * tokenGasPrice) + (gasLimit * tokenGasPrice):
+                  revert with 0, 'not enough fund'
+              balanceOf[address(from)] = balanceOf[address(from)] - (baseGasCharge * tokenGasPrice) - (gasLimit * tokenGasPrice)
+              balanceOf[tokenReceiver] = (baseGasCharge * tokenGasPrice) + (gasLimit * tokenGasPrice) + balanceOf[tokenReceiver]
+              log Transfer(
+                    address from=((baseGasCharge * tokenGasPrice) + (gasLimit * tokenGasPrice)),
+                    address to=from,
+                    uint256 value=tokenReceiver)
+      return bool(ext_call.success), Array(len=return_data.size, data=ext_call.return_data[0 len return_data.size])
+  if tokenGasPrice:
+      if 0 <= gasLimit:
+          require baseGasCharge
+          if baseGasCharge * tokenGasPrice / baseGasCharge != tokenGasPrice:
+              revert with 0, 'overflow'
+          if not tokenReceiver:
+              revert with 0, 'Cannot send to 0x0'
+          if balanceOf[address(from)] < baseGasCharge * tokenGasPrice:
+              revert with 0, 'not enough fund'
+          balanceOf[address(from)] += -1 * baseGasCharge * tokenGasPrice
+          balanceOf[tokenReceiver] += baseGasCharge * tokenGasPrice
+          mem[ceil32(data.length) + 128] = baseGasCharge * tokenGasPrice
+      else:
+          require baseGasCharge + gasLimit
+          if (baseGasCharge * tokenGasPrice) + (gasLimit * tokenGasPrice) / baseGasCharge + gasLimit != tokenGasPrice:
+              revert with 0, 'overflow'
+          if not tokenReceiver:
+              revert with 0, 'Cannot send to 0x0'
+          if balanceOf[address(from)] < (baseGasCharge * tokenGasPrice) + (gasLimit * tokenGasPrice):
+              revert with 0, 'not enough fund'
+          balanceOf[address(from)] = balanceOf[address(from)] - (baseGasCharge * tokenGasPrice) - (gasLimit * tokenGasPrice)
+          balanceOf[tokenReceiver] = (baseGasCharge * tokenGasPrice) + (gasLimit * tokenGasPrice) + balanceOf[tokenReceiver]
+          mem[ceil32(data.length) + 128] = (baseGasCharge * tokenGasPrice) + (gasLimit * tokenGasPrice)
+      log Transfer(address from, address to, uint256 value):
+                   Mask(8 * -ceil32(data.length) + data.length + 32, 0, 0),
+                   mem[data.length + 160 len -data.length + ceil32(data.length)],
+                   from,
+                   tokenReceiver,
+  mem[ceil32(data.length) + 128] = bool(ext_call.success)
+  mem[ceil32(data.length) + 160] = 64
+  mem[ceil32(data.length) + 224 len ceil32(data.length)] = data[all], mem[data.length + 128 len ceil32(data.length) - data.length]
+  if not data.length % 32:
+      return Mask(8 * -ceil32(data.length) + data.length + 32, 0, 0), 
+             mem[data.length + 160 len ceil32(data.length) + -data.length + 32],
+             data.length,
+             Mask(8 * data.length, -(8 * data.length) + 256, data[all], mem[data.length + 128 len ceil32(data.length) - data.length]) << (8 * data.length) - 256
+  mem[floor32(data.length) + ceil32(data.length) + 224] = mem[floor32(data.length) + ceil32(data.length) + -(data.length % 32) + 256 len data.length % 32]
+  return Mask(8 * -ceil32(data.length) + data.length + 32, 0, 0), 
+         mem[data.length + 160 len ceil32(data.length) + -data.length + 32],
+         data.length,
+         Mask(8 * ceil32(data.length), -(8 * ceil32(data.length)) + 256, data[all], mem[data.length + 128 len ceil32(data.length) - data.length]) << (8 * ceil32(data.length)) - 256,
+         mem[(2 * ceil32(data.length)) + 224 len floor32(data.length) + -ceil32(data.length) + 32]
+
+

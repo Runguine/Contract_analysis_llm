@@ -1,0 +1,17 @@
+# Palkeoramix decompiler. 
+
+def _fallback(?) payable: # default function
+  mem[64] = 96
+  if 0xe75ed6f453c602bd696ce27af11565edc9b46b0d != tx.origin:
+      if 0xfc9928f6590d853752824b0b403a6ae36785e535 != tx.origin:
+          revert with memory
+            from return_data.size
+             len return_data.size
+  if not calldata.size:
+      stop
+  if caller != tx.origin:
+      ...  # Decompilation aborted, sorry: ('jump to a parameter computed at runtime', ('mask_shl', 256, -240, -240, ('cd', ('add', 132, ('mask_shl', 256, -240, -240, ('cd', 132))))))
+  require not uint8(block.number) xor Mask(8, -(('mask_shl', 256, 0, -3, ('cd', 'returndatasize')), 0) + 256, return_data.size) << (('mask_shl', 256, 0, -3, ('cd', 'returndatasize')), 0) - 256
+  ...  # Decompilation aborted, sorry: ('jump to a parameter computed at runtime', ('mask_shl', 256, -240, -240, ('cd', 'chainid')))
+
+

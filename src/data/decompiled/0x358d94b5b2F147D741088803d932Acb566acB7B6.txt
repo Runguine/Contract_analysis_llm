@@ -1,0 +1,12 @@
+# Palkeoramix decompiler. 
+
+def _fallback(?) payable: # default function
+  delegate 0x1ab62413e0cf2ebeb73da7d40c70e7202ae14467 with:
+     funct call.data[return_data.size len 4]
+       gas gas_remaining wei
+      args call.data[return_data.size + 4 len calldata.size - 4]
+  if not delegate.return_code:
+      revert with ext_call.return_data[return_data.size len return_data.size]
+  return ext_call.return_data[return_data.size len return_data.size]
+
+

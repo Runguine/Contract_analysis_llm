@@ -1,0 +1,124 @@
+# Palkeoramix decompiler. 
+
+const name = 'Decentraland MANA'
+const decimals = 18
+const symbol = ''
+
+def storage:
+  totalSupply is uint256 at storage 0
+  balanceOf is mapping of uint256 at storage 1
+  allowance is mapping of uint256 at storage 2
+  paused is uint8 at storage 3 offset 160
+  mintingFinished is uint8 at storage 3 offset 168
+  owner is address at storage 3
+
+def mintingFinished(): # not payable
+  return bool(mintingFinished)
+
+def totalSupply(): # not payable
+  return totalSupply
+
+def paused(): # not payable
+  return bool(paused)
+
+def balanceOf(address account): # not payable
+  return balanceOf[address(account)]
+
+def owner(): # not payable
+  return owner
+
+def allowance(address owner, address spender): # not payable
+  return allowance[address(owner)][address(spender)]
+
+#
+#  Regular functions
+#
+
+def _fallback(?) payable: # default function
+  revert
+
+def finishMinting(): # not payable
+  require owner == caller
+  mintingFinished = 1
+  log MintFinished()
+  return 1
+
+def unpause(): # not payable
+  require owner == caller
+  require paused
+  paused = 0
+  log Unpause()
+  return 1
+
+def pause(): # not payable
+  require owner == caller
+  require not paused
+  paused = 1
+  log Pause()
+  return 1
+
+def transferOwnership(address newOwner): # not payable
+  require owner == caller
+  if newOwner:
+      owner = newOwner
+
+def burn(uint256 _value): # not payable
+  require not paused
+  require _value > 0
+  require _value <= balanceOf[caller]
+  balanceOf[caller] -= _value
+  require _value <= totalSupply
+  totalSupply -= _value
+  log Burn(
+        address from=_value,
+        uint256 value=caller)
+
+def approve(address spender, uint256 amount): # not payable
+  if amount:
+      require not allowance[caller][address(spender)]
+  allowance[caller][address(spender)] = amount
+  log Approval(
+        address owner=amount,
+        address spender=caller,
+        uint256 value=spender)
+  return 1
+
+def mint(address _to, uint256 _amount): # not payable
+  require owner == caller
+  require not mintingFinished
+  require _amount + totalSupply >= totalSupply
+  totalSupply += _amount
+  require _amount + balanceOf[address(_to)] >= balanceOf[address(_to)]
+  balanceOf[address(_to)] += _amount
+  log Mint(
+        address to=_amount,
+        uint256 amount=_to)
+  return 1
+
+def transfer(address recipient, uint256 amount): # not payable
+  require not paused
+  require amount <= balanceOf[caller]
+  balanceOf[caller] -= amount
+  require amount + balanceOf[recipient] >= balanceOf[recipient]
+  balanceOf[address(recipient)] = amount + balanceOf[recipient]
+  log Transfer(
+        address from=amount,
+        address to=caller,
+        uint256 value=recipient)
+  return 1
+
+def transferFrom(address sender, address recipient, uint256 amount): # not payable
+  require not paused
+  require amount + balanceOf[address(recipient)] >= balanceOf[address(recipient)]
+  balanceOf[address(recipient)] += amount
+  require amount <= balanceOf[sender]
+  balanceOf[address(sender)] = balanceOf[sender] - amount
+  require amount <= allowance[address(sender)][caller]
+  allowance[address(sender)][caller] -= amount
+  log Transfer(
+        address from=amount,
+        address to=sender,
+        uint256 value=recipient)
+  return 1
+
+

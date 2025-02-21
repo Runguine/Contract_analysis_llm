@@ -1,0 +1,500 @@
+# Palkeoramix decompiler. 
+
+const decimals = 18
+const DEFAULT_ADMIN_ROLE = 0
+const MINTER_ROLE = 0x9f2df0fed2c77648de5860a4cc508cd0818c85b8b8a1ab4ceeef8d981c8956a6
+const PAUSER_ROLE = 0x65d7a28e3265b37a6474929f336521b332c1681b933f6cb9f3376673440d862a
+
+def storage:
+  roleAdmin is mapping of struct at storage 0
+  roleMember is array of struct at storage 1
+  balanceOf is mapping of uint256 at storage 2
+  allowance is mapping of uint256 at storage 3
+  totalSupply is uint256 at storage 4
+  stor5 is array of struct at storage 5
+  stor6 is array of struct at storage 6
+  paused is uint8 at storage 7
+
+def totalSupply() payable: 
+  return totalSupply
+
+def getRoleAdmin(bytes32 role) payable: 
+  require calldata.size - 4 >=′ 32
+  require role == role
+  return roleAdmin[role].field_256
+
+def paused() payable: 
+  return bool(paused)
+
+def balanceOf(address account) payable: 
+  require calldata.size - 4 >=′ 32
+  require account == account
+  return balanceOf[address(account)]
+
+def getRoleMember(bytes32 role, uint256 index) payable: 
+  require calldata.size - 4 >=′ 64
+  require role == role
+  require index == index
+  if roleMember[role].field_0 <= index:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'EnumerableSet: index out of bounds'
+  if index >= roleMember[role].field_0:
+      revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+  return roleMember[role][index].field_0
+
+def hasRole(bytes32 role, address account) payable: 
+  require calldata.size - 4 >=′ 64
+  require role == role
+  require account == account
+  return bool(roleAdmin[role][address(account)].field_0)
+
+def getRoleMemberCount(bytes32 role) payable: 
+  require calldata.size - 4 >=′ 32
+  require role == role
+  return roleMember[role].field_0
+
+def allowance(address owner, address spender) payable: 
+  require calldata.size - 4 >=′ 64
+  require owner == owner
+  require spender == spender
+  return allowance[address(owner)][address(spender)]
+
+#
+#  Regular functions
+#
+
+def _fallback(?) payable: # default function
+  revert
+
+def pause() payable: 
+  if not roleAdmin[0x65d7a28e3265b37a6474929f336521b332c1681b933f6cb9f3376673440d862a][caller].field_0:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  'ERC20PresetMinterPauser: must have pauser role to pause'
+  if paused:
+      revert with 0, 'Pausable: paused'
+  paused = 1
+  log Paused(address account=caller)
+
+def unpause() payable: 
+  if not roleAdmin[0x65d7a28e3265b37a6474929f336521b332c1681b933f6cb9f3376673440d862a][caller].field_0:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  'ERC20PresetMinterPauser: must have pauser role to unpause'
+  if not paused:
+      revert with 0, 'Pausable: not paused'
+  paused = 0
+  log Unpaused(address account=caller)
+
+def supportsInterface(bytes4 interfaceId) payable: 
+  require calldata.size - 4 >=′ 32
+  require interfaceId == Mask(32, 224, interfaceId)
+  if Mask(32, 224, interfaceId) == 0x5a05180f00000000000000000000000000000000000000000000000000000000:
+      return True
+  if Mask(32, 224, interfaceId) == 0x7965db0b00000000000000000000000000000000000000000000000000000000:
+      return True
+  return (Mask(32, 224, interfaceId) == 0x1ffc9a700000000000000000000000000000000000000000000000000000000)
+
+def approve(address spender, uint256 amount) payable: 
+  require calldata.size - 4 >=′ 64
+  require spender == spender
+  require amount == amount
+  if not caller:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: approve from the zero address'
+  if not spender:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: approve to the zero address'
+  allowance[caller][address(spender)] = amount
+  log Approval(
+        address owner=amount,
+        address spender=caller,
+        uint256 value=spender)
+  return 1
+
+def burn(uint256 _value) payable: 
+  require calldata.size - 4 >=′ 32
+  require _value == _value
+  if not caller:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: burn from the zero address'
+  if paused:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20Pausable: token transfer while paused'
+  if balanceOf[caller] < _value:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: burn amount exceeds balance'
+  balanceOf[caller] -= _value
+  if totalSupply < _value:
+      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+  totalSupply -= _value
+  log Transfer(
+        address from=_value,
+        address to=caller,
+        uint256 value=0)
+
+def increaseAllowance(address spender, uint256 addedValue) payable: 
+  require calldata.size - 4 >=′ 64
+  require spender == spender
+  require addedValue == addedValue
+  if allowance[caller][address(spender)] > -addedValue - 1:
+      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+  if not caller:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: approve from the zero address'
+  if not spender:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: approve to the zero address'
+  allowance[caller][address(spender)] += addedValue
+  log Approval(
+        address owner=(allowance[caller][address(spender)] + addedValue),
+        address spender=caller,
+        uint256 value=spender)
+  return 1
+
+def decreaseAllowance(address spender, uint256 subtractedValue) payable: 
+  require calldata.size - 4 >=′ 64
+  require spender == spender
+  require subtractedValue == subtractedValue
+  if allowance[caller][address(spender)] < subtractedValue:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: decreased allowance below zero'
+  if not caller:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: approve from the zero address'
+  if not spender:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: approve to the zero address'
+  allowance[caller][address(spender)] -= subtractedValue
+  log Approval(
+        address owner=(allowance[caller][address(spender)] - subtractedValue),
+        address spender=caller,
+        uint256 value=spender)
+  return 1
+
+def transfer(address recipient, uint256 amount) payable: 
+  require calldata.size - 4 >=′ 64
+  require recipient == recipient
+  require amount == amount
+  if not caller:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: transfer from the zero address'
+  if not recipient:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: transfer to the zero address'
+  if paused:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20Pausable: token transfer while paused'
+  if balanceOf[caller] < amount:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: transfer amount exceeds balance'
+  balanceOf[caller] -= amount
+  if balanceOf[address(recipient)] > -amount - 1:
+      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+  balanceOf[address(recipient)] += amount
+  log Transfer(
+        address from=amount,
+        address to=caller,
+        uint256 value=recipient)
+  return 1
+
+def mint(address _to, uint256 _amount) payable: 
+  require calldata.size - 4 >=′ 64
+  require _to == _to
+  require _amount == _amount
+  if not roleAdmin[0x9f2df0fed2c77648de5860a4cc508cd0818c85b8b8a1ab4ceeef8d981c8956a6][caller].field_0:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  'ERC20PresetMinterPauser: must have minter role to mint'
+  if not _to:
+      revert with 0, 'ERC20: mint to the zero address'
+  if paused:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20Pausable: token transfer while paused'
+  if totalSupply > -_amount - 1:
+      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+  totalSupply += _amount
+  if balanceOf[address(_to)] > -_amount - 1:
+      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+  balanceOf[address(_to)] += _amount
+  log Transfer(
+        address from=_amount,
+        address to=0,
+        uint256 value=_to)
+
+def grantRole(bytes32 role, address account) payable: 
+  require calldata.size - 4 >=′ 64
+  require role == role
+  require account == account
+  if not roleAdmin[roleAdmin[role].field_256][caller].field_0:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'AccessControl: sender must be an admin to grant'
+  if not roleAdmin[role][address(account)].field_0:
+      roleAdmin[role][address(account)].field_0 = 1
+      log RoleGranted(
+            bytes32 role=role,
+            address account=account,
+            address sender=caller)
+  if not roleMember[role][1][address(account)].field_0:
+      roleMember[role].field_0++
+      roleMember[role][roleMember[role].field_0].field_0 = account
+      roleMember[role][roleMember[role].field_0].field_160 = 0
+      roleMember[role][1][address(account)].field_0 = roleMember[role].field_0
+
+def burnFrom(address _from, uint256 _value) payable: 
+  require calldata.size - 4 >=′ 64
+  require _from == _from
+  require _value == _value
+  if allowance[address(_from)][caller] < _value:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: burn amount exceeds allowance'
+  if not _from:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: approve from the zero address'
+  if not caller:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: approve to the zero address'
+  allowance[address(_from)][caller] -= _value
+  log Approval(
+        address owner=(allowance[address(_from)][caller] - _value),
+        address spender=_from,
+        uint256 value=caller)
+  if not _from:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: burn from the zero address'
+  if paused:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20Pausable: token transfer while paused'
+  if balanceOf[address(_from)] < _value:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: burn amount exceeds balance'
+  balanceOf[address(_from)] -= _value
+  if totalSupply < _value:
+      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+  totalSupply -= _value
+  log Transfer(
+        address from=_value,
+        address to=_from,
+        uint256 value=0)
+
+def transferFrom(address sender, address recipient, uint256 amount) payable: 
+  require calldata.size - 4 >=′ 96
+  require sender == sender
+  require recipient == recipient
+  require amount == amount
+  if not sender:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: transfer from the zero address'
+  if not recipient:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: transfer to the zero address'
+  if paused:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20Pausable: token transfer while paused'
+  if balanceOf[address(sender)] < amount:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: transfer amount exceeds balance'
+  balanceOf[address(sender)] -= amount
+  if balanceOf[address(recipient)] > -amount - 1:
+      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+  balanceOf[address(recipient)] += amount
+  log Transfer(
+        address from=amount,
+        address to=sender,
+        uint256 value=recipient)
+  if allowance[address(sender)][caller] < amount:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: transfer amount exceeds allowance'
+  if not sender:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: approve from the zero address'
+  if not caller:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: approve to the zero address'
+  allowance[address(sender)][caller] -= amount
+  log Approval(
+        address owner=(allowance[address(sender)][caller] - amount),
+        address spender=sender,
+        uint256 value=caller)
+  return 1
+
+def renounceRole(bytes32 role, address account) payable: 
+  require calldata.size - 4 >=′ 64
+  require role == role
+  require account == account
+  if account != caller:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'AccessControl: can only renounce roles for self'
+  if roleAdmin[role][address(account)].field_0:
+      roleAdmin[role][address(account)].field_0 = 0
+      log RoleRevoked(
+            bytes32 role=role,
+            address account=account,
+            address sender=caller)
+  if roleMember[role][1][address(account)].field_0:
+      if roleMember[role][1][address(account)].field_0 < 1:
+          revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+      if roleMember[role].field_0 < 1:
+          revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+      if roleMember[role].field_0 - 1 >= roleMember[role].field_0:
+          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+      if roleMember[role][1][address(account)].field_0 - 1 >= roleMember[role].field_0:
+          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+      roleMember[role][roleMember[role][1][address(account)].field_0].field_0 = roleMember[role][roleMember[role].field_0].field_0
+      if roleMember[role][1][address(account)].field_0 - 1 > -2:
+          revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+      roleMember[role][1][roleMember[role][roleMember[role].field_0].field_0].field_0 = roleMember[role][1][address(account)].field_0
+      if not roleMember[role].field_0:
+          revert with Panic(49)  # If you call .pop() on an empty array.
+      roleMember[role][roleMember[role].field_0].field_0 = 0
+      roleMember[role].field_0--
+      roleMember[role][1][address(account)].field_0 = 0
+
+def revokeRole(bytes32 role, address account) payable: 
+  require calldata.size - 4 >=′ 64
+  require role == role
+  require account == account
+  if not roleAdmin[roleAdmin[role].field_256][caller].field_0:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'AccessControl: sender must be an admin to revoke'
+  if roleAdmin[role][address(account)].field_0:
+      roleAdmin[role][address(account)].field_0 = 0
+      log RoleRevoked(
+            bytes32 role=role,
+            address account=account,
+            address sender=caller)
+  if roleMember[role][1][address(account)].field_0:
+      if roleMember[role][1][address(account)].field_0 < 1:
+          revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+      if roleMember[role].field_0 < 1:
+          revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+      if roleMember[role].field_0 - 1 >= roleMember[role].field_0:
+          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+      if roleMember[role][1][address(account)].field_0 - 1 >= roleMember[role].field_0:
+          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+      roleMember[role][roleMember[role][1][address(account)].field_0].field_0 = roleMember[role][roleMember[role].field_0].field_0
+      if roleMember[role][1][address(account)].field_0 - 1 > -2:
+          revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+      roleMember[role][1][roleMember[role][roleMember[role].field_0].field_0].field_0 = roleMember[role][1][address(account)].field_0
+      if not roleMember[role].field_0:
+          revert with Panic(49)  # If you call .pop() on an empty array.
+      roleMember[role][roleMember[role].field_0].field_0 = 0
+      roleMember[role].field_0--
+      roleMember[role][1][address(account)].field_0 = 0
+
+def name() payable: 
+  if bool(stor5.length):
+      if bool(stor5.length) == stor5.length.field_1 < 32:
+          revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+      if bool(stor5.length):
+          if bool(stor5.length) == stor5.length.field_1 < 32:
+              revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+          if stor5.length.field_1:
+              if 31 < stor5.length.field_1:
+                  mem[128] = uint256(stor5.field_0)
+                  idx = 128
+                  s = 0
+                  while stor5.length.field_1 + 96 > idx:
+                      mem[idx + 32] = stor5[s].field_256
+                      idx = idx + 32
+                      s = s + 1
+                      continue 
+                  return Array(len=2 * Mask(256, -1, stor5.length.field_1), data=mem[128 len ceil32(stor5.length.field_1)])
+              mem[128] = 256 * stor5.length.field_8
+      else:
+          if bool(stor5.length) == stor5.length.field_1 < 32:
+              revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+          if stor5.length.field_1:
+              if 31 < stor5.length.field_1:
+                  mem[128] = uint256(stor5.field_0)
+                  idx = 128
+                  s = 0
+                  while stor5.length.field_1 + 96 > idx:
+                      mem[idx + 32] = stor5[s].field_256
+                      idx = idx + 32
+                      s = s + 1
+                      continue 
+                  return Array(len=2 * Mask(256, -1, stor5.length.field_1), data=mem[128 len ceil32(stor5.length.field_1)])
+              mem[128] = 256 * stor5.length.field_8
+      mem[ceil32(stor5.length.field_1) + 192 len ceil32(stor5.length.field_1)] = mem[128 len ceil32(stor5.length.field_1)]
+      if ceil32(stor5.length.field_1) > stor5.length.field_1:
+          mem[ceil32(stor5.length.field_1) + stor5.length.field_1 + 192] = 0
+      return Array(len=2 * Mask(256, -1, stor5.length.field_1), data=mem[128 len ceil32(stor5.length.field_1)], mem[(2 * ceil32(stor5.length.field_1)) + 192 len 2 * ceil32(stor5.length.field_1)]), 
+  if bool(stor5.length) == stor5.length.field_1 < 32:
+      revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+  if bool(stor5.length):
+      if bool(stor5.length) == stor5.length.field_1 < 32:
+          revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+      if stor5.length.field_1:
+          if 31 < stor5.length.field_1:
+              mem[128] = uint256(stor5.field_0)
+              idx = 128
+              s = 0
+              while stor5.length.field_1 + 96 > idx:
+                  mem[idx + 32] = stor5[s].field_256
+                  idx = idx + 32
+                  s = s + 1
+                  continue 
+              return Array(len=stor5.length % 128, data=mem[128 len ceil32(stor5.length.field_1)])
+          mem[128] = 256 * stor5.length.field_8
+  else:
+      if bool(stor5.length) == stor5.length.field_1 < 32:
+          revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+      if stor5.length.field_1:
+          if 31 < stor5.length.field_1:
+              mem[128] = uint256(stor5.field_0)
+              idx = 128
+              s = 0
+              while stor5.length.field_1 + 96 > idx:
+                  mem[idx + 32] = stor5[s].field_256
+                  idx = idx + 32
+                  s = s + 1
+                  continue 
+              return Array(len=stor5.length % 128, data=mem[128 len ceil32(stor5.length.field_1)])
+          mem[128] = 256 * stor5.length.field_8
+  mem[ceil32(stor5.length.field_1) + 192 len ceil32(stor5.length.field_1)] = mem[128 len ceil32(stor5.length.field_1)]
+  if ceil32(stor5.length.field_1) > stor5.length.field_1:
+      mem[ceil32(stor5.length.field_1) + stor5.length.field_1 + 192] = 0
+  return Array(len=stor5.length % 128, data=mem[128 len ceil32(stor5.length.field_1)], mem[(2 * ceil32(stor5.length.field_1)) + 192 len 2 * ceil32(stor5.length.field_1)]), 
+
+def symbol() payable: 
+  if bool(stor6.length):
+      if bool(stor6.length) == stor6.length.field_1 < 32:
+          revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+      if bool(stor6.length):
+          if bool(stor6.length) == stor6.length.field_1 < 32:
+              revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+          if stor6.length.field_1:
+              if 31 < stor6.length.field_1:
+                  mem[128] = uint256(stor6.field_0)
+                  idx = 128
+                  s = 0
+                  while stor6.length.field_1 + 96 > idx:
+                      mem[idx + 32] = stor6[s].field_256
+                      idx = idx + 32
+                      s = s + 1
+                      continue 
+                  return Array(len=2 * Mask(256, -1, stor6.length.field_1), data=mem[128 len ceil32(stor6.length.field_1)])
+              mem[128] = 256 * stor6.length.field_8
+      else:
+          if bool(stor6.length) == stor6.length.field_1 < 32:
+              revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+          if stor6.length.field_1:
+              if 31 < stor6.length.field_1:
+                  mem[128] = uint256(stor6.field_0)
+                  idx = 128
+                  s = 0
+                  while stor6.length.field_1 + 96 > idx:
+                      mem[idx + 32] = stor6[s].field_256
+                      idx = idx + 32
+                      s = s + 1
+                      continue 
+                  return Array(len=2 * Mask(256, -1, stor6.length.field_1), data=mem[128 len ceil32(stor6.length.field_1)])
+              mem[128] = 256 * stor6.length.field_8
+      mem[ceil32(stor6.length.field_1) + 192 len ceil32(stor6.length.field_1)] = mem[128 len ceil32(stor6.length.field_1)]
+      if ceil32(stor6.length.field_1) > stor6.length.field_1:
+          mem[ceil32(stor6.length.field_1) + stor6.length.field_1 + 192] = 0
+      return Array(len=2 * Mask(256, -1, stor6.length.field_1), data=mem[128 len ceil32(stor6.length.field_1)], mem[(2 * ceil32(stor6.length.field_1)) + 192 len 2 * ceil32(stor6.length.field_1)]), 
+  if bool(stor6.length) == stor6.length.field_1 < 32:
+      revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+  if bool(stor6.length):
+      if bool(stor6.length) == stor6.length.field_1 < 32:
+          revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+      if stor6.length.field_1:
+          if 31 < stor6.length.field_1:
+              mem[128] = uint256(stor6.field_0)
+              idx = 128
+              s = 0
+              while stor6.length.field_1 + 96 > idx:
+                  mem[idx + 32] = stor6[s].field_256
+                  idx = idx + 32
+                  s = s + 1
+                  continue 
+              return Array(len=stor6.length % 128, data=mem[128 len ceil32(stor6.length.field_1)])
+          mem[128] = 256 * stor6.length.field_8
+  else:
+      if bool(stor6.length) == stor6.length.field_1 < 32:
+          revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+      if stor6.length.field_1:
+          if 31 < stor6.length.field_1:
+              mem[128] = uint256(stor6.field_0)
+              idx = 128
+              s = 0
+              while stor6.length.field_1 + 96 > idx:
+                  mem[idx + 32] = stor6[s].field_256
+                  idx = idx + 32
+                  s = s + 1
+                  continue 
+              return Array(len=stor6.length % 128, data=mem[128 len ceil32(stor6.length.field_1)])
+          mem[128] = 256 * stor6.length.field_8
+  mem[ceil32(stor6.length.field_1) + 192 len ceil32(stor6.length.field_1)] = mem[128 len ceil32(stor6.length.field_1)]
+  if ceil32(stor6.length.field_1) > stor6.length.field_1:
+      mem[ceil32(stor6.length.field_1) + stor6.length.field_1 + 192] = 0
+  return Array(len=stor6.length % 128, data=mem[128 len ceil32(stor6.length.field_1)], mem[(2 * ceil32(stor6.length.field_1)) + 192 len 2 * ceil32(stor6.length.field_1)]), 
+
+

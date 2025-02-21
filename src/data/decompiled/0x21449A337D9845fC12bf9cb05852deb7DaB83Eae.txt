@@ -1,0 +1,49 @@
+# Palkeoramix decompiler. 
+
+def storage:
+  stor0 is address at storage 0
+
+def _fallback(?) payable: # default function
+  revert
+
+def sweep(address _token): # not payable
+  require calldata.size - 4 >=′ 32
+  require _token == _token
+  static call stor0.unknown7bd163f3(address _param1) with:
+          gas gas_remaining wei
+         args caller
+  if not ext_call.success:
+      revert with ext_call.return_data[0 len return_data.size]
+  require return_data.size >=′ 32
+  require ext_call.return_data[0] == bool(ext_call.return_data[0])
+  if not ext_call.return_data[0]:
+      revert with 0, 'Unauthorized'
+  static call stor0.unknown45491ea0() with:
+          gas gas_remaining wei
+  if not ext_call.success:
+      revert with ext_call.return_data[0 len return_data.size]
+  require return_data.size >=′ 32
+  require ext_call.return_data[0] == ext_call.return_data[12 len 20]
+  if not _token:
+      call ext_call.return_data[12 len 20] with:
+         value eth.balance(this.address) wei
+           gas 2300 * is_zero(value) wei
+      if not ext_call.success:
+          revert with ext_call.return_data[0 len return_data.size]
+      log 0xa5f4158b: eth.balance(this.address), address(ext_call.return_data[0])
+  else:
+      static call _token.balanceOf(address account) with:
+              gas gas_remaining wei
+             args this.address
+      if not ext_call.success:
+          revert with ext_call.return_data[0 len return_data.size]
+      require return_data.size >=′ 32
+      require ext_call.return_data[0] == ext_call.return_data[0]
+      mem[(4 * ceil32(return_data.size)) + 196 len 96] = transfer(address recipient, uint256 amount), address(ext_call.return_data[0]) << 64, 0, ext_call.return_data[0], mem[(4 * ceil32(return_data.size)) + 196 len 28]
+      call _token.mem[(4 * ceil32(return_data.size)) + 196 len 4] with:
+           gas gas_remaining wei
+          args mem[(4 * ceil32(return_data.size)) + 200 len 64]
+      log 0xa5f4158b: ext_call.return_data[0], address(ext_call.return_data[0])
+  return 1
+
+

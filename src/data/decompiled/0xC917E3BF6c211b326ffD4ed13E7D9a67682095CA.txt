@@ -1,0 +1,309 @@
+# Palkeoramix decompiler. 
+
+const typeAndVersion = 'AuthorizedForwarder 1.1.0', 0
+const linkToken = 0x514910771af9ca656af840dff83e8264ecf986ca
+
+def storage:
+  owner is address at storage 0
+  stor1 is address at storage 1
+  stor2 is mapping of uint8 at storage 2
+  stor3 is array of struct at storage 3
+
+def owner() payable: 
+  return owner
+
+def isAuthorizedSender(address sender) payable: 
+  require calldata.size - 4 >=′ 32
+  require sender == sender
+  return bool(stor2[address(sender)])
+
+#
+#  Regular functions
+#
+
+def _fallback(?) payable: # default function
+  revert
+
+def acceptOwnership() payable: 
+  if stor1 != caller:
+      revert with 0, 'Must be proposed owner'
+  owner = caller
+  stor1 = 0
+  log OwnershipTransferred(
+        address previousOwner=owner,
+        address newOwner=caller)
+
+def transferOwnership(address newOwner) payable: 
+  require calldata.size - 4 >=′ 32
+  require newOwner == newOwner
+  if owner != caller:
+      revert with 0, 'Only callable by owner'
+  if not newOwner - caller:
+      revert with 0, 'Cannot transfer to self'
+  stor1 = newOwner
+  log OwnershipTransferRequested(
+        address from=owner,
+        address to=newOwner)
+
+def transferOwnershipWithMessage(address to, bytes message) payable: 
+  require calldata.size - 4 >=′ 64
+  require to == to
+  require message <= LOCK8605463013()
+  require message + 35 <′ calldata.size
+  require message.length <= LOCK8605463013()
+  require message + message.length + 36 <= calldata.size
+  if owner != caller:
+      revert with 0, 'Only callable by owner'
+  if not to - caller:
+      revert with 0, 'Cannot transfer to self'
+  stor1 = to
+  log OwnershipTransferRequested(
+        address from=owner,
+        address to=to)
+  log OwnershipTransferRequestedWithMessage(
+        address from=Array(len=message.length, data=message[all]),
+        address to=caller,
+        bytes message=to)
+
+def ownerForward(address to, bytes data) payable: 
+  require calldata.size - 4 >=′ 64
+  require to == to
+  require data <= LOCK8605463013()
+  require data + 35 <′ calldata.size
+  require data.length <= LOCK8605463013()
+  require data + data.length + 36 <= calldata.size
+  if owner != caller:
+      revert with 0, 'Only callable by owner'
+  if not ext_code.size(to):
+      revert with 0, 'Must forward to a contract'
+  mem[96 len data.length] = data[all]
+  mem[data.length + 96] = 0
+  call to with:
+       gas gas_remaining wei
+      args data[all]
+  if ext_call.success:
+      stop
+  if not return_data.size:
+      if not -mem[96]:
+          revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'Forwarded call reverted without reason'
+      revert with memory
+        from 128
+         len mem[96]
+  if not -return_data.size:
+      revert with 0, 'Forwarded call reverted without reason'
+  revert with ext_call.return_data[0 len return_data.size]
+
+def forward(address to, bytes data) payable: 
+  require calldata.size - 4 >=′ 64
+  require to == to
+  require data <= LOCK8605463013()
+  require data + 35 <′ calldata.size
+  require data.length <= LOCK8605463013()
+  require data + data.length + 36 <= calldata.size
+  if not stor2[caller]:
+      revert with 0, 'Not authorized sender'
+  if not to - 0x514910771af9ca656af840dff83e8264ecf986ca:
+      revert with 0, 'Cannot forward to Link token'
+  if not ext_code.size(to):
+      revert with 0, 'Must forward to a contract'
+  mem[96 len data.length] = data[all]
+  mem[data.length + 96] = 0
+  call to with:
+       gas gas_remaining wei
+      args data[all]
+  if ext_call.success:
+      stop
+  if not return_data.size:
+      if not -mem[96]:
+          revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'Forwarded call reverted without reason'
+      revert with memory
+        from 128
+         len mem[96]
+  if not -return_data.size:
+      revert with 0, 'Forwarded call reverted without reason'
+  revert with ext_call.return_data[0 len return_data.size]
+
+def getAuthorizedSenders() payable: 
+  mem[64] = (32 * stor3.length) + 128
+  mem[96] = stor3.length
+  if not stor3.length:
+      mem[(32 * stor3.length) + 128] = 32
+      mem[(32 * stor3.length) + 160] = stor3.length
+      idx = 0
+      s = (32 * stor3.length) + 192
+      t = 128
+      while idx < stor3.length:
+          mem[s] = mem[t + 12 len 20]
+          idx = idx + 1
+          s = s + 32
+          t = t + 32
+          continue 
+      return memory
+        from (32 * stor3.length) + 128
+         len (96 * stor3.length) + 64
+  mem[128] = address(stor3.field_0)
+  idx = 128
+  s = 0
+  while (32 * stor3.length) + 96 > idx:
+      mem[idx + 32] = stor3[s].field_256
+      idx = idx + 32
+      s = s + 1
+      continue 
+  mem[(32 * stor3.length) + 128] = 32
+  mem[(32 * stor3.length) + 160] = stor3.length
+  idx = 0
+  s = mem[64] + 64
+  t = 128
+  while idx < stor3.length:
+      mem[s] = mem[t + 12 len 20]
+      idx = idx + 1
+      s = s + 32
+      t = t + 32
+      continue 
+  return memory
+    from mem[64]
+     len (64 * stor3.length) + -mem[64] + 192
+
+def unknownb64fa9e6() payable: 
+  mem[64] = 96
+  require calldata.size - 4 >=′ 64
+  require cd[4] <= LOCK8605463013()
+  require cd[4] + 35 <′ calldata.size
+  require ('cd', 4).length <= LOCK8605463013()
+  require cd[4] + (32 * ('cd', 4).length) + 36 <= calldata.size
+  require cd[36] <= LOCK8605463013()
+  require cd[36] + 35 <′ calldata.size
+  require ('cd', 36).length <= LOCK8605463013()
+  require cd[36] + (32 * ('cd', 36).length) + 36 <= calldata.size
+  mem[0] = caller
+  if not stor2[caller]:
+      revert with 0, 'Not authorized sender'
+  if ('cd', 36).length != ('cd', 4).length:
+      revert with 0, 'Arrays must have the same length'
+  idx = 0
+  while idx < ('cd', 4).length:
+      require cd[((32 * idx) + cd[4] + 36)] == address(cd[((32 * idx) + cd[4] + 36)])
+      if not address(cd[((32 * idx) + cd[4] + 36)]) - 0x514910771af9ca656af840dff83e8264ecf986ca:
+          revert with 0, 'Cannot forward to Link token'
+      if idx >= ('cd', 36).length:
+          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+      require cd[(cd[36] + (32 * idx) + 36)] <′ calldata.size + -cd[36] - 67
+      require cd[(cd[36] + cd[(cd[36] + (32 * idx) + 36)] + 36)] <= LOCK8605463013()
+      require cd[36] + cd[(cd[36] + (32 * idx) + 36)] + 68 <=′ calldata.size - cd[(cd[36] + cd[(cd[36] + (32 * idx) + 36)] + 36)]
+      if not ext_code.size(address(cd[((32 * idx) + cd[4] + 36)])):
+          revert with 0, 'Must forward to a contract'
+      _23 = mem[64]
+      mem[mem[64] len cd[(cd[36] + cd[(cd[36] + (32 * idx) + 36)] + 36)]] = call.data[cd[36] + cd[(cd[36] + (32 * idx) + 36)] + 68 len cd[(cd[36] + cd[(cd[36] + (32 * idx) + 36)] + 36)]]
+      mem[cd[(cd[36] + cd[(cd[36] + (32 * idx) + 36)] + 36)] + mem[64]] = 0
+      call address(cd[((32 * idx) + cd[4] + 36)]).mem[mem[64] len 4] with:
+           gas gas_remaining wei
+          args mem[mem[64] + 4 len cd[(cd[36] + cd[(cd[36] + (32 * idx) + 36)] + 36)] + _23 + -mem[64] - 4]
+      if not return_data.size:
+          if ext_call.success:
+              if not idx - 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff:
+                  revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+              idx = idx + 1
+              continue 
+          if not -mem[96]:
+              revert with 0, 'Forwarded call reverted without reason'
+          revert with memory
+            from 128
+             len mem[96]
+      _27 = mem[64]
+      mem[64] = mem[64] + ceil32(return_data.size) + 1
+      mem[_27] = return_data.size
+      mem[_27 + 32 len return_data.size] = ext_call.return_data[0 len return_data.size]
+      if ext_call.success:
+          if not idx - 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff:
+              revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+          idx = idx + 1
+          continue 
+      if not -return_data.size:
+          revert with 0, 'Forwarded call reverted without reason'
+      revert with ext_call.return_data[0 len return_data.size]
+
+def setAuthorizedSenders(address[] senders) payable: 
+  mem[64] = 96
+  require calldata.size - 4 >=′ 32
+  require senders <= LOCK8605463013()
+  require senders + 35 <′ calldata.size
+  require senders.length <= LOCK8605463013()
+  require senders + (32 * senders.length) + 36 <= calldata.size
+  if owner != caller:
+      revert with 0, 'Cannot set authorized senders'
+  if not senders.length:
+      revert with 0, 'Must have at least 1 sender'
+  idx = 0
+  while idx < stor3.length:
+      mem[0] = stor3[idx].field_0
+      mem[32] = 2
+      stor2[stor3[idx].field_0] = 0
+      if not idx - 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff:
+          revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+      idx = idx + 1
+      continue 
+  idx = 0
+  while idx < senders.length:
+      require cd[((32 * idx) + senders + 36)] == address(cd[((32 * idx) + senders + 36)])
+      if stor2[address(cd[((32 * idx) + senders + 36)])]:
+          revert with 0, 'Must not have duplicate senders'
+      if idx >= senders.length:
+          revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+      require cd[((32 * idx) + senders + 36)] == address(cd[((32 * idx) + senders + 36)])
+      mem[0] = address(cd[((32 * idx) + senders + 36)])
+      mem[32] = 2
+      stor2[address(cd[((32 * idx) + senders + 36)])] = 1
+      if not idx - 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff:
+          revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+      idx = idx + 1
+      continue 
+  stor3.length = senders.length
+  if not senders.length:
+      idx = 0
+      while stor3.length > idx:
+          stor3[idx].field_0 = 0
+          idx = idx + 1
+          continue 
+      idx = 0
+      s = 192
+      t = senders + 36
+      while idx < senders.length:
+          require cd[t] == address(cd[t])
+          mem[s] = address(cd[t])
+          idx = idx + 1
+          s = s + 32
+          t = t + 32
+          continue 
+      log AuthorizedSendersChanged(
+            address[] senders=Array(len=senders.length, data=mem[192 len 32 * senders.length]),
+            address changedBy=caller)
+  else:
+      s = 0
+      idx = senders + 36
+      while senders + (32 * senders.length) + 36 > idx:
+          stor3[s].field_0 = address(cd[idx])
+          s = s + 1
+          idx = idx + 32
+          continue 
+      idx = Mask(251, 0, (32 * senders.length) + 31) >> 5
+      while stor3.length > idx:
+          stor3[idx].field_0 = 0
+          idx = idx + 1
+          continue 
+      mem[96] = 64
+      mem[160] = senders.length
+      s = 0
+      s = 192
+      t = senders + 36
+      while senders.length < senders.length:
+          require cd[t] == address(cd[t])
+          mem[s] = address(cd[t])
+          s = senders.length + 1
+          s = s + 32
+          t = t + 32
+          continue 
+      mem[128] = caller
+      log AuthorizedSendersChanged(address[] senders, address changedBy):
+                                   mem[mem[64] len s - mem[64]],
+
+

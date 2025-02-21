@@ -1,0 +1,1039 @@
+# Palkeoramix decompiler. 
+
+const unknown3f81a192 = 0xffffffffffffffffffffffffffffffffffffffff
+const unknown44ba1fca = 0xf66b632ae3b479ef109dee46eb319414289a8426a08b64d81aad232941f9d22a
+const registry = 0xde6d4872c0c8167fb4f405c7854fd2fed7edca21
+
+def storage:
+  stor0 is mapping of uint8 at storage 0
+  stor1 is uint256 at storage 1
+  paused is uint8 at storage 2 offset 160
+  unknown4fd49efdAddress is address at storage 2
+  stor3 is array of struct at storage 3
+  stor4 is mapping of uint256 at storage 4
+  stor36537761088921069283317711299314116619845529402864012630411801997362287725485 is mapping of uint8 at storage 0x50c7a3d1a23c7ff4a61d37c3f2c4aeb36cf60b43ee893723db201d3eb941cbad
+
+def unknown4fd49efd(): # not payable
+  return unknown4fd49efdAddress
+
+def paused(): # not payable
+  return bool(paused)
+
+def unknownf157fac2(uint256 _param1): # not payable
+  require calldata.size - 4 >=′ 32
+  return bool(stor4[_param1])
+
+#
+#  Regular functions
+#
+
+def _fallback(?) payable: # default function
+  revert
+
+def pause(): # not payable
+  if not stor50C7[call.func_hash]:
+      if not stor0[caller][call.func_hash]:
+          revert with 0, 'AUTH_SENDER_NOT_ALLOWED'
+  if paused:
+      revert with 0, 'Pausable: paused'
+  paused = 1
+  log Paused(address account=caller)
+
+def unpause(): # not payable
+  if not stor50C7[call.func_hash]:
+      if not stor0[caller][call.func_hash]:
+          revert with 0, 'AUTH_SENDER_NOT_ALLOWED'
+  if not paused:
+      revert with 0, 'Pausable: not paused'
+  paused = 0
+  log Unpaused(address account=caller)
+
+def isAuthorized(address _param1, bytes4 _param2): # not payable
+  require calldata.size - 4 >=′ 64
+  require _param1 == _param1
+  require _param2 == Mask(32, 224, _param2)
+  if stor50C7[Mask(32, 224, _param2)]:
+      return bool(stor50C7[Mask(32, 224, _param2)])
+  return bool(stor0[address(_param1)][Mask(32, 224, _param2)])
+
+def unknown13e3b57c(uint256 _param1): # not payable
+  require calldata.size - 4 >=′ 32
+  require _param1 == address(_param1)
+  if not stor50C7[call.func_hash]:
+      if not stor0[caller][call.func_hash]:
+          revert with 0, 'AUTH_SENDER_NOT_ALLOWED'
+  if unknown4fd49efdAddress:
+      revert with 0, 'SMART_VAULT_ALREADY_SET'
+  unknown4fd49efdAddress = address(_param1)
+  log 0x6a7abc64: address(_param1)
+
+def unknown6646a436(uint256 _param1, uint256 _param2): # not payable
+  require calldata.size - 4 >=′ 64
+  require _param1 == address(_param1)
+  require _param2 == Mask(32, 224, _param2)
+  if not stor50C7[call.func_hash]:
+      if not stor0[caller][call.func_hash]:
+          revert with 0, 'AUTH_SENDER_NOT_ALLOWED'
+  stor0[address(_param1)][Mask(32, 224, _param2)] = 0
+  log 0xa2e97b9e: Mask(32, 224, _param2), address(_param1)
+
+def unknown933f0f3c(uint256 _param1, uint256 _param2): # not payable
+  require calldata.size - 4 >=′ 64
+  require _param1 == address(_param1)
+  require _param2 == Mask(32, 224, _param2)
+  if not stor50C7[call.func_hash]:
+      if not stor0[caller][call.func_hash]:
+          revert with 0, 'AUTH_SENDER_NOT_ALLOWED'
+  stor0[address(_param1)][Mask(32, 224, _param2)] = 1
+  log 0x7f06c1c3: Mask(32, 224, _param2), address(_param1)
+
+def unknown452d98c7(): # not payable
+  if stor3.length:
+      mem[128] = uint256(stor3.field_0)
+      idx = 128
+      s = 0
+      while (32 * stor3.length) + 96 > idx:
+          mem[idx + 32] = stor3[s].field_256
+          idx = idx + 32
+          s = s + 1
+          continue 
+      return Array(len=stor3.length, data=mem[128 len 32 * stor3.length])
+  mem[(32 * stor3.length) + 128] = 32
+  mem[(32 * stor3.length) + 160] = stor3.length
+  mem[(32 * stor3.length) + 192 len 32 * stor3.length] = mem[128 len 32 * stor3.length]
+  return memory
+    from (32 * stor3.length) + 128
+     len (96 * stor3.length) + 64
+
+def unknownb771ed9f(uint256 _param1, uint256 _param2): # not payable
+  require calldata.size - 4 >=′ 64
+  require _param2 == bool(_param2)
+  if not stor50C7[call.func_hash]:
+      if not stor0[caller][call.func_hash]:
+          revert with 0, 'AUTH_SENDER_NOT_ALLOWED'
+  if _param1 > 255:
+      revert with 0, 'SWAPPER_INVALID_SOURCE_ID'
+  if _param2:
+      if stor4[_param1]:
+          return 0
+      stor3.length++
+      stor3[stor3.length].field_0 = _param1
+      stor4[_param1] = stor3.length
+  else:
+      if not stor4[_param1]:
+          return 0
+      if stor4[_param1] - 1 > stor4[_param1]:
+          revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+      if stor3.length - 1 > stor3.length:
+          revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+      if stor3.length - 1 != stor4[_param1] - 1:
+          if stor3.length - 1 >= stor3.length:
+              revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+          if stor4[_param1] - 1 >= stor3.length:
+              revert with Panic(50)  # If you access an array, bytesN or an array slice at an out-of-bounds or negative index (i.e. x[i] where i >= x.length or i < 0).
+          stor3[stor4[_param1]].field_0 = stor3[stor3.length].field_0
+          stor4[stor3[stor3.length].field_0] = stor4[_param1]
+      if not stor3.length:
+          revert with Panic(49)  # If you call .pop() on an empty array.
+      stor3[stor3.length].field_0 = 0
+      stor3.length--
+      stor4[_param1] = 0
+  log 0xe5859e75: bool(_param2), _param1
+  return 1
+
+def unknown049639fb(uint256 _param1, uint256 _param2, uint256 _param3, uint256 _param4, uint256 _param5, array _param6) payable: 
+  require calldata.size - 4 >=′ 192
+  require _param1 == uint8(_param1)
+  require _param2 == address(_param2)
+  require _param3 == address(_param3)
+  require _param6 <= LOCK8605463013()
+  require _param6 + 35 <′ calldata.size
+  if _param6.length > LOCK8605463013():
+      revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+  if ceil32(ceil32(_param6.length)) + 97 < 96 or ceil32(ceil32(_param6.length)) + 97 > LOCK8605463013():
+      revert with Panic(65)  # If you allocate too much memory or create an array that is too large.
+  require _param6 + _param6.length + 36 <= calldata.size
+  if not stor1 - 2:
+      revert with 0, 'ReentrancyGuard: reentrant call'
+  stor1 = 2
+  if paused:
+      revert with 0, 'Pausable: paused'
+  if not stor4[_param1 << 248]:
+      revert with 0, 'SWAPPER_SOURCE_NOT_ALLOWED'
+  if not address(_param2) - address(_param3):
+      revert with 0, 'SWAPPER_SAME_TOKENS'
+  if not address(_param2):
+      revert with 0, 'SWAPPER_TOKEN_IN_ZERO'
+  if not address(_param3):
+      revert with 0, 'SWAPPER_TOKEN_OUT_ZERO'
+  if _param4 <= 0:
+      revert with 0, 'SWAPPER_AMOUNT_IN_ZERO'
+  if _param5 <= 0:
+      revert with 0, 'SWAPPER_MIN_AMOUNT_OUT_ZERO'
+  if address(_param2) - 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee:
+      if call.value:
+          revert with 0, 'SWAPPER_VALUE_GT_ZERO'
+      mem[ceil32(ceil32(_param6.length)) + 133] = unknown4fd49efdAddress
+      static call address(_param2).allowance(address owner, address spender) with:
+              gas gas_remaining wei
+             args caller, unknown4fd49efdAddress
+      if not ext_call.success:
+          revert with ext_call.return_data[0 len return_data.size]
+      require return_data.size >=′ 32
+      if ext_call.return_data[0] < _param4:
+          revert with 0, 'SWAPPER_BAD_ALLOWANCE'
+      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + 133] = address(_param2)
+      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + 165] = caller
+      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + 197] = _param4
+      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + 229] = 128
+      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + 261] = 0
+      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + 293 len 0] = None
+      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + 293] = 0
+      call unknown4fd49efdAddress.unknown5af547e6(uint256 _param1, uint256 _param2, uint256 _param3, array _param4) with:
+           gas gas_remaining wei
+          args address(_param2), caller, _param4, 128, 0
+      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + 129] = ext_call.return_data[0]
+      if not ext_call.success:
+          revert with ext_call.return_data[0 len return_data.size]
+      require return_data.size >=′ 32
+      if address(_param2) != 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee:
+          if address(_param3) == 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee:
+              mem[ceil32(ceil32(_param6.length)) + (2 * ceil32(return_data.size)) + 129] = 0x17fcb39b00000000000000000000000000000000000000000000000000000000
+              static call unknown4fd49efdAddress.wrappedNativeToken() with:
+                      gas gas_remaining wei
+                     args mem[ceil32(ceil32(_param6.length)) + (2 * ceil32(return_data.size)) + 133 len ceil32(return_data.size)]
+              mem[ceil32(ceil32(_param6.length)) + (2 * ceil32(return_data.size)) + 129] = ext_call.return_data[0]
+              if not ext_call.success:
+                  revert with ext_call.return_data[0 len return_data.size]
+              require return_data.size >=′ 32
+              require ext_call.return_data[0] == ext_call.return_data[12 len 20]
+              if not address(_param2) - ext_call.return_data[12 len 20]:
+                  if ext_call.return_data[0] < _param5:
+                      mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 129] = 0x8c379a000000000000000000000000000000000000000000000000000000000
+                      mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 133] = 32
+                      mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 165] = 27
+                      mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 197] = 'SWAPPER_WRAP_MIN_AMOUNT_OUT'
+                      revert with memory
+                        from ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 129
+                         len (5 * ceil32(return_data.size)) + 100
+                  if address(_param3) != 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee:
+                      call unknown4fd49efdAddress.unknown9003afee(uint256 _param1, uint256 _param2, uint256 _param3, array _param4) with:
+                           gas gas_remaining wei
+                          args address(_param3), ext_call.return_data[0], caller, 128, 0
+                      if not ext_call.success:
+                          revert with ext_call.return_data[0 len return_data.size]
+                      require return_data.size >=′ 32
+                      log 0x68f46c45 
+                      stor1 = 1
+                      stop
+                  call unknown4fd49efdAddress.unknownb413148e(uint256 _param1, array _param2) with:
+                       gas gas_remaining wei
+                      args ext_call.return_data[0], 64, 0, None
+                  if not ext_call.success:
+                      revert with ext_call.return_data[0 len return_data.size]
+                  require return_data.size >=′ 32
+                  call unknown4fd49efdAddress.unknown9003afee(uint256 _param1, uint256 _param2, uint256 _param3, array _param4) with:
+                       gas gas_remaining wei
+                      args address(_param3), ext_call.return_data[0], caller, 128, 0
+              else:
+                  mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 133] = uint8(_param1)
+                  mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 165] = address(_param2)
+                  mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 197] = address(ext_call.return_data[0])
+                  mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 229] = ext_call.return_data[0]
+                  mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 261] = 1
+                  mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 293] = _param5
+                  mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 325] = 224
+                  mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 357] = _param6.length
+                  mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 389 len ceil32(_param6.length)] = _param6[all], ext_call.return_data[_param6.length + -ceil32(ceil32(_param6.length)) + 31 len ceil32(_param6.length) - _param6.length]
+                  mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + _param6.length + 389] = 0
+                  call unknown4fd49efdAddress.unknown37e0ac02(uint256 _param1, uint256 _param2, uint256 _param3, uint256 _param4, uint256 _param5, uint256 _param6, array _param7) with:
+                       gas gas_remaining wei
+                      args mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 133 len (5 * ceil32(return_data.size)) + ceil32(_param6.length) + 256]
+                  if not ext_call.success:
+                      revert with ext_call.return_data[0 len return_data.size]
+                  require return_data.size >=′ 32
+                  if address(_param3) == 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee:
+                      call unknown4fd49efdAddress.unknownb413148e(uint256 _param1, array _param2) with:
+                           gas gas_remaining wei
+                          args ext_call.return_data[0], 64, 0
+                  else:
+                      call unknown4fd49efdAddress.unknown9003afee(uint256 _param1, uint256 _param2, uint256 _param3, array _param4) with:
+                           gas gas_remaining wei
+                          args address(_param3), ext_call.return_data[0], caller, 128, 0
+          else:
+              if address(_param2) - address(_param3):
+                  mem[ceil32(ceil32(_param6.length)) + (2 * ceil32(return_data.size)) + 133] = uint8(_param1)
+                  mem[ceil32(ceil32(_param6.length)) + (2 * ceil32(return_data.size)) + 165] = address(_param2)
+                  mem[ceil32(ceil32(_param6.length)) + (2 * ceil32(return_data.size)) + 197] = address(_param3)
+                  mem[ceil32(ceil32(_param6.length)) + (2 * ceil32(return_data.size)) + 229] = ext_call.return_data[0]
+                  mem[ceil32(ceil32(_param6.length)) + (2 * ceil32(return_data.size)) + 261] = 1
+                  mem[ceil32(ceil32(_param6.length)) + (2 * ceil32(return_data.size)) + 293] = _param5
+                  mem[ceil32(ceil32(_param6.length)) + (2 * ceil32(return_data.size)) + 325] = 224
+                  mem[ceil32(ceil32(_param6.length)) + (2 * ceil32(return_data.size)) + 357] = _param6.length
+                  mem[ceil32(ceil32(_param6.length)) + (2 * ceil32(return_data.size)) + 389 len ceil32(_param6.length)] = _param6[all], ext_call.return_data[_param6.length + -ceil32(ceil32(_param6.length)) + 31 len ceil32(_param6.length) - _param6.length]
+                  mem[ceil32(ceil32(_param6.length)) + (2 * ceil32(return_data.size)) + _param6.length + 389] = 0
+                  call unknown4fd49efdAddress.unknown37e0ac02(uint256 _param1, uint256 _param2, uint256 _param3, uint256 _param4, uint256 _param5, uint256 _param6, array _param7) with:
+                       gas gas_remaining wei
+                      args mem[ceil32(ceil32(_param6.length)) + (2 * ceil32(return_data.size)) + 133 len ceil32(return_data.size) + ceil32(_param6.length) + 256]
+                  if not ext_call.success:
+                      revert with ext_call.return_data[0 len return_data.size]
+                  require return_data.size >=′ 32
+                  if address(_param3) == 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee:
+                      call unknown4fd49efdAddress.unknownb413148e(uint256 _param1, array _param2) with:
+                           gas gas_remaining wei
+                          args ext_call.return_data[0], 64, 0, None
+                  else:
+                      call unknown4fd49efdAddress.unknown9003afee(uint256 _param1, uint256 _param2, uint256 _param3, array _param4) with:
+                           gas gas_remaining wei
+                          args address(_param3), ext_call.return_data[0], caller, 128, 0
+              else:
+                  if ext_call.return_data[0] < _param5:
+                      mem[ceil32(ceil32(_param6.length)) + (2 * ceil32(return_data.size)) + 129] = 0x8c379a000000000000000000000000000000000000000000000000000000000
+                      mem[ceil32(ceil32(_param6.length)) + (2 * ceil32(return_data.size)) + 133] = 32
+                      mem[ceil32(ceil32(_param6.length)) + (2 * ceil32(return_data.size)) + 165] = 27
+                      mem[ceil32(ceil32(_param6.length)) + (2 * ceil32(return_data.size)) + 197] = 'SWAPPER_WRAP_MIN_AMOUNT_OUT'
+                      revert with memory
+                        from ceil32(ceil32(_param6.length)) + (2 * ceil32(return_data.size)) + 129
+                         len ceil32(return_data.size) + 100
+                  if address(_param3) != 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee:
+                      call unknown4fd49efdAddress.unknown9003afee(uint256 _param1, uint256 _param2, uint256 _param3, array _param4) with:
+                           gas gas_remaining wei
+                          args address(_param3), ext_call.return_data[0], caller, 128, 0
+                      if not ext_call.success:
+                          revert with ext_call.return_data[0 len return_data.size]
+                      require return_data.size >=′ 32
+                      log 0x68f46c45 
+                      stor1 = 1
+                      stop
+                  mem[ceil32(ceil32(_param6.length)) + (2 * ceil32(return_data.size)) + 165] = ext_call.return_data[0]
+                  mem[ceil32(ceil32(_param6.length)) + (2 * ceil32(return_data.size)) + 197] = 64
+                  mem[ceil32(ceil32(_param6.length)) + (2 * ceil32(return_data.size)) + 229] = 0
+                  mem[ceil32(ceil32(_param6.length)) + (2 * ceil32(return_data.size)) + 261 len 0] = None
+                  mem[ceil32(ceil32(_param6.length)) + (2 * ceil32(return_data.size)) + 261] = 0
+                  call unknown4fd49efdAddress.unknownb413148e(uint256 _param1, array _param2) with:
+                       gas gas_remaining wei
+                      args ext_call.return_data[0], 64, 0
+                  mem[ceil32(ceil32(_param6.length)) + (2 * ceil32(return_data.size)) + 161] = ext_call.return_data[0]
+                  if not ext_call.success:
+                      revert with ext_call.return_data[0 len return_data.size]
+                  require return_data.size >=′ 32
+                  _1507 = ext_call.return_data[0]
+                  mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 193] = 0x9003afee00000000000000000000000000000000000000000000000000000000
+                  mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 197] = address(_param3)
+                  mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 229] = _1507
+                  mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 261] = caller
+                  mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 293] = 128
+                  mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 325] = mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 161]
+                  mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 357 len ceil32(mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 161])] = mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 193 len ceil32(mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 161])]
+                  mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 161] + 357] = 0
+                  call unknown4fd49efdAddress.unknown9003afee(uint256 _param1, uint256 _param2, uint256 _param3, array _param4) with:
+                       gas gas_remaining wei
+                      args address(_param3), _1507, caller, Array(len=mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 161], data=mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 357 len ceil32(mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 161])])
+      else:
+          mem[ceil32(ceil32(_param6.length)) + (2 * ceil32(return_data.size)) + 129] = 0x17fcb39b00000000000000000000000000000000000000000000000000000000
+          static call unknown4fd49efdAddress.wrappedNativeToken() with:
+                  gas gas_remaining wei
+                 args mem[ceil32(ceil32(_param6.length)) + (2 * ceil32(return_data.size)) + 133 len ceil32(return_data.size)]
+          mem[ceil32(ceil32(_param6.length)) + (2 * ceil32(return_data.size)) + 129] = ext_call.return_data[0]
+          if not ext_call.success:
+              revert with ext_call.return_data[0 len return_data.size]
+          require return_data.size >=′ 32
+          require ext_call.return_data[0] == ext_call.return_data[12 len 20]
+          if address(_param3) != 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee:
+              if ext_call.return_data[12 len 20] - address(_param3):
+                  mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 133] = uint8(_param1)
+                  mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 165] = address(ext_call.return_data[0])
+                  mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 197] = address(_param3)
+                  mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 229] = ext_call.return_data[0]
+                  mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 261] = 1
+                  mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 293] = _param5
+                  mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 325] = 224
+                  mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 357] = _param6.length
+                  mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 389 len ceil32(_param6.length)] = _param6[all], ext_call.return_data[_param6.length + -ceil32(ceil32(_param6.length)) + 31 len ceil32(_param6.length) - _param6.length]
+                  mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + _param6.length + 389] = 0
+                  call unknown4fd49efdAddress.unknown37e0ac02(uint256 _param1, uint256 _param2, uint256 _param3, uint256 _param4, uint256 _param5, uint256 _param6, array _param7) with:
+                       gas gas_remaining wei
+                      args mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 133 len (5 * ceil32(return_data.size)) + ceil32(_param6.length) + 256]
+                  if not ext_call.success:
+                      revert with ext_call.return_data[0 len return_data.size]
+                  require return_data.size >=′ 32
+                  if address(_param3) == 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee:
+                      call unknown4fd49efdAddress.unknownb413148e(uint256 _param1, array _param2) with:
+                           gas gas_remaining wei
+                          args ext_call.return_data[0], 64, 0, None
+                  else:
+                      call unknown4fd49efdAddress.unknown9003afee(uint256 _param1, uint256 _param2, uint256 _param3, array _param4) with:
+                           gas gas_remaining wei
+                          args address(_param3), ext_call.return_data[0], caller, 128, 0
+              else:
+                  if ext_call.return_data[0] < _param5:
+                      mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 129] = 0x8c379a000000000000000000000000000000000000000000000000000000000
+                      mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 133] = 32
+                      mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 165] = 27
+                      mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 197] = 'SWAPPER_WRAP_MIN_AMOUNT_OUT'
+                      revert with memory
+                        from ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 129
+                         len (5 * ceil32(return_data.size)) + 100
+                  if address(_param3) != 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee:
+                      call unknown4fd49efdAddress.unknown9003afee(uint256 _param1, uint256 _param2, uint256 _param3, array _param4) with:
+                           gas gas_remaining wei
+                          args address(_param3), ext_call.return_data[0], caller, 128, 0
+                      if not ext_call.success:
+                          revert with ext_call.return_data[0 len return_data.size]
+                      require return_data.size >=′ 32
+                      log 0x68f46c45 
+                      stor1 = 1
+                      stop
+                  mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 165] = ext_call.return_data[0]
+                  mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 197] = 64
+                  mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 229] = 0
+                  mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 261 len 0] = None
+                  mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 261] = 0
+                  call unknown4fd49efdAddress.unknownb413148e(uint256 _param1, array _param2) with:
+                       gas gas_remaining wei
+                      args ext_call.return_data[0], 64, 0
+                  mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 161] = ext_call.return_data[0]
+                  if not ext_call.success:
+                      revert with ext_call.return_data[0 len return_data.size]
+                  require return_data.size >=′ 32
+                  _1501 = ext_call.return_data[0]
+                  mem[ceil32(ceil32(_param6.length)) + (6 * ceil32(return_data.size)) + 193] = 0x9003afee00000000000000000000000000000000000000000000000000000000
+                  mem[ceil32(ceil32(_param6.length)) + (6 * ceil32(return_data.size)) + 197] = address(_param3)
+                  mem[ceil32(ceil32(_param6.length)) + (6 * ceil32(return_data.size)) + 229] = _1501
+                  mem[ceil32(ceil32(_param6.length)) + (6 * ceil32(return_data.size)) + 261] = caller
+                  mem[ceil32(ceil32(_param6.length)) + (6 * ceil32(return_data.size)) + 293] = 128
+                  mem[ceil32(ceil32(_param6.length)) + (6 * ceil32(return_data.size)) + 325] = mem[ceil32(ceil32(_param6.length)) + (6 * ceil32(return_data.size)) + 161]
+                  mem[ceil32(ceil32(_param6.length)) + (6 * ceil32(return_data.size)) + 357 len ceil32(mem[ceil32(ceil32(_param6.length)) + (6 * ceil32(return_data.size)) + 161])] = mem[ceil32(ceil32(_param6.length)) + (6 * ceil32(return_data.size)) + 193 len ceil32(mem[ceil32(ceil32(_param6.length)) + (6 * ceil32(return_data.size)) + 161])]
+                  mem[ceil32(ceil32(_param6.length)) + (6 * ceil32(return_data.size)) + mem[ceil32(ceil32(_param6.length)) + (6 * ceil32(return_data.size)) + 161] + 357] = 0
+                  call unknown4fd49efdAddress.unknown9003afee(uint256 _param1, uint256 _param2, uint256 _param3, array _param4) with:
+                       gas gas_remaining wei
+                      args address(_param3), _1501, caller, Array(len=mem[ceil32(ceil32(_param6.length)) + (6 * ceil32(return_data.size)) + 161], data=mem[ceil32(ceil32(_param6.length)) + (6 * ceil32(return_data.size)) + 357 len ceil32(mem[ceil32(ceil32(_param6.length)) + (6 * ceil32(return_data.size)) + 161])])
+          else:
+              mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 129] = 0x17fcb39b00000000000000000000000000000000000000000000000000000000
+              static call unknown4fd49efdAddress.wrappedNativeToken() with:
+                      gas gas_remaining wei
+                     args mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 133 len 5 * ceil32(return_data.size)]
+              if not ext_call.success:
+                  revert with ext_call.return_data[0 len return_data.size]
+              require return_data.size >=′ 32
+              require ext_call.return_data[0] == ext_call.return_data[12 len 20]
+              if address(ext_call.return_data[0]) - ext_call.return_data[12 len 20]:
+                  mem[ceil32(ceil32(_param6.length)) + (6 * ceil32(return_data.size)) + 389 len ceil32(_param6.length)] = _param6[all], ext_call.return_data[_param6.length + -ceil32(ceil32(_param6.length)) + 31 len ceil32(_param6.length) - _param6.length]
+                  mem[ceil32(ceil32(_param6.length)) + (6 * ceil32(return_data.size)) + _param6.length + 389] = 0
+                  call unknown4fd49efdAddress.unknown37e0ac02(uint256 _param1, uint256 _param2, uint256 _param3, uint256 _param4, uint256 _param5, uint256 _param6, array _param7) with:
+                       gas gas_remaining wei
+                      args _param1 << 248, address(ext_call.return_data[0]), address(ext_call.return_data[0]), ext_call.return_data[0], 1, _param5, Array(len=_param6.length, data=mem[ceil32(ceil32(_param6.length)) + (6 * ceil32(return_data.size)) + 389 len (9 * ceil32(return_data.size)) + ceil32(_param6.length)])
+                  if not ext_call.success:
+                      revert with ext_call.return_data[0 len return_data.size]
+                  require return_data.size >=′ 32
+                  if address(_param3) == 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee:
+                      call unknown4fd49efdAddress.unknownb413148e(uint256 _param1, array _param2) with:
+                           gas gas_remaining wei
+                          args ext_call.return_data[0], 64, 0
+                  else:
+                      call unknown4fd49efdAddress.unknown9003afee(uint256 _param1, uint256 _param2, uint256 _param3, array _param4) with:
+                           gas gas_remaining wei
+                          args address(_param3), ext_call.return_data[0], caller, 128, 0
+              else:
+                  if ext_call.return_data[0] < _param5:
+                      revert with 0, 
+                                  'SWAPPER_WRAP_MIN_AMOUNT_OUT',
+                                  mem[ceil32(ceil32(_param6.length)) + (6 * ceil32(return_data.size)) + 229 len 9 * ceil32(return_data.size)]
+                  if address(_param3) != 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee:
+                      call unknown4fd49efdAddress.unknown9003afee(uint256 _param1, uint256 _param2, uint256 _param3, array _param4) with:
+                           gas gas_remaining wei
+                          args address(_param3), ext_call.return_data[0], caller, 128, 0
+                      if not ext_call.success:
+                          revert with ext_call.return_data[0 len return_data.size]
+                      require return_data.size >=′ 32
+                      log 0x68f46c45 
+                      stor1 = 1
+                      stop
+                  mem[ceil32(ceil32(_param6.length)) + (6 * ceil32(return_data.size)) + 165] = ext_call.return_data[0]
+                  mem[ceil32(ceil32(_param6.length)) + (6 * ceil32(return_data.size)) + 197] = 64
+                  mem[ceil32(ceil32(_param6.length)) + (6 * ceil32(return_data.size)) + 229] = 0
+                  mem[ceil32(ceil32(_param6.length)) + (6 * ceil32(return_data.size)) + 261 len 0] = None
+                  mem[ceil32(ceil32(_param6.length)) + (6 * ceil32(return_data.size)) + 261] = 0
+                  call unknown4fd49efdAddress.unknownb413148e(uint256 _param1, array _param2) with:
+                       gas gas_remaining wei
+                      args ext_call.return_data[0], 64, 0
+                  mem[ceil32(ceil32(_param6.length)) + (6 * ceil32(return_data.size)) + 161] = ext_call.return_data[0]
+                  if not ext_call.success:
+                      revert with ext_call.return_data[0 len return_data.size]
+                  require return_data.size >=′ 32
+                  _1498 = ext_call.return_data[0]
+                  mem[ceil32(ceil32(_param6.length)) + (7 * ceil32(return_data.size)) + 193] = 0x9003afee00000000000000000000000000000000000000000000000000000000
+                  mem[ceil32(ceil32(_param6.length)) + (7 * ceil32(return_data.size)) + 197] = address(_param3)
+                  mem[ceil32(ceil32(_param6.length)) + (7 * ceil32(return_data.size)) + 229] = _1498
+                  mem[ceil32(ceil32(_param6.length)) + (7 * ceil32(return_data.size)) + 261] = caller
+                  mem[ceil32(ceil32(_param6.length)) + (7 * ceil32(return_data.size)) + 293] = 128
+                  mem[ceil32(ceil32(_param6.length)) + (7 * ceil32(return_data.size)) + 325] = mem[ceil32(ceil32(_param6.length)) + (7 * ceil32(return_data.size)) + 161]
+                  mem[ceil32(ceil32(_param6.length)) + (7 * ceil32(return_data.size)) + 357 len ceil32(mem[ceil32(ceil32(_param6.length)) + (7 * ceil32(return_data.size)) + 161])] = mem[ceil32(ceil32(_param6.length)) + (7 * ceil32(return_data.size)) + 193 len ceil32(mem[ceil32(ceil32(_param6.length)) + (7 * ceil32(return_data.size)) + 161])]
+                  mem[ceil32(ceil32(_param6.length)) + (7 * ceil32(return_data.size)) + mem[ceil32(ceil32(_param6.length)) + (7 * ceil32(return_data.size)) + 161] + 357] = 0
+                  call unknown4fd49efdAddress.unknown9003afee(uint256 _param1, uint256 _param2, uint256 _param3, array _param4) with:
+                       gas gas_remaining wei
+                      args address(_param3), _1498, caller, Array(len=mem[ceil32(ceil32(_param6.length)) + (7 * ceil32(return_data.size)) + 161], data=mem[ceil32(ceil32(_param6.length)) + (7 * ceil32(return_data.size)) + 357 len ceil32(mem[ceil32(ceil32(_param6.length)) + (7 * ceil32(return_data.size)) + 161])])
+  else:
+      if _param4 != call.value:
+          revert with 0, 'SWAPPER_UNEXPECTED_VALUE'
+      if eth.balance(this.address) < _param4:
+          revert with 0, 'Address: insufficient balance'
+      call unknown4fd49efdAddress with:
+         value _param4 wei
+           gas gas_remaining wei
+      if not ext_call.success:
+          revert with 0, 'Address: unable to send value, recipient may have reverted'
+      if not return_data.size:
+          mem[ceil32(ceil32(_param6.length)) + 165] = 64
+          mem[ceil32(ceil32(_param6.length)) + 197] = 0
+          mem[ceil32(ceil32(_param6.length)) + 229 len 0] = None
+          mem[ceil32(ceil32(_param6.length)) + 229] = 0
+          call unknown4fd49efdAddress.unknown109b3c83(uint256 _param1, array _param2) with:
+               gas gas_remaining wei
+              args _param4, 64, 0, None
+          if not ext_call.success:
+              revert with ext_call.return_data[0 len return_data.size]
+          require return_data.size >=′ 32
+          if address(_param2) != 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee:
+              if address(_param3) != 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee:
+                  if address(_param2) - address(_param3):
+                      call unknown4fd49efdAddress.unknown37e0ac02(uint256 _param1, uint256 _param2, uint256 _param3, uint256 _param4, uint256 _param5, uint256 _param6, array _param7) with:
+                           gas gas_remaining wei
+                          args _param1 << 248, address(_param2), address(_param3), ext_call.return_data[0], 1, _param5, Array(len=_param6.length, data=_param6[all])
+                      if not ext_call.success:
+                          revert with ext_call.return_data[0 len return_data.size]
+                      require return_data.size >=′ 32
+                      if address(_param3) == 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee:
+                          call unknown4fd49efdAddress.unknownb413148e(uint256 _param1, array _param2) with:
+                               gas gas_remaining wei
+                              args ext_call.return_data[0], 64, 0
+                      else:
+                          call unknown4fd49efdAddress.unknown9003afee(uint256 _param1, uint256 _param2, uint256 _param3, array _param4) with:
+                               gas gas_remaining wei
+                              args address(_param3), ext_call.return_data[0], caller, 128, 0
+                  else:
+                      if ext_call.return_data[0] < _param5:
+                          revert with 0, 'SWAPPER_WRAP_MIN_AMOUNT_OUT'
+                      if address(_param3) != 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee:
+                          call unknown4fd49efdAddress.unknown9003afee(uint256 _param1, uint256 _param2, uint256 _param3, array _param4) with:
+                               gas gas_remaining wei
+                              args address(_param3), ext_call.return_data[0], caller, 128, 0
+                          if not ext_call.success:
+                              revert with ext_call.return_data[0 len return_data.size]
+                          require return_data.size >=′ 32
+                          log 0x68f46c45 
+                          stor1 = 1
+                          stop
+                      call unknown4fd49efdAddress.unknownb413148e(uint256 _param1, array _param2) with:
+                           gas gas_remaining wei
+                          args ext_call.return_data[0], 64, 0, None
+                      if not ext_call.success:
+                          revert with ext_call.return_data[0 len return_data.size]
+                      require return_data.size >=′ 32
+                      call unknown4fd49efdAddress.unknown9003afee(uint256 _param1, uint256 _param2, uint256 _param3, array _param4) with:
+                           gas gas_remaining wei
+                          args address(_param3), ext_call.return_data[0], caller, 128, 0
+              else:
+                  static call unknown4fd49efdAddress.wrappedNativeToken() with:
+                          gas gas_remaining wei
+                  if not ext_call.success:
+                      revert with ext_call.return_data[0 len return_data.size]
+                  require return_data.size >=′ 32
+                  require ext_call.return_data[0] == ext_call.return_data[12 len 20]
+                  if address(_param2) - ext_call.return_data[12 len 20]:
+                      call unknown4fd49efdAddress.unknown37e0ac02(uint256 _param1, uint256 _param2, uint256 _param3, uint256 _param4, uint256 _param5, uint256 _param6, array _param7) with:
+                           gas gas_remaining wei
+                          args _param1 << 248, address(_param2), address(ext_call.return_data[0]), ext_call.return_data[0], 1, _param5, Array(len=_param6.length, data=_param6[all])
+                      if not ext_call.success:
+                          revert with ext_call.return_data[0 len return_data.size]
+                      require return_data.size >=′ 32
+                      if address(_param3) == 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee:
+                          call unknown4fd49efdAddress.unknownb413148e(uint256 _param1, array _param2) with:
+                               gas gas_remaining wei
+                              args ext_call.return_data[0], 64, 0
+                      else:
+                          call unknown4fd49efdAddress.unknown9003afee(uint256 _param1, uint256 _param2, uint256 _param3, array _param4) with:
+                               gas gas_remaining wei
+                              args address(_param3), ext_call.return_data[0], caller, 128, 0
+                  else:
+                      if ext_call.return_data[0] < _param5:
+                          revert with 0, 'SWAPPER_WRAP_MIN_AMOUNT_OUT'
+                      if address(_param3) != 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee:
+                          call unknown4fd49efdAddress.unknown9003afee(uint256 _param1, uint256 _param2, uint256 _param3, array _param4) with:
+                               gas gas_remaining wei
+                              args address(_param3), ext_call.return_data[0], caller, 128, 0
+                          if not ext_call.success:
+                              revert with ext_call.return_data[0 len return_data.size]
+                          require return_data.size >=′ 32
+                          log 0x68f46c45 
+                          stor1 = 1
+                          stop
+                      call unknown4fd49efdAddress.unknownb413148e(uint256 _param1, array _param2) with:
+                           gas gas_remaining wei
+                          args ext_call.return_data[0], 64, 0, None
+                      if not ext_call.success:
+                          revert with ext_call.return_data[0 len return_data.size]
+                      require return_data.size >=′ 32
+                      call unknown4fd49efdAddress.unknown9003afee(uint256 _param1, uint256 _param2, uint256 _param3, array _param4) with:
+                           gas gas_remaining wei
+                          args address(_param3), ext_call.return_data[0], caller, 128, 0
+          else:
+              static call unknown4fd49efdAddress.wrappedNativeToken() with:
+                      gas gas_remaining wei
+              if not ext_call.success:
+                  revert with ext_call.return_data[0 len return_data.size]
+              require return_data.size >=′ 32
+              require ext_call.return_data[0] == ext_call.return_data[12 len 20]
+              if address(_param3) == 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee:
+                  static call unknown4fd49efdAddress.wrappedNativeToken() with:
+                          gas gas_remaining wei
+                  if not ext_call.success:
+                      revert with ext_call.return_data[0 len return_data.size]
+                  require return_data.size >=′ 32
+                  require ext_call.return_data[0] == ext_call.return_data[12 len 20]
+                  if address(ext_call.return_data[0]) - ext_call.return_data[12 len 20]:
+                      call unknown4fd49efdAddress.unknown37e0ac02(uint256 _param1, uint256 _param2, uint256 _param3, uint256 _param4, uint256 _param5, uint256 _param6, array _param7) with:
+                           gas gas_remaining wei
+                          args _param1 << 248, address(ext_call.return_data[0]), address(ext_call.return_data[0]), ext_call.return_data[0], 1, _param5, Array(len=_param6.length, data=_param6[all])
+                      if not ext_call.success:
+                          revert with ext_call.return_data[0 len return_data.size]
+                      require return_data.size >=′ 32
+                      if address(_param3) == 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee:
+                          call unknown4fd49efdAddress.unknownb413148e(uint256 _param1, array _param2) with:
+                               gas gas_remaining wei
+                              args ext_call.return_data[0], 64, 0, None
+                      else:
+                          call unknown4fd49efdAddress.unknown9003afee(uint256 _param1, uint256 _param2, uint256 _param3, array _param4) with:
+                               gas gas_remaining wei
+                              args address(_param3), ext_call.return_data[0], caller, 128, 0
+                  else:
+                      if ext_call.return_data[0] < _param5:
+                          revert with 0, 'SWAPPER_WRAP_MIN_AMOUNT_OUT'
+                      if address(_param3) != 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee:
+                          call unknown4fd49efdAddress.unknown9003afee(uint256 _param1, uint256 _param2, uint256 _param3, array _param4) with:
+                               gas gas_remaining wei
+                              args address(_param3), ext_call.return_data[0], caller, 128, 0
+                          if not ext_call.success:
+                              revert with ext_call.return_data[0 len return_data.size]
+                          require return_data.size >=′ 32
+                          log 0x68f46c45 
+                          stor1 = 1
+                          stop
+                      call unknown4fd49efdAddress.unknownb413148e(uint256 _param1, array _param2) with:
+                           gas gas_remaining wei
+                          args ext_call.return_data[0], 64, 0, None
+                      if not ext_call.success:
+                          revert with ext_call.return_data[0 len return_data.size]
+                      require return_data.size >=′ 32
+                      call unknown4fd49efdAddress.unknown9003afee(uint256 _param1, uint256 _param2, uint256 _param3, array _param4) with:
+                           gas gas_remaining wei
+                          args address(_param3), ext_call.return_data[0], caller, 128, 0
+              else:
+                  if ext_call.return_data[12 len 20] - address(_param3):
+                      call unknown4fd49efdAddress.unknown37e0ac02(uint256 _param1, uint256 _param2, uint256 _param3, uint256 _param4, uint256 _param5, uint256 _param6, array _param7) with:
+                           gas gas_remaining wei
+                          args _param1 << 248, address(ext_call.return_data[0]), address(_param3), ext_call.return_data[0], 1, _param5, Array(len=_param6.length, data=_param6[all])
+                      if not ext_call.success:
+                          revert with ext_call.return_data[0 len return_data.size]
+                      require return_data.size >=′ 32
+                      if address(_param3) == 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee:
+                          call unknown4fd49efdAddress.unknownb413148e(uint256 _param1, array _param2) with:
+                               gas gas_remaining wei
+                              args ext_call.return_data[0], 64, 0, None
+                      else:
+                          call unknown4fd49efdAddress.unknown9003afee(uint256 _param1, uint256 _param2, uint256 _param3, array _param4) with:
+                               gas gas_remaining wei
+                              args address(_param3), ext_call.return_data[0], caller, 128, 0
+                  else:
+                      if ext_call.return_data[0] < _param5:
+                          revert with 0, 'SWAPPER_WRAP_MIN_AMOUNT_OUT'
+                      if address(_param3) != 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee:
+                          call unknown4fd49efdAddress.unknown9003afee(uint256 _param1, uint256 _param2, uint256 _param3, array _param4) with:
+                               gas gas_remaining wei
+                              args address(_param3), ext_call.return_data[0], caller, 128, 0
+                          if not ext_call.success:
+                              revert with ext_call.return_data[0 len return_data.size]
+                          require return_data.size >=′ 32
+                          log 0x68f46c45 
+                          stor1 = 1
+                          stop
+                      mem[ceil32(ceil32(_param6.length)) + (2 * ceil32(return_data.size)) + 165] = ext_call.return_data[0]
+                      mem[ceil32(ceil32(_param6.length)) + (2 * ceil32(return_data.size)) + 197] = 64
+                      mem[ceil32(ceil32(_param6.length)) + (2 * ceil32(return_data.size)) + 229] = 0
+                      mem[ceil32(ceil32(_param6.length)) + (2 * ceil32(return_data.size)) + 261 len 0] = None
+                      mem[ceil32(ceil32(_param6.length)) + (2 * ceil32(return_data.size)) + 261] = 0
+                      call unknown4fd49efdAddress.unknownb413148e(uint256 _param1, array _param2) with:
+                           gas gas_remaining wei
+                          args ext_call.return_data[0], 64, 0
+                      mem[ceil32(ceil32(_param6.length)) + (2 * ceil32(return_data.size)) + 161] = ext_call.return_data[0]
+                      if not ext_call.success:
+                          revert with ext_call.return_data[0 len return_data.size]
+                      require return_data.size >=′ 32
+                      _1513 = ext_call.return_data[0]
+                      mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 193] = 0x9003afee00000000000000000000000000000000000000000000000000000000
+                      mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 197] = address(_param3)
+                      mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 229] = _1513
+                      mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 261] = caller
+                      mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 293] = 128
+                      mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 325] = mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 161]
+                      mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 357 len ceil32(mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 161])] = mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 193 len ceil32(mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 161])]
+                      mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 161] + 357] = 0
+                      call unknown4fd49efdAddress.unknown9003afee(uint256 _param1, uint256 _param2, uint256 _param3, array _param4) with:
+                           gas gas_remaining wei
+                          args address(_param3), _1513, caller, Array(len=mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 161], data=mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 357 len ceil32(mem[ceil32(ceil32(_param6.length)) + (4 * ceil32(return_data.size)) + 161])])
+      else:
+          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + 134] = _param4
+          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + 166] = 64
+          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + 198] = 0
+          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + 230 len 0] = None
+          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + 230] = 0
+          call unknown4fd49efdAddress.unknown109b3c83(uint256 _param1, array _param2) with:
+               gas gas_remaining wei
+              args _param4, 64, 0
+          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + 130] = ext_call.return_data[0]
+          if not ext_call.success:
+              revert with ext_call.return_data[0 len return_data.size]
+          require return_data.size >=′ 32
+          _728 = ext_call.return_data[0]
+          if address(_param2) != 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee:
+              if address(_param3) != 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee:
+                  if not address(_param2) - address(_param3):
+                      if ext_call.return_data[0] < _param5:
+                          revert with 0, 'SWAPPER_WRAP_MIN_AMOUNT_OUT'
+                      if address(_param3) == 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee:
+                          call unknown4fd49efdAddress.unknownb413148e(uint256 _param1, array _param2) with:
+                               gas gas_remaining wei
+                              args _728, Array(len=0, data=None)
+                          if not ext_call.success:
+                              revert with ext_call.return_data[0 len return_data.size]
+                          require return_data.size >=′ 32
+                          call unknown4fd49efdAddress.unknown9003afee(uint256 _param1, uint256 _param2, uint256 _param3, array _param4) with:
+                               gas gas_remaining wei
+                              args address(_param3), ext_call.return_data[0], caller, 128, 0
+                          if not ext_call.success:
+                              revert with ext_call.return_data[0 len return_data.size]
+                          ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + ceil32(return_data.size) + 162] = 0x9003afee00000000000000000000000000000000000000000000000000000000
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + ceil32(return_data.size) + 166] = address(_param3)
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + ceil32(return_data.size) + 198] = _728
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + ceil32(return_data.size) + 230] = caller
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + ceil32(return_data.size) + 262] = 128
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + ceil32(return_data.size) + 294] = mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + ceil32(return_data.size) + 130]
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + ceil32(return_data.size) + 326 len ceil32(mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + ceil32(return_data.size) + 130])] = mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + ceil32(return_data.size) + 162 len ceil32(mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + ceil32(return_data.size) + 130])]
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + ceil32(return_data.size) + mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + ceil32(return_data.size) + 130] + 326] = 0
+                      call unknown4fd49efdAddress.unknown9003afee(uint256 _param1, uint256 _param2, uint256 _param3, array _param4) with:
+                           gas gas_remaining wei
+                          args address(_param3), _728, caller, Array(len=mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + ceil32(return_data.size) + 130], data=mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + ceil32(return_data.size) + 326 len ceil32(mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + ceil32(return_data.size) + 130])])
+                      if not ext_call.success:
+                          revert with ext_call.return_data[0 len return_data.size]
+                      require return_data.size >=′ 32
+                      log 0x68f46c45 
+                      stor1 = 1
+                      stop
+                  mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + ceil32(return_data.size) + 134] = uint8(_param1)
+                  mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + ceil32(return_data.size) + 166] = address(_param2)
+                  mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + ceil32(return_data.size) + 198] = address(_param3)
+                  mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + ceil32(return_data.size) + 230] = _728
+                  mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + ceil32(return_data.size) + 262] = 1
+                  mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + ceil32(return_data.size) + 294] = _param5
+                  mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + ceil32(return_data.size) + 326] = 224
+                  mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + ceil32(return_data.size) + 358] = _param6.length
+                  mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + ceil32(return_data.size) + 390 len ceil32(_param6.length)] = _param6[all], Mask(8 * ceil32(_param6.length) - _param6.length, -(8 * ceil32(_param6.length) + -ceil32(ceil32(_param6.length)) + 31) + 256, return_data.size) >> -(8 * ceil32(_param6.length) + -ceil32(ceil32(_param6.length)) + 31) + 256
+                  mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + ceil32(return_data.size) + _param6.length + 390] = 0
+                  call unknown4fd49efdAddress.unknown37e0ac02(uint256 _param1, uint256 _param2, uint256 _param3, uint256 _param4, uint256 _param5, uint256 _param6, array _param7) with:
+                       gas gas_remaining wei
+                      args _param1 << 248, address(_param2), address(_param3), _728, 1, _param5, 224, _param6.length, _param6[all], Mask(8 * ceil32(_param6.length) - _param6.length, -(8 * ceil32(_param6.length) + -ceil32(ceil32(_param6.length)) + 31) + 256, return_data.size) >> -(8 * ceil32(_param6.length) + -ceil32(ceil32(_param6.length)) + 31) + 256
+                  mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + ceil32(return_data.size) + 130] = ext_call.return_data[0]
+                  if not ext_call.success:
+                      revert with ext_call.return_data[0 len return_data.size]
+                  require return_data.size >=′ 32
+                  _1530 = ext_call.return_data[0]
+                  if address(_param3) == 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee:
+                      call unknown4fd49efdAddress.unknownb413148e(uint256 _param1, array _param2) with:
+                           gas gas_remaining wei
+                          args _1530, 64, 0
+                  else:
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 162] = 0x9003afee00000000000000000000000000000000000000000000000000000000
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 166] = address(_param3)
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 198] = _1530
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 230] = caller
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 262] = 128
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 294] = mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 130]
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 326 len ceil32(mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 130])] = mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 162 len ceil32(mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 130])]
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 130] + 326] = 0
+                      call unknown4fd49efdAddress.unknown9003afee(uint256 _param1, uint256 _param2, uint256 _param3, array _param4) with:
+                           gas gas_remaining wei
+                          args address(_param3), _1530, caller, Array(len=mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 130], data=mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 326 len ceil32(mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 130])])
+              else:
+                  static call unknown4fd49efdAddress.wrappedNativeToken() with:
+                          gas gas_remaining wei
+                  mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + ceil32(return_data.size) + 130] = ext_call.return_data[0]
+                  if not ext_call.success:
+                      revert with ext_call.return_data[0 len return_data.size]
+                  require return_data.size >=′ 32
+                  _754 = ext_call.return_data[0]
+                  require ext_call.return_data[0] == ext_call.return_data[12 len 20]
+                  if not address(_param2) - ext_call.return_data[12 len 20]:
+                      if _728 < _param5:
+                          revert with 0, 'SWAPPER_WRAP_MIN_AMOUNT_OUT'
+                      if address(_param3) != 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee:
+                          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 162] = 0x9003afee00000000000000000000000000000000000000000000000000000000
+                          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 166] = address(_param3)
+                          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 198] = _728
+                          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 230] = caller
+                          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 262] = 128
+                          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 294] = mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 130]
+                          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 326 len ceil32(mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 130])] = mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 162 len ceil32(mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 130])]
+                          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 130] + 326] = 0
+                          call unknown4fd49efdAddress.unknown9003afee(uint256 _param1, uint256 _param2, uint256 _param3, array _param4) with:
+                               gas gas_remaining wei
+                              args address(_param3), _728, caller, Array(len=mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 130], data=mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 326 len ceil32(mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 130])])
+                          if not ext_call.success:
+                              revert with ext_call.return_data[0 len return_data.size]
+                          require return_data.size >=′ 32
+                          log 0x68f46c45 
+                          stor1 = 1
+                          stop
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 166] = _728
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 198] = 64
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 230] = 0
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 262 len 0] = None
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 262] = 0
+                      call unknown4fd49efdAddress.unknownb413148e(uint256 _param1, array _param2) with:
+                           gas gas_remaining wei
+                          args _728, 64, 0
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 162] = ext_call.return_data[0]
+                      if not ext_call.success:
+                          revert with ext_call.return_data[0 len return_data.size]
+                      require return_data.size >=′ 32
+                      _1528 = ext_call.return_data[0]
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 194] = 0x9003afee00000000000000000000000000000000000000000000000000000000
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 198] = address(_param3)
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 230] = _1528
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 262] = caller
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 294] = 128
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 326] = mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 162]
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 358 len ceil32(mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 162])] = mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 194 len ceil32(mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 162])]
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 162] + 358] = 0
+                      call unknown4fd49efdAddress.unknown9003afee(uint256 _param1, uint256 _param2, uint256 _param3, array _param4) with:
+                           gas gas_remaining wei
+                          args address(_param3), _1528, caller, Array(len=mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 162], data=mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 358 len ceil32(mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 162])])
+                  else:
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 134] = uint8(_param1)
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 166] = address(_param2)
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 198] = address(_754)
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 230] = _728
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 262] = 1
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 294] = _param5
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 326] = 224
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 358] = _param6.length
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 390 len ceil32(_param6.length)] = _param6[all], Mask(8 * ceil32(_param6.length) - _param6.length, -(8 * ceil32(_param6.length) + -ceil32(ceil32(_param6.length)) + 31) + 256, return_data.size) >> -(8 * ceil32(_param6.length) + -ceil32(ceil32(_param6.length)) + 31) + 256
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + _param6.length + 390] = 0
+                      call unknown4fd49efdAddress.unknown37e0ac02(uint256 _param1, uint256 _param2, uint256 _param3, uint256 _param4, uint256 _param5, uint256 _param6, array _param7) with:
+                           gas gas_remaining wei
+                          args _param1 << 248, address(_param2), address(_754), _728, 1, _param5, 224, _param6.length, _param6[all], Mask(8 * ceil32(_param6.length) - _param6.length, -(8 * ceil32(_param6.length) + -ceil32(ceil32(_param6.length)) + 31) + 256, return_data.size) >> -(8 * ceil32(_param6.length) + -ceil32(ceil32(_param6.length)) + 31) + 256
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 130] = ext_call.return_data[0]
+                      if not ext_call.success:
+                          revert with ext_call.return_data[0 len return_data.size]
+                      require return_data.size >=′ 32
+                      _1527 = ext_call.return_data[0]
+                      if address(_param3) == 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee:
+                          call unknown4fd49efdAddress.unknownb413148e(uint256 _param1, array _param2) with:
+                               gas gas_remaining wei
+                              args _1527, Array(len=0, data=None)
+                      else:
+                          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 162] = 0x9003afee00000000000000000000000000000000000000000000000000000000
+                          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 166] = address(_param3)
+                          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 198] = _1527
+                          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 230] = caller
+                          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 262] = 128
+                          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 294] = mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 130]
+                          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 326 len ceil32(mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 130])] = mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 162 len ceil32(mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 130])]
+                          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 130] + 326] = 0
+                          call unknown4fd49efdAddress.unknown9003afee(uint256 _param1, uint256 _param2, uint256 _param3, array _param4) with:
+                               gas gas_remaining wei
+                              args address(_param3), _1527, caller, Array(len=mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 130], data=mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 326 len ceil32(mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 130])])
+          else:
+              static call unknown4fd49efdAddress.wrappedNativeToken() with:
+                      gas gas_remaining wei
+              mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + ceil32(return_data.size) + 130] = ext_call.return_data[0]
+              if not ext_call.success:
+                  revert with ext_call.return_data[0 len return_data.size]
+              require return_data.size >=′ 32
+              _740 = ext_call.return_data[0]
+              require ext_call.return_data[0] == ext_call.return_data[12 len 20]
+              if address(_param3) != 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee:
+                  if not ext_call.return_data[12 len 20] - address(_param3):
+                      if _728 < _param5:
+                          revert with 0, 'SWAPPER_WRAP_MIN_AMOUNT_OUT'
+                      if address(_param3) != 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee:
+                          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 162] = 0x9003afee00000000000000000000000000000000000000000000000000000000
+                          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 166] = address(_param3)
+                          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 198] = _728
+                          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 230] = caller
+                          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 262] = 128
+                          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 294] = mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 130]
+                          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 326 len ceil32(mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 130])] = mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 162 len ceil32(mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 130])]
+                          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 130] + 326] = 0
+                          call unknown4fd49efdAddress.unknown9003afee(uint256 _param1, uint256 _param2, uint256 _param3, array _param4) with:
+                               gas gas_remaining wei
+                              args address(_param3), _728, caller, Array(len=mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 130], data=mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 326 len ceil32(mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 130])])
+                          if not ext_call.success:
+                              revert with ext_call.return_data[0 len return_data.size]
+                          require return_data.size >=′ 32
+                          log 0x68f46c45 
+                          stor1 = 1
+                          stop
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 166] = _728
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 198] = 64
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 230] = 0
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 262 len 0] = None
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 262] = 0
+                      call unknown4fd49efdAddress.unknownb413148e(uint256 _param1, array _param2) with:
+                           gas gas_remaining wei
+                          args _728, 64, 0
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 162] = ext_call.return_data[0]
+                      if not ext_call.success:
+                          revert with ext_call.return_data[0 len return_data.size]
+                      require return_data.size >=′ 32
+                      _1525 = ext_call.return_data[0]
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 194] = 0x9003afee00000000000000000000000000000000000000000000000000000000
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 198] = address(_param3)
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 230] = _1525
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 262] = caller
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 294] = 128
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 326] = mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 162]
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 358 len ceil32(mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 162])] = mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 194 len ceil32(mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 162])]
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 162] + 358] = 0
+                      call unknown4fd49efdAddress.unknown9003afee(uint256 _param1, uint256 _param2, uint256 _param3, array _param4) with:
+                           gas gas_remaining wei
+                          args address(_param3), _1525, caller, Array(len=mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 162], data=mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 358 len ceil32(mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 162])])
+                  else:
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 134] = uint8(_param1)
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 166] = address(_740)
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 198] = address(_param3)
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 230] = _728
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 262] = 1
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 294] = _param5
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 326] = 224
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 358] = _param6.length
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 390 len ceil32(_param6.length)] = _param6[all], Mask(8 * ceil32(_param6.length) - _param6.length, -(8 * ceil32(_param6.length) + -ceil32(ceil32(_param6.length)) + 31) + 256, return_data.size) >> -(8 * ceil32(_param6.length) + -ceil32(ceil32(_param6.length)) + 31) + 256
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + _param6.length + 390] = 0
+                      call unknown4fd49efdAddress.unknown37e0ac02(uint256 _param1, uint256 _param2, uint256 _param3, uint256 _param4, uint256 _param5, uint256 _param6, array _param7) with:
+                           gas gas_remaining wei
+                          args _param1 << 248, address(_740), address(_param3), _728, 1, _param5, 224, _param6.length, _param6[all], Mask(8 * ceil32(_param6.length) - _param6.length, -(8 * ceil32(_param6.length) + -ceil32(ceil32(_param6.length)) + 31) + 256, return_data.size) >> -(8 * ceil32(_param6.length) + -ceil32(ceil32(_param6.length)) + 31) + 256
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 130] = ext_call.return_data[0]
+                      if not ext_call.success:
+                          revert with ext_call.return_data[0 len return_data.size]
+                      require return_data.size >=′ 32
+                      _1524 = ext_call.return_data[0]
+                      if address(_param3) == 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee:
+                          call unknown4fd49efdAddress.unknownb413148e(uint256 _param1, array _param2) with:
+                               gas gas_remaining wei
+                              args _1524, 64, 0
+                      else:
+                          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 162] = 0x9003afee00000000000000000000000000000000000000000000000000000000
+                          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 166] = address(_param3)
+                          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 198] = _1524
+                          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 230] = caller
+                          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 262] = 128
+                          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 294] = mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 130]
+                          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 326 len ceil32(mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 130])] = mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 162 len ceil32(mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 130])]
+                          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 130] + 326] = 0
+                          call unknown4fd49efdAddress.unknown9003afee(uint256 _param1, uint256 _param2, uint256 _param3, array _param4) with:
+                               gas gas_remaining wei
+                              args address(_param3), _1524, caller, Array(len=mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 130], data=mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 326 len ceil32(mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 130])])
+              else:
+                  static call unknown4fd49efdAddress.wrappedNativeToken() with:
+                          gas gas_remaining wei
+                  mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (2 * ceil32(return_data.size)) + 130] = ext_call.return_data[0]
+                  if not ext_call.success:
+                      revert with ext_call.return_data[0 len return_data.size]
+                  require return_data.size >=′ 32
+                  _795 = ext_call.return_data[0]
+                  require ext_call.return_data[0] == ext_call.return_data[12 len 20]
+                  if not address(_740) - ext_call.return_data[12 len 20]:
+                      if _728 < _param5:
+                          revert with 0, 'SWAPPER_WRAP_MIN_AMOUNT_OUT'
+                      if address(_param3) != 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee:
+                          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 162] = 0x9003afee00000000000000000000000000000000000000000000000000000000
+                          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 166] = address(_param3)
+                          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 198] = _728
+                          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 230] = caller
+                          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 262] = 128
+                          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 294] = mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 130]
+                          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 326 len ceil32(mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 130])] = mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 162 len ceil32(mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 130])]
+                          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 130] + 326] = 0
+                          call unknown4fd49efdAddress.unknown9003afee(uint256 _param1, uint256 _param2, uint256 _param3, array _param4) with:
+                               gas gas_remaining wei
+                              args address(_param3), _728, caller, Array(len=mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 130], data=mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 326 len ceil32(mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 130])])
+                          if not ext_call.success:
+                              revert with ext_call.return_data[0 len return_data.size]
+                          require return_data.size >=′ 32
+                          log 0x68f46c45 
+                          stor1 = 1
+                          stop
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 166] = _728
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 198] = 64
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 230] = 0
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 262 len 0] = None
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 262] = 0
+                      call unknown4fd49efdAddress.unknownb413148e(uint256 _param1, array _param2) with:
+                           gas gas_remaining wei
+                          args _728, 64, 0
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 162] = ext_call.return_data[0]
+                      if not ext_call.success:
+                          revert with ext_call.return_data[0 len return_data.size]
+                      require return_data.size >=′ 32
+                      _1522 = ext_call.return_data[0]
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (6 * ceil32(return_data.size)) + 194] = 0x9003afee00000000000000000000000000000000000000000000000000000000
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (6 * ceil32(return_data.size)) + 198] = address(_param3)
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (6 * ceil32(return_data.size)) + 230] = _1522
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (6 * ceil32(return_data.size)) + 262] = caller
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (6 * ceil32(return_data.size)) + 294] = 128
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (6 * ceil32(return_data.size)) + 326] = mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (6 * ceil32(return_data.size)) + 162]
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (6 * ceil32(return_data.size)) + 358 len ceil32(mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (6 * ceil32(return_data.size)) + 162])] = mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (6 * ceil32(return_data.size)) + 194 len ceil32(mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (6 * ceil32(return_data.size)) + 162])]
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (6 * ceil32(return_data.size)) + mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (6 * ceil32(return_data.size)) + 162] + 358] = 0
+                      call unknown4fd49efdAddress.unknown9003afee(uint256 _param1, uint256 _param2, uint256 _param3, array _param4) with:
+                           gas gas_remaining wei
+                          args address(_param3), _1522, caller, Array(len=mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (6 * ceil32(return_data.size)) + 162], data=mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (6 * ceil32(return_data.size)) + 358 len ceil32(mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (6 * ceil32(return_data.size)) + 162])])
+                  else:
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 134] = uint8(_param1)
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 166] = address(_740)
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 198] = address(_795)
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 230] = _728
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 262] = 1
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 294] = _param5
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 326] = 224
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 358] = _param6.length
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 390 len ceil32(_param6.length)] = _param6[all], Mask(8 * ceil32(_param6.length) - _param6.length, -(8 * ceil32(_param6.length) + -ceil32(ceil32(_param6.length)) + 31) + 256, return_data.size) >> -(8 * ceil32(_param6.length) + -ceil32(ceil32(_param6.length)) + 31) + 256
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + _param6.length + 390] = 0
+                      call unknown4fd49efdAddress.unknown37e0ac02(uint256 _param1, uint256 _param2, uint256 _param3, uint256 _param4, uint256 _param5, uint256 _param6, array _param7) with:
+                           gas gas_remaining wei
+                          args _param1 << 248, address(_740), address(_795), _728, 1, _param5, 224, _param6.length, _param6[all], Mask(8 * ceil32(_param6.length) - _param6.length, -(8 * ceil32(_param6.length) + -ceil32(ceil32(_param6.length)) + 31) + 256, return_data.size) >> -(8 * ceil32(_param6.length) + -ceil32(ceil32(_param6.length)) + 31) + 256
+                      mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (4 * ceil32(return_data.size)) + 130] = ext_call.return_data[0]
+                      if not ext_call.success:
+                          revert with ext_call.return_data[0 len return_data.size]
+                      require return_data.size >=′ 32
+                      _1521 = ext_call.return_data[0]
+                      if address(_param3) == 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee:
+                          call unknown4fd49efdAddress.unknownb413148e(uint256 _param1, array _param2) with:
+                               gas gas_remaining wei
+                              args _1521, 64, 0
+                      else:
+                          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (6 * ceil32(return_data.size)) + 162] = 0x9003afee00000000000000000000000000000000000000000000000000000000
+                          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (6 * ceil32(return_data.size)) + 166] = address(_param3)
+                          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (6 * ceil32(return_data.size)) + 198] = _1521
+                          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (6 * ceil32(return_data.size)) + 230] = caller
+                          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (6 * ceil32(return_data.size)) + 262] = 128
+                          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (6 * ceil32(return_data.size)) + 294] = mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (6 * ceil32(return_data.size)) + 130]
+                          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (6 * ceil32(return_data.size)) + 326 len ceil32(mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (6 * ceil32(return_data.size)) + 130])] = mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (6 * ceil32(return_data.size)) + 162 len ceil32(mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (6 * ceil32(return_data.size)) + 130])]
+                          mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (6 * ceil32(return_data.size)) + mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (6 * ceil32(return_data.size)) + 130] + 326] = 0
+                          call unknown4fd49efdAddress.unknown9003afee(uint256 _param1, uint256 _param2, uint256 _param3, array _param4) with:
+                               gas gas_remaining wei
+                              args address(_param3), _1521, caller, Array(len=mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (6 * ceil32(return_data.size)) + 130], data=mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (6 * ceil32(return_data.size)) + 326 len ceil32(mem[ceil32(ceil32(_param6.length)) + ceil32(return_data.size) + (6 * ceil32(return_data.size)) + 130])])
+  if not ext_call.success:
+      revert with ext_call.return_data[0 len return_data.size]
+  ...  # Decompilation aborted, sorry: ("decompilation didn't finish",)
+
+

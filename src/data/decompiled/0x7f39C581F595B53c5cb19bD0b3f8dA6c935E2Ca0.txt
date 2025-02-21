@@ -1,0 +1,355 @@
+# Palkeoramix decompiler. 
+
+def storage:
+  balanceOf is mapping of uint256 at storage 0
+  allowance is mapping of uint256 at storage 1
+  totalSupply is uint256 at storage 2
+  name is array of uint256 at storage 3
+  symbol is array of uint256 at storage 4
+  decimals is uint8 at storage 5
+  nonces is mapping of uint256 at storage 6
+  stETHAddress is address at storage 7
+
+def name(): # not payable
+  return name[0 len name.length]
+
+def totalSupply(): # not payable
+  return totalSupply
+
+def decimals(): # not payable
+  return decimals
+
+def balanceOf(address account): # not payable
+  require calldata.size - 4 >= 32
+  return balanceOf[address(account)]
+
+def nonces(address _param1): # not payable
+  require calldata.size - 4 >= 32
+  return nonces[address(_param1)]
+
+def symbol(): # not payable
+  return symbol[0 len symbol.length]
+
+def stETH(): # not payable
+  return stETHAddress
+
+def allowance(address owner, address spender): # not payable
+  require calldata.size - 4 >= 64
+  return allowance[address(owner)][address(spender)]
+
+#
+#  Regular functions
+#
+
+def _fallback(?) payable: # default function
+  revert
+
+def DOMAIN_SEPARATOR(): # not payable
+  if 1 != chainid:
+      return sha3(0x8b73c3c69bb8fe3d512ecc4cf759cc79239f7b179b0ffacaa9a75d522b39400f, 0xb6d02a790ca4952ed9faa11074863de95b4c8bc405a22873605ff97356993b36, 0xc89efdaa54c0f20c7adf612882df0950f5a951637e0307cdcb4c672f298b8bc6, chainid, this.address)
+  return 0xd4a8ff90a402dc7d4fcbf60f5488291263c743ccff180e139f47d139cedfd5fe
+
+def tokensPerStEth(): # not payable
+  require ext_code.size(stETHAddress)
+  static call stETHAddress.getSharesByPooledEth(uint256 _ethAmount) with:
+          gas gas_remaining wei
+         args 10^18
+  if not ext_call.success:
+      revert with ext_call.return_data[0 len return_data.size]
+  require return_data.size >= 32
+  return ext_call.return_data[0]
+
+def stEthPerToken(): # not payable
+  require ext_code.size(stETHAddress)
+  static call stETHAddress.getPooledEthByShares(uint256 _sharesAmount) with:
+          gas gas_remaining wei
+         args 10^18
+  if not ext_call.success:
+      revert with ext_call.return_data[0 len return_data.size]
+  require return_data.size >= 32
+  return ext_call.return_data[0]
+
+def getWstETHByStETH(uint256 _stETHAmount): # not payable
+  require calldata.size - 4 >= 32
+  require ext_code.size(stETHAddress)
+  static call stETHAddress.getSharesByPooledEth(uint256 _ethAmount) with:
+          gas gas_remaining wei
+         args _stETHAmount
+  if not ext_call.success:
+      revert with ext_call.return_data[0 len return_data.size]
+  require return_data.size >= 32
+  return ext_call.return_data[0]
+
+def getStETHByWstETH(uint256 _wstETHAmount): # not payable
+  require calldata.size - 4 >= 32
+  require ext_code.size(stETHAddress)
+  static call stETHAddress.getPooledEthByShares(uint256 _sharesAmount) with:
+          gas gas_remaining wei
+         args _wstETHAmount
+  if not ext_call.success:
+      revert with ext_call.return_data[0 len return_data.size]
+  require return_data.size >= 32
+  return ext_call.return_data[0]
+
+def approve(address spender, uint256 amount): # not payable
+  require calldata.size - 4 >= 64
+  if not caller:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  36,
+                  0x7345524332303a20617070726f76652066726f6d20746865207a65726f20616464726573,
+                  mem[200 len 28]
+  if not spender:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  34,
+                  0x6445524332303a20617070726f766520746f20746865207a65726f20616464726573,
+                  mem[198 len 30]
+  allowance[caller][address(spender)] = amount
+  log Approval(
+        address owner=amount,
+        address spender=caller,
+        uint256 value=spender)
+  return 1
+
+def decreaseAllowance(address spender, uint256 subtractedValue): # not payable
+  require calldata.size - 4 >= 64
+  if subtractedValue > allowance[caller][address(spender)]:
+      revert with 0, 
+                  32,
+                  37,
+                  0x7345524332303a2064656372656173656420616c6c6f77616e63652062656c6f77207a6572,
+                  mem[165 len 27],
+                  mem[219 len 5]
+  if not caller:
+      revert with 0, 32, 36, 0x7345524332303a20617070726f76652066726f6d20746865207a65726f20616464726573, mem[296 len 28]
+  if not spender:
+      revert with 0, 32, 34, 0x6445524332303a20617070726f766520746f20746865207a65726f20616464726573, mem[294 len 30]
+  allowance[caller][address(spender)] -= subtractedValue
+  log Approval(
+        address owner=(allowance[caller][address(spender)] - subtractedValue),
+        address spender=caller,
+        uint256 value=spender)
+  return 1
+
+def increaseAllowance(address spender, uint256 addedValue): # not payable
+  require calldata.size - 4 >= 64
+  if addedValue + allowance[caller][address(spender)] < allowance[caller][address(spender)]:
+      revert with 0, 'SafeMath: addition overflow'
+  if not caller:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  36,
+                  0x7345524332303a20617070726f76652066726f6d20746865207a65726f20616464726573,
+                  mem[200 len 28]
+  if not spender:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  34,
+                  0x6445524332303a20617070726f766520746f20746865207a65726f20616464726573,
+                  mem[198 len 30]
+  allowance[caller][address(spender)] += addedValue
+  log Approval(
+        address owner=(addedValue + allowance[caller][address(spender)]),
+        address spender=caller,
+        uint256 value=spender)
+  return 1
+
+def wrap(uint256 tokenId): # not payable
+  require calldata.size - 4 >= 32
+  if tokenId <= 0:
+      revert with 0, 'wstETH: can't wrap zero stETH'
+  require ext_code.size(stETHAddress)
+  static call stETHAddress.getSharesByPooledEth(uint256 _ethAmount) with:
+          gas gas_remaining wei
+         args tokenId
+  if not ext_call.success:
+      revert with ext_call.return_data[0 len return_data.size]
+  require return_data.size >= 32
+  if not caller:
+      revert with 0, 'ERC20: mint to the zero address'
+  if ext_call.return_data[0] + totalSupply < totalSupply:
+      revert with 0, 'SafeMath: addition overflow'
+  totalSupply += ext_call.return_data[0]
+  if ext_call.return_data[0] + balanceOf[caller] < balanceOf[caller]:
+      revert with 0, 'SafeMath: addition overflow'
+  balanceOf[caller] += ext_call.return_data[0]
+  log Transfer(
+        address from=ext_call.return_data[0],
+        address to=0,
+        uint256 value=caller)
+  require ext_code.size(stETHAddress)
+  call stETHAddress.transferFrom(address sender, address recipient, uint256 amount) with:
+       gas gas_remaining wei
+      args caller, this.address, tokenId
+  if not ext_call.success:
+      revert with ext_call.return_data[0 len return_data.size]
+  require return_data.size >= 32
+  return ext_call.return_data[0]
+
+def transfer(address recipient, uint256 amount): # not payable
+  require calldata.size - 4 >= 64
+  if not caller:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  37,
+                  0x7345524332303a207472616e736665722066726f6d20746865207a65726f20616464726573,
+                  mem[201 len 27]
+  if not recipient:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  35,
+                  0xfe45524332303a207472616e7366657220746f20746865207a65726f20616464726573,
+                  mem[199 len 29]
+  if amount > balanceOf[caller]:
+      revert with 0, 
+                  32,
+                  38,
+                  0x7345524332303a207472616e7366657220616d6f756e7420657863656564732062616c616e63,
+                  mem[166 len 26],
+                  mem[218 len 6]
+  balanceOf[caller] -= amount
+  if amount + balanceOf[recipient] < balanceOf[recipient]:
+      revert with 0, 'SafeMath: addition overflow'
+  balanceOf[address(recipient)] = amount + balanceOf[recipient]
+  log Transfer(
+        address from=amount,
+        address to=caller,
+        uint256 value=recipient)
+  return 1
+
+def unwrap(uint256 amount): # not payable
+  require calldata.size - 4 >= 32
+  if amount <= 0:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  38,
+                  0x657773744554483a207a65726f20616d6f756e7420756e77726170206e6f7420616c6c6f7765,
+                  mem[202 len 26]
+  require ext_code.size(stETHAddress)
+  static call stETHAddress.getPooledEthByShares(uint256 _sharesAmount) with:
+          gas gas_remaining wei
+         args amount
+  if not ext_call.success:
+      revert with ext_call.return_data[0 len return_data.size]
+  require return_data.size >= 32
+  if not caller:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  33,
+                  0x6545524332303a206275726e2066726f6d20746865207a65726f20616464726573,
+                  mem[197 len 31]
+  if amount > balanceOf[caller]:
+      revert with 0, 32, 34, 0x7345524332303a206275726e20616d6f756e7420657863656564732062616c616e63, mem[162 len 30], mem[222 len 2]
+  balanceOf[caller] -= amount
+  if amount > totalSupply:
+      revert with 0, 'SafeMath: subtraction overflow'
+  totalSupply -= amount
+  log Transfer(
+        address from=amount,
+        address to=caller,
+        uint256 value=0)
+  require ext_code.size(stETHAddress)
+  call stETHAddress.transfer(address recipient, uint256 amount) with:
+       gas gas_remaining wei
+      args caller, ext_call.return_data[0]
+  if not ext_call.success:
+      revert with ext_call.return_data[0 len return_data.size]
+  require return_data.size >= 32
+  return ext_call.return_data[0]
+
+def transferFrom(address sender, address recipient, uint256 amount): # not payable
+  require calldata.size - 4 >= 96
+  if not sender:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  37,
+                  0x7345524332303a207472616e736665722066726f6d20746865207a65726f20616464726573,
+                  mem[201 len 27]
+  if not recipient:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 
+                  32,
+                  35,
+                  0xfe45524332303a207472616e7366657220746f20746865207a65726f20616464726573,
+                  mem[199 len 29]
+  if amount > balanceOf[address(sender)]:
+      revert with 0, 
+                  32,
+                  38,
+                  0x7345524332303a207472616e7366657220616d6f756e7420657863656564732062616c616e63,
+                  mem[166 len 26],
+                  mem[218 len 6]
+  balanceOf[address(sender)] -= amount
+  if amount + balanceOf[recipient] < balanceOf[recipient]:
+      revert with 0, 'SafeMath: addition overflow'
+  balanceOf[address(recipient)] = amount + balanceOf[recipient]
+  log Transfer(
+        address from=amount,
+        address to=sender,
+        uint256 value=recipient)
+  if amount > allowance[address(sender)][caller]:
+      revert with 0, 
+                  32,
+                  40,
+                  0x6545524332303a207472616e7366657220616d6f756e74206578636565647320616c6c6f77616e63,
+                  mem[264 len 24],
+                  mem[312 len 8]
+  if not sender:
+      revert with 0, 32, 36, 0x7345524332303a20617070726f76652066726f6d20746865207a65726f20616464726573, mem[392 len 28]
+  if not caller:
+      revert with 0, 32, 34, 0x6445524332303a20617070726f766520746f20746865207a65726f20616464726573, mem[390 len 30]
+  allowance[address(sender)][caller] -= amount
+  log Approval(
+        address owner=(allowance[address(sender)][caller] - amount),
+        address spender=sender,
+        uint256 value=caller)
+  return 1
+
+def permit(address owner, address spender, uint256 value, uint256 deadline, uint8 v, bytes32 r, bytes32 s): # not payable
+  require calldata.size - 4 >= 224
+  if block.timestamp > deadline:
+      revert with 0, 'ERC20Permit: expired deadline'
+  if 1 != chainid:
+      if s > 0x7fffffffffffffffffffffffffffffff5d576e7357a4501ddfe92f46681b20a0:
+          revert with 0, 32, 34, 0x6545434453413a20696e76616c6964207369676e6174757265202773272076616c75, mem[712 len 30]
+      if v != 27:
+          if v != 28:
+              revert with 0, 32, 34, 0x6545434453413a20696e76616c6964207369676e6174757265202776272076616c75, mem[712 len 30]
+      signer = erecover(sha3(0, sha3(0x8b73c3c69bb8fe3d512ecc4cf759cc79239f7b179b0ffacaa9a75d522b39400f, 0xb6d02a790ca4952ed9faa11074863de95b4c8bc405a22873605ff97356993b36, 0xc89efdaa54c0f20c7adf612882df0950f5a951637e0307cdcb4c672f298b8bc6, chainid, this.address), sha3(0x6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9, address(owner), address(spender), value, nonces[address(owner)], deadline)), v << 248, r, s) # precompiled
+      if not erecover.result:
+          revert with ext_call.return_data[0 len return_data.size]
+      if not address(signer):
+          revert with 0, 'ECDSA: invalid signature'
+      if address(signer) != owner:
+          revert with 0, 'ERC20Permit: invalid signature'
+      nonces[address(owner)]++
+      if not owner:
+          revert with 0, 32, 36, 0x7345524332303a20617070726f76652066726f6d20746865207a65726f20616464726573, Mask(192, 0, s), mem[770 len 4]
+      if not spender:
+          revert with 0, 32, 34, 0x6445524332303a20617070726f766520746f20746865207a65726f20616464726573, Mask(208, 0, s), mem[770 len 4]
+  else:
+      if s > 0x7fffffffffffffffffffffffffffffff5d576e7357a4501ddfe92f46681b20a0:
+          revert with 0, 32, 34, 0x6545434453413a20696e76616c6964207369676e6174757265202773272076616c75, mem[520 len 30]
+      if v != 27:
+          if v != 28:
+              revert with 0, 32, 34, 0x6545434453413a20696e76616c6964207369676e6174757265202776272076616c75, mem[520 len 30]
+      signer = erecover(sha3(0, 0xd4a8ff90a402dc7d4fcbf60f5488291263c743ccff180e139f47d139cedfd5fe, sha3(0x6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9, address(owner), address(spender), value, nonces[address(owner)], deadline)), v << 248, r, s) # precompiled
+      if not erecover.result:
+          revert with ext_call.return_data[0 len return_data.size]
+      if not address(signer):
+          revert with 0, 'ECDSA: invalid signature'
+      if address(signer) != owner:
+          revert with 0, 'ERC20Permit: invalid signature'
+      nonces[address(owner)]++
+      if not owner:
+          revert with 0, 32, 36, 0x7345524332303a20617070726f76652066726f6d20746865207a65726f20616464726573, Mask(192, 0, s), mem[578 len 4]
+      if not spender:
+          revert with 0, 32, 34, 0x6445524332303a20617070726f766520746f20746865207a65726f20616464726573, Mask(208, 0, s), mem[578 len 4]
+  ('bool', ('param', 'spender'))
+  allowance[address(owner)][address(spender)] = value
+  log Approval(
+        address owner=value,
+        address spender=owner,
+        uint256 value=spender)
+
+

@@ -1,0 +1,333 @@
+# Palkeoramix decompiler. 
+
+const unknown0c900e90 = 8413939394 * 10^18
+const decimals = 18
+const marketingReserve = 8413939394 * 10^18
+const unknown638a35b6 = 10517424242 * 10^18
+const unknownb61d43b1 = 10517424242 * 10^18
+const liquidityReserve = 4206969697 * 10^18
+
+def storage:
+  owner is address at storage 0
+  balanceOf is mapping of uint256 at storage 1
+  allowance is mapping of uint256 at storage 2
+  totalSupply is uint256 at storage 3
+  stor4 is array of struct at storage 4
+  stor5 is array of struct at storage 5
+
+def totalSupply() payable: 
+  return totalSupply
+
+def balanceOf(address account) payable: 
+  require calldata.size - 4 >=′ 32
+  require account == account
+  return balanceOf[address(account)]
+
+def owner() payable: 
+  return owner
+
+def allowance(address owner, address spender) payable: 
+  require calldata.size - 4 >=′ 64
+  require owner == owner
+  require spender == spender
+  return allowance[address(owner)][address(spender)]
+
+#
+#  Regular functions
+#
+
+def _fallback(?) payable: # default function
+  revert
+
+def renounceOwnership() payable: 
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  owner = 0
+  log OwnershipTransferred(
+        address previousOwner=owner,
+        address newOwner=0)
+
+def transferOwnership(address newOwner) payable: 
+  require calldata.size - 4 >=′ 32
+  require newOwner == newOwner
+  if owner != caller:
+      revert with 0, 'Ownable: caller is not the owner'
+  if not newOwner:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'Ownable: new owner is the zero address'
+  owner = newOwner
+  log OwnershipTransferred(
+        address previousOwner=owner,
+        address newOwner=newOwner)
+
+def approve(address spender, uint256 amount) payable: 
+  require calldata.size - 4 >=′ 64
+  require spender == spender
+  require amount == amount
+  if not caller:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: approve from the zero address'
+  if not spender:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: approve to the zero address'
+  allowance[caller][address(spender)] = amount
+  log Approval(
+        address owner=amount,
+        address spender=caller,
+        uint256 value=spender)
+  return 1
+
+def burn(uint256 _value) payable: 
+  require calldata.size - 4 >=′ 32
+  require _value == _value
+  if not caller:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: burn from the zero address'
+  if balanceOf[caller] < _value:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: burn amount exceeds balance'
+  balanceOf[caller] -= _value
+  if totalSupply < _value:
+      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+  totalSupply -= _value
+  log Transfer(
+        address from=_value,
+        address to=caller,
+        uint256 value=0)
+
+def increaseAllowance(address spender, uint256 addedValue) payable: 
+  require calldata.size - 4 >=′ 64
+  require spender == spender
+  require addedValue == addedValue
+  if allowance[caller][address(spender)] > -addedValue - 1:
+      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+  if not caller:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: approve from the zero address'
+  if not spender:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: approve to the zero address'
+  allowance[caller][address(spender)] += addedValue
+  log Approval(
+        address owner=(allowance[caller][address(spender)] + addedValue),
+        address spender=caller,
+        uint256 value=spender)
+  return 1
+
+def decreaseAllowance(address spender, uint256 subtractedValue) payable: 
+  require calldata.size - 4 >=′ 64
+  require spender == spender
+  require subtractedValue == subtractedValue
+  if allowance[caller][address(spender)] < subtractedValue:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: decreased allowance below zero'
+  if not caller:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: approve from the zero address'
+  if not spender:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: approve to the zero address'
+  allowance[caller][address(spender)] -= subtractedValue
+  log Approval(
+        address owner=(allowance[caller][address(spender)] - subtractedValue),
+        address spender=caller,
+        uint256 value=spender)
+  return 1
+
+def transfer(address recipient, uint256 amount) payable: 
+  require calldata.size - 4 >=′ 64
+  require recipient == recipient
+  require amount == amount
+  if amount <= 0:
+      revert with 0, 'ERC20: transfer amount zero'
+  if not caller:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: transfer from the zero address'
+  if not recipient:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: transfer to the zero address'
+  if balanceOf[caller] < amount:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: transfer amount exceeds balance'
+  balanceOf[caller] -= amount
+  if balanceOf[address(recipient)] > -amount - 1:
+      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+  balanceOf[address(recipient)] += amount
+  log Transfer(
+        address from=amount,
+        address to=caller,
+        uint256 value=recipient)
+  return 1
+
+def transferFrom(address sender, address recipient, uint256 amount) payable: 
+  require calldata.size - 4 >=′ 96
+  require sender == sender
+  require recipient == recipient
+  require amount == amount
+  if amount <= 0:
+      revert with 0, 'ERC20: transfer amount zero'
+  if not sender:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: transfer from the zero address'
+  if not recipient:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: transfer to the zero address'
+  if balanceOf[address(sender)] < amount:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: transfer amount exceeds balance'
+  balanceOf[address(sender)] -= amount
+  if balanceOf[address(recipient)] > -amount - 1:
+      revert with Panic(17)  # If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
+  balanceOf[address(recipient)] += amount
+  log Transfer(
+        address from=amount,
+        address to=sender,
+        uint256 value=recipient)
+  if allowance[address(sender)][caller] < amount:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: transfer amount exceeds allowance'
+  if not sender:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: approve from the zero address'
+  if not caller:
+      revert with 0x8c379a000000000000000000000000000000000000000000000000000000000, 'ERC20: approve to the zero address'
+  allowance[address(sender)][caller] -= amount
+  log Approval(
+        address owner=(allowance[address(sender)][caller] - amount),
+        address spender=sender,
+        uint256 value=caller)
+  return 1
+
+def name() payable: 
+  if bool(stor4.length):
+      if bool(stor4.length) == stor4.length.field_1 < 32:
+          revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+      if bool(stor4.length):
+          if bool(stor4.length) == stor4.length.field_1 < 32:
+              revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+          if stor4.length.field_1:
+              if 31 < stor4.length.field_1:
+                  mem[128] = uint256(stor4.field_0)
+                  idx = 128
+                  s = 0
+                  while stor4.length.field_1 + 96 > idx:
+                      mem[idx + 32] = stor4[s].field_256
+                      idx = idx + 32
+                      s = s + 1
+                      continue 
+                  return Array(len=2 * Mask(256, -1, stor4.length.field_1), data=mem[128 len ceil32(stor4.length.field_1)])
+              mem[128] = 256 * stor4.length.field_8
+      else:
+          if bool(stor4.length) == stor4.length.field_1 < 32:
+              revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+          if stor4.length.field_1:
+              if 31 < stor4.length.field_1:
+                  mem[128] = uint256(stor4.field_0)
+                  idx = 128
+                  s = 0
+                  while stor4.length.field_1 + 96 > idx:
+                      mem[idx + 32] = stor4[s].field_256
+                      idx = idx + 32
+                      s = s + 1
+                      continue 
+                  return Array(len=2 * Mask(256, -1, stor4.length.field_1), data=mem[128 len ceil32(stor4.length.field_1)])
+              mem[128] = 256 * stor4.length.field_8
+      mem[ceil32(stor4.length.field_1) + 192 len ceil32(stor4.length.field_1)] = mem[128 len ceil32(stor4.length.field_1)]
+      if ceil32(stor4.length.field_1) > stor4.length.field_1:
+          mem[ceil32(stor4.length.field_1) + stor4.length.field_1 + 192] = 0
+      return Array(len=2 * Mask(256, -1, stor4.length.field_1), data=mem[128 len ceil32(stor4.length.field_1)], mem[(2 * ceil32(stor4.length.field_1)) + 192 len 2 * ceil32(stor4.length.field_1)]), 
+  if bool(stor4.length) == stor4.length.field_1 < 32:
+      revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+  if bool(stor4.length):
+      if bool(stor4.length) == stor4.length.field_1 < 32:
+          revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+      if stor4.length.field_1:
+          if 31 < stor4.length.field_1:
+              mem[128] = uint256(stor4.field_0)
+              idx = 128
+              s = 0
+              while stor4.length.field_1 + 96 > idx:
+                  mem[idx + 32] = stor4[s].field_256
+                  idx = idx + 32
+                  s = s + 1
+                  continue 
+              return Array(len=stor4.length % 128, data=mem[128 len ceil32(stor4.length.field_1)])
+          mem[128] = 256 * stor4.length.field_8
+  else:
+      if bool(stor4.length) == stor4.length.field_1 < 32:
+          revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+      if stor4.length.field_1:
+          if 31 < stor4.length.field_1:
+              mem[128] = uint256(stor4.field_0)
+              idx = 128
+              s = 0
+              while stor4.length.field_1 + 96 > idx:
+                  mem[idx + 32] = stor4[s].field_256
+                  idx = idx + 32
+                  s = s + 1
+                  continue 
+              return Array(len=stor4.length % 128, data=mem[128 len ceil32(stor4.length.field_1)])
+          mem[128] = 256 * stor4.length.field_8
+  mem[ceil32(stor4.length.field_1) + 192 len ceil32(stor4.length.field_1)] = mem[128 len ceil32(stor4.length.field_1)]
+  if ceil32(stor4.length.field_1) > stor4.length.field_1:
+      mem[ceil32(stor4.length.field_1) + stor4.length.field_1 + 192] = 0
+  return Array(len=stor4.length % 128, data=mem[128 len ceil32(stor4.length.field_1)], mem[(2 * ceil32(stor4.length.field_1)) + 192 len 2 * ceil32(stor4.length.field_1)]), 
+
+def symbol() payable: 
+  if bool(stor5.length):
+      if bool(stor5.length) == stor5.length.field_1 < 32:
+          revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+      if bool(stor5.length):
+          if bool(stor5.length) == stor5.length.field_1 < 32:
+              revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+          if stor5.length.field_1:
+              if 31 < stor5.length.field_1:
+                  mem[128] = uint256(stor5.field_0)
+                  idx = 128
+                  s = 0
+                  while stor5.length.field_1 + 96 > idx:
+                      mem[idx + 32] = stor5[s].field_256
+                      idx = idx + 32
+                      s = s + 1
+                      continue 
+                  return Array(len=2 * Mask(256, -1, stor5.length.field_1), data=mem[128 len ceil32(stor5.length.field_1)])
+              mem[128] = 256 * stor5.length.field_8
+      else:
+          if bool(stor5.length) == stor5.length.field_1 < 32:
+              revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+          if stor5.length.field_1:
+              if 31 < stor5.length.field_1:
+                  mem[128] = uint256(stor5.field_0)
+                  idx = 128
+                  s = 0
+                  while stor5.length.field_1 + 96 > idx:
+                      mem[idx + 32] = stor5[s].field_256
+                      idx = idx + 32
+                      s = s + 1
+                      continue 
+                  return Array(len=2 * Mask(256, -1, stor5.length.field_1), data=mem[128 len ceil32(stor5.length.field_1)])
+              mem[128] = 256 * stor5.length.field_8
+      mem[ceil32(stor5.length.field_1) + 192 len ceil32(stor5.length.field_1)] = mem[128 len ceil32(stor5.length.field_1)]
+      if ceil32(stor5.length.field_1) > stor5.length.field_1:
+          mem[ceil32(stor5.length.field_1) + stor5.length.field_1 + 192] = 0
+      return Array(len=2 * Mask(256, -1, stor5.length.field_1), data=mem[128 len ceil32(stor5.length.field_1)], mem[(2 * ceil32(stor5.length.field_1)) + 192 len 2 * ceil32(stor5.length.field_1)]), 
+  if bool(stor5.length) == stor5.length.field_1 < 32:
+      revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+  if bool(stor5.length):
+      if bool(stor5.length) == stor5.length.field_1 < 32:
+          revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+      if stor5.length.field_1:
+          if 31 < stor5.length.field_1:
+              mem[128] = uint256(stor5.field_0)
+              idx = 128
+              s = 0
+              while stor5.length.field_1 + 96 > idx:
+                  mem[idx + 32] = stor5[s].field_256
+                  idx = idx + 32
+                  s = s + 1
+                  continue 
+              return Array(len=stor5.length % 128, data=mem[128 len ceil32(stor5.length.field_1)])
+          mem[128] = 256 * stor5.length.field_8
+  else:
+      if bool(stor5.length) == stor5.length.field_1 < 32:
+          revert with Panic(34)  # If you access a storage byte array that is incorrectly encoded.
+      if stor5.length.field_1:
+          if 31 < stor5.length.field_1:
+              mem[128] = uint256(stor5.field_0)
+              idx = 128
+              s = 0
+              while stor5.length.field_1 + 96 > idx:
+                  mem[idx + 32] = stor5[s].field_256
+                  idx = idx + 32
+                  s = s + 1
+                  continue 
+              return Array(len=stor5.length % 128, data=mem[128 len ceil32(stor5.length.field_1)])
+          mem[128] = 256 * stor5.length.field_8
+  mem[ceil32(stor5.length.field_1) + 192 len ceil32(stor5.length.field_1)] = mem[128 len ceil32(stor5.length.field_1)]
+  if ceil32(stor5.length.field_1) > stor5.length.field_1:
+      mem[ceil32(stor5.length.field_1) + stor5.length.field_1 + 192] = 0
+  return Array(len=stor5.length % 128, data=mem[128 len ceil32(stor5.length.field_1)], mem[(2 * ceil32(stor5.length.field_1)) + 192 len 2 * ceil32(stor5.length.field_1)]), 
+
+
