@@ -5,7 +5,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..',
 
 import argparse
 import time
-from src.ethereum.abi_fetcher import get_contract_addresses, get_abi
+from src.ethereum.abi_fetcher import get_contract_addresses, get_contract_metadata, process_contract_metadata
 from src.database import get_db
 from src.database.crud import upsert_contract
 
@@ -26,13 +26,19 @@ def main():
             continue
         
         for addr in addresses:
-            abi = get_abi(addr)
-            if abi:
-                upsert_contract(db, {
-                    "address": addr.lower(),
-                    "abi": abi,
-                    "block_number": block_num
-                })
+            # 获取完整元数据
+            metadata = get_contract_metadata(addr)
+            if not metadata:
+                continue
+                
+            processed = process_contract_metadata(metadata)
+            
+            upsert_contract(db, {
+                "address": addr.lower(),
+                "block_number": block_num,
+                **processed  # 包含ABI和源代码等字段
+            })
+            
             time.sleep(0.2)
 
 if __name__ == "__main__":           

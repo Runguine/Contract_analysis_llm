@@ -8,6 +8,6 @@ class Contract(Base):
 
     address = Column(String(42), primary_key=True)
     abi = Column(JSON)
-    bytecode = Column(String)
+    contract_name = Column(String)
     block_number = Column(BigInteger)
-    created_at = Column(TIMESTAMP, server_default='NOW()')
+    source_code = Column(JSON)

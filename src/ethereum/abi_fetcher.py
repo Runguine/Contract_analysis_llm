@@ -41,16 +41,35 @@ def get_contract_addresses(block_number):
         print(f"获取区块合约地址时出错: {e}")
         return []  # 确保返回一个空列表
 
-def get_abi(address):
-    """获取合约ABI"""
-    url = f"https://api.etherscan.io/api?module=contract&action=getabi&address={address}&apikey={settings.ETHERSCAN_API_KEY}"
+def get_contract_metadata(address):
+    """获取合约元数据（包含ABI和源代码）"""
+    url = f"https://api.etherscan.io/api?module=contract&action=getsourcecode&address={address}&apikey={settings.ETHERSCAN_API_KEY}"
     try:
         response = requests.get(url)
         if response.status_code == 200:
-            response_json = response.json()
-            if response_json['status'] == '1' and response_json['message'] == 'OK':
-                return json.loads(response_json['result'])
-        return []
+            data = response.json()
+            if data['status'] == '1' and data['message'] == 'OK':
+                return data['result'][0]
+        return None
     except Exception as e:
-        print(f"获取ABI时出错 {contract_addresses}: {e}")
-        return []
+        print(f"获取合约元数据失败 {address}: {e}")
+        return None
+
+def process_contract_metadata(metadata):
+    """处理Etherscan返回的元数据"""
+    processed = {
+        'abi': json.loads(metadata.get('ABI', '[]')) if metadata.get('ABI') != 'Contract source code not verified' else [],
+        'source_code': metadata.get('SourceCode', ''),
+        'contract_name': metadata.get('ContractName', ''),
+    }
+    # 处理嵌套的源代码格式（Flattened和JSON格式）
+    if processed['source_code'].startswith('{{'):
+        try:
+            sources = json.loads(processed['source_code'][1:-1])  # 去除外部花括号
+            processed['source_code'] = "\n\n".join(
+                f"// File: {name}\n{content['content']}" if isinstance(content, dict) and 'content' in content else f"// File: {name}\n{content}"
+                for name, content in sources.get('sources', {}).items()
+            )
+        except json.JSONDecodeError:
+            pass
+    return processed

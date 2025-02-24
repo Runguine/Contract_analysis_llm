@@ -4,16 +4,24 @@ from .models import Contract
 from sqlalchemy import desc
 
 def upsert_contract(db: Session, contract_data: dict):
-    """插入或更新合约数据"""
+    """增强版插入/更新合约数据"""
     contract = db.query(Contract).filter(Contract.address == contract_data["address"]).first()
+    
+    update_data = {
+        'abi': contract_data.get('abi', []),
+        'source_code': contract_data.get('source_code', ''),
+        'contract_name': contract_data.get('contract_name', ''),
+        'address': contract_data.get('address', ''),
+        'block_number': contract_data.get('block_number', '')
+    }
+    
     if contract:
-        # 更新已有记录（如追加bytecode）
-        for key, value in contract_data.items():
+        for key, value in update_data.items():
             setattr(contract, key, value)
     else:
-        # 插入新记录
-        contract = Contract(**contract_data)
+        contract = Contract(**{**contract_data, **update_data})
         db.add(contract)
+    
     db.commit()
     return contract
 
@@ -53,3 +61,17 @@ def get_latest_two_contract_abis(db: Session):
         .all()  # 获取所有符合条件的记录
     )
     return [contract.abi for contract in contracts if contract.abi]  # 返回所有非空的 ABI
+
+def get_limit_contracts_source_code(db: Session):
+    """
+    查询数据库中最新创建的两条合约记录，并返回它们的 ABI
+    :param db: 数据库会话
+    :return: 包含最新两条合约 ABI 的列表（JSON 格式），如果未找到则返回空列表
+    """
+    contracts = (
+        db.query(Contract)
+        .order_by(desc(Contract.created_at))  # 按创建时间降序排列
+        .limit(1)  # 限制查询结果为最新的两条记录
+        .all()  # 获取所有符合条件的记录
+    )
+    return contracts  # 返回所有非空的 ABI
