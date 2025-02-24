@@ -9,7 +9,7 @@ def upsert_contract(db: Session, contract_data: dict):
     
     update_data = {
         'abi': contract_data.get('abi', []),
-        'source_code': contract_data.get('source_code', ''),
+        'source_code': contract_data.get('source_code', []),
         'contract_name': contract_data.get('contract_name', ''),
         'address': contract_data.get('address', ''),
         'block_number': contract_data.get('block_number', '')
@@ -56,7 +56,7 @@ def get_latest_two_contract_abis(db: Session):
     """
     contracts = (
         db.query(Contract)
-        .order_by(desc(Contract.created_at))  # 按创建时间降序排列
+        # .order_by(desc(Contract.created_at))  # 按创建时间降序排列
         .limit(1)  # 限制查询结果为最新的两条记录
         .all()  # 获取所有符合条件的记录
     )
@@ -70,8 +70,10 @@ def get_limit_contracts_source_code(db: Session):
     """
     contracts = (
         db.query(Contract)
-        .order_by(desc(Contract.created_at))  # 按创建时间降序排列
-        .limit(1)  # 限制查询结果为最新的两条记录
+        # .order_by(desc(Contract.created_at))  # 按创建时间降序排列
+        .limit(530)  # 限制查询结果为最新的两条记录
         .all()  # 获取所有符合条件的记录
     )
-    return contracts  # 返回所有非空的 ABI
+    # 将每个 Contract 对象转换为字典
+    contracts_dict = [contract.__dict__ for contract in contracts]
+    return contracts_dict  # 返回所有非空的 ABI

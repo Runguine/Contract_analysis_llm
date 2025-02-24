@@ -68,8 +68,9 @@ def process_contract_metadata(metadata):
             sources = json.loads(processed['source_code'][1:-1])  # 去除外部花括号
             processed['source_code'] = "\n\n".join(
                 f"// File: {name}\n{content['content']}" if isinstance(content, dict) and 'content' in content else f"// File: {name}\n{content}"
-                for name, content in sources.get('sources', {}).items()
+                for name, content in sources.items()
             )
+            #print(processed['source_code'])
         except json.JSONDecodeError:
             pass
     return processed

@@ -11,3 +11,4 @@ class Contract(Base):
     contract_name = Column(String)
     block_number = Column(BigInteger)
     source_code = Column(JSON)
+    bytecode = Column(String)

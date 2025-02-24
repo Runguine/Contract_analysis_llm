@@ -4,9 +4,8 @@
 
 import sys
 import os
-import json  # 导入 json 模块
+import json
 
-# sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
 
 from src.database import get_db
@@ -16,14 +15,16 @@ from config.settings import settings
 
 db = next(get_db())
 # 获取 abis，转换为 JSON 格式
-abis = get_latest_two_contract_abis(db)
-abis_json = json.dumps(abis)
-abis_object = json.loads(abis_json)
-
-print(len(abis_object))
-
-for abi in abis_object:
-    print(abi)
+abis = get_limit_contracts_source_code(db)
+i = 0
+for abi in abis:
+    source_code = abi['source_code']
+    address = abi['address']
+    bytecode = abi['bytecode']
+    if source_code is not None:
+        i = i + 1
+    
+print(i)
 
 # PROMPT = settings.PROMPT
 

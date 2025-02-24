@@ -32,14 +32,15 @@ def main():
                 continue
                 
             processed = process_contract_metadata(metadata)
-            
-            upsert_contract(db, {
+            contract_data = {
                 "address": addr.lower(),
                 "block_number": block_num,
                 **processed  # 包含ABI和源代码等字段
-            })
-            
-            time.sleep(0.2)
+            }
+            #print(contract_data.get('address', ''))
+            #print(contract_data.get('source_code', []))
+            upsert_contract(db, contract_data)
+            time.sleep(0.25)
 
 if __name__ == "__main__":           
     main()
